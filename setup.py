@@ -27,6 +27,7 @@ setup(
     name='teamplify',
     version=teamplify_runner.__version__,
     description='Teamplify on-premise runner',
+    long_description=open('README.rst').read(),
     author='Teamplify',
     author_email='support@teamplify.com',
     url='https://github.com/teamplify/teamplify-runner/',

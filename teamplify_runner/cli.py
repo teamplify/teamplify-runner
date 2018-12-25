@@ -43,7 +43,7 @@ def _start(env):
             'probably OK if you only need to run a demo on your local machine. '
             'However, in this mode it will not be available to anyone from the '
             'network. If you\'d like to make it available on the network, you '
-            'should a provide publicly visible domain name that points to this '
+            'should provide a publicly visible domain name that points to this '
             'server. To specify a domain name for Teamplify please run:\n'
             ' -> teamplify configure'
         )

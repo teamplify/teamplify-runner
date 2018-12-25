@@ -4,8 +4,8 @@ from datetime import datetime
 
 import click
 
-from teamplify_runner.configurator import BASE_DIR, Configurator, \
-    ConfigurationError
+from teamplify_runner.configurator import BASE_DIR, ConfigurationError, \
+    Configurator
 from teamplify_runner.utils import cd, run
 
 
@@ -96,7 +96,8 @@ def _backup(env, filename=None):
             host='localhost',
             db=env['DB_NAME'],
             filename=os.path.join('/backup', default_filename),
-    ))
+        )
+    )
     click.echo('Making backup of Teamplify DB to:\n -> %s' % target_file)
     click.echo('Please wait...')
     try:
@@ -126,7 +127,8 @@ def _restore(env, filename):
             '-e "%s"'.format(
                 user=env['DB_USER'],
                 password=env['DB_PASSWORD'],
-        ))
+            )
+        )
         click.echo('Dropping and re-creating the DB...')
         run(sql % ('drop database %s' % env['DB_NAME']))
         run(sql % ('create database %s' % env['DB_NAME']))

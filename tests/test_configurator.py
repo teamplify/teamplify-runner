@@ -2,7 +2,7 @@ import os
 
 from pytest import fail
 
-from teamplify_runner.configurator import Configurator, ConfigurationError
+from teamplify_runner.configurator import ConfigurationError, Configurator
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

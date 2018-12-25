@@ -22,7 +22,6 @@ def get_requirements(extra=None):
         ]
 
 
-
 setup(
     name='teamplify',
     version=teamplify_runner.__version__,

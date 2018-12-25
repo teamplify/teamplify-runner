@@ -35,7 +35,6 @@ class ConfigurationError(Exception):
         return self.messages[0]
 
 
-
 def validate_hostname(hostname):
     try:
         socket.gethostbyname(hostname)
@@ -223,4 +222,3 @@ class Configurator:
                 validate_port(value)
             elif option == 'address_from':
                 validate_email(value)
-

@@ -82,7 +82,7 @@ class Configurator:
     defaults = OrderedDict(
         web=OrderedDict(
             host='localhost',
-            port=8280,
+            port=8228,
             use_ssl='no',
         ),
         db=OrderedDict(

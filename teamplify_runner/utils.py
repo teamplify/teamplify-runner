@@ -25,7 +25,7 @@ def run(cmd, raise_on_error=True, **kwargs):
         cmd,
         stdout=sarge.Capture(),
         stderr=sarge.Capture(),
-        **kwargs,
+        **kwargs
     )
     stdout = result.stdout.read()
     stderr = result.stderr.read()
@@ -46,5 +46,5 @@ def random_string(length):
     # Use /dev/urandom, see https://stackoverflow.com/a/23728630
     choice = random.SystemRandom().choice
     return ''.join(
-        choice(string.ascii_letters + string.digits) for _ in range(length),
+        choice(string.ascii_letters + string.digits) for _ in range(length)
     )

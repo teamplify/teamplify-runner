@@ -62,7 +62,7 @@ validate_port = partial(validate_integer, min=0, max=65535)
 
 
 def validate_boolean(value):
-    if value.lower() not in ('yes', 'no', 'true', 'false', '0', '1'):
+    if value.lower() not in ('yes', 'no', 'y', 'n', 'true', 'false', '0', '1'):
         raise ConfigurationError(
             'Must be yes or no, or true / false, or 1 / 0. '
             'You provided: %s' % value,

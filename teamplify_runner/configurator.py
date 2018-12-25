@@ -79,32 +79,32 @@ def validate_email(value):
 
 
 class Configurator:
-    defaults = OrderedDict(
-        web=OrderedDict(
-            host='localhost',
-            port=8228,
-            use_ssl='no',
-        ),
-        db=OrderedDict(
-            host='builtin_db',
-            name='teamplify',
-            port=3306,
-            user='root',
-            password='teamplify',
-            backup_mount=os.path.join(BASE_DIR, 'backup'),
-        ),
-        email=OrderedDict(
-            address_from='Teamplify <support@teamplify.com>',
-            smtp_host='builtin_smtp',
-            smtp_protocol='plain',
-            smtp_port=25,
-            smtp_user='',
-            smtp_password='',
-        ),
-        crypto=OrderedDict(
-            signing_key=random_string(50),
-        ),
-    )
+    defaults = OrderedDict((
+        ('web', OrderedDict((
+            ('host', 'localhost'),
+            ('port', 8228),
+            ('use_ssl', 'no'),
+        ))),
+        ('db', OrderedDict((
+            ('host', 'builtin_db'),
+            ('name', 'teamplify'),
+            ('port', 3306),
+            ('user', 'root'),
+            ('password', 'teamplify'),
+            ('backup_mount', os.path.join(BASE_DIR, 'backup')),
+        ))),
+        ('email', OrderedDict((
+            ('address_from', 'Teamplify <support@teamplify.com>'),
+            ('smtp_host', 'builtin_smtp'),
+            ('smtp_protocol', 'plain'),
+            ('smtp_port', 25),
+            ('smtp_user', ''),
+            ('smtp_password', ''),
+        ))),
+        ('crypto', OrderedDict((
+            ('signing_key', random_string(50)),
+        ))),
+    ))
     default_config_locations = [
         os.environ.get('TEAMPLIFY_CONF', ''),
         os.path.expanduser('~/.teamplify.ini'),

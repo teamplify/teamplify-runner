@@ -8,13 +8,18 @@ from teamplify_runner.configurator import ConfigurationError, Configurator
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
-def test_default_configuration_is_valid():
+def test_default_configuration_is_valid_except_product_key():
+    expected_errors = [
+        '[main] product_key: Product key is missing',
+    ]
     configuration = Configurator().dumps()
     assert configuration.startswith('[')
     try:
         Configurator().loads(configuration).validate()
-    except ConfigurationError:
-        fail('Default configuration must be valid')
+    except ConfigurationError as e:
+        assert e.messages == expected_errors
+    else:
+        fail('Default configuration must fail on product key')
 
 
 def test_valid_configurations():
@@ -33,6 +38,7 @@ def test_valid_configurations():
 def test_deeply_invalid_configuration():
     invalid_config = os.path.join(BASE_DIR, 'conf_sample_invalid.ini')
     expected_errors = [
+        '[main] product_key: Invalid product key: 42',
         '[web] port: Must be an integer. You provided: gav',
         '[web] use_ssl: Must be yes or no, or true / false, or 1 / 0. '
         'You provided: not sure',

@@ -77,8 +77,18 @@ def validate_email(value):
         raise ConfigurationError('Invalid email: %s' % value)
 
 
+def validate_product_key(value):
+    if not value:
+        raise ConfigurationError('Product key is missing')
+    if not re.match('^svr_[A-Za-z0-9]{16}-[A-Za-z0-9]{20}$', value):
+        raise ConfigurationError('Invalid product key: %s' % value)
+
+
 class Configurator:
     defaults = OrderedDict((
+        ('main', OrderedDict((
+            ('product_key', ''),
+        ))),
         ('web', OrderedDict((
             ('host', 'localhost'),
             ('port', 8228),
@@ -187,7 +197,10 @@ class Configurator:
             raise ConfigurationError('Unknown option')
 
         value = self.parser.get(section, option)
-        if section == 'web':
+        if section == 'main':
+            if option == 'product_key':
+                validate_product_key(value)
+        elif section == 'web':
             if option == 'host':
                 validate_hostname(value)
             elif option == 'port':

@@ -155,14 +155,15 @@ def cli(ctx, config):
     config = Configurator(config).load()
     if config.config_path:
         click.echo('Using configuration file at %s' % config.config_path)
-    try:
-        config.validate()
-    except ConfigurationError as e:
-        title = 'Configuration problem'
-        title += ' - ' if len(e.messages) > 1 else ':\n -> '
-        click.echo('%s%s' % (title, str(e)), err=True)
-        click.echo('Command aborted.', err=True)
-        exit(1)
+    if ctx.invoked_subcommand != 'configure':
+        try:
+            config.validate()
+        except ConfigurationError as e:
+            title = 'Configuration problem'
+            title += ' - ' if len(e.messages) > 1 else ':\n -> '
+            click.echo('%s%s' % (title, str(e)), err=True)
+            click.echo('Command aborted.', err=True)
+            exit(1)
     ctx.obj['config'] = config
 
 
@@ -173,7 +174,7 @@ def configure(ctx):
     Interactive configuration wizard
     """
     config = ctx.obj['config']
-    config.dump()
+    config.remove_unknown().dump()
     click.echo('Current configuration saved to:\n -> %s' % config.config_path)
     click.echo(
         '\nThe file above contains the full list of configurable options. '

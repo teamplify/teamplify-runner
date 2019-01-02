@@ -235,3 +235,19 @@ class Configurator:
                 validate_port(value)
             elif option == 'address_from':
                 validate_email(value)
+
+    def remove_unknown(self):
+        unknown_sections = []
+        for section in self.parser.sections():
+            if section not in self.defaults:
+                unknown_sections.append(section)
+                continue
+            unknown_options = []
+            for option in self.parser.options(section):
+                if option not in self.defaults[section]:
+                    unknown_options.append(option)
+            for option in unknown_options:
+                self.parser.remove_option(section, option)
+        for section in unknown_sections:
+            self.parser.remove_section(section)
+        return self

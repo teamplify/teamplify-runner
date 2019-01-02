@@ -55,6 +55,7 @@ services:
     volumes:
       - repos:/repos/
     environment:
+      - MAIN_PRODUCT_KEY
       - WEB_HOST
       - WEB_PORT
       - DB_HOST
@@ -85,6 +86,7 @@ services:
       - repos:/repos/
     environment:
       - C_FORCE_ROOT=1
+      - MAIN_PRODUCT_KEY
       - WEB_HOST
       - WEB_PORT
       - DB_HOST
@@ -115,6 +117,7 @@ services:
       - repos:/repos/
     environment:
       - C_FORCE_ROOT=1
+      - MAIN_PRODUCT_KEY
       - WEB_HOST
       - WEB_PORT
       - DB_HOST
@@ -142,6 +145,7 @@ services:
     volumes:
       - repos:/repos/
     environment:
+      - MAIN_PRODUCT_KEY
       - WEB_HOST
       - WEB_PORT
       - DB_HOST

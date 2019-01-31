@@ -19,7 +19,6 @@ send you an update once it's ready.
 
 
 * `About`_
-* `Quickstart`_
 * `System requirements`_
 * `Installation`_
 * `Configuration`_
@@ -39,51 +38,6 @@ development team that helps you to track the work progress and automatically
 notify the team about situations that may require their attention. It is
 available in two deployment options: `in the cloud <https://teamplify.com>`_ or
 on-premise. This package is the installer for the on-premise version.
-
-
-Quickstart
-----------
-
-The detailed installation and configuration instructions are listed below, but
-if you prefer a quick step-by-step guide, here you go:
-
-1. On-premise installation requires a product key. Please email us at
-   `support@teamplify.com <mailto:support@teamplify.com>`_ to get your product
-   key;
-
-2. Make sure that you have Docker v1.13+, and Python 3.4+ installed, and then
-   install Teamplify runner via pip:
-
-.. code:: shell
-
-    $ pip3 install teamplify
-
-3. You would need a configuration file. The following command would create an
-   initial configuration file with default settings:
-
-.. code:: shell
-
-    $ teamplify configure
-
-The configuration file would be saved to ``~/.teamplify.ini``. Open it with a
-text editor and fill in the following values: ``product_key`` - the product key
-that you've got on step 1; ``host`` and ``port`` in ``[web]`` section - the
-domain name and port on which Teamplify should be running. The domain name must
-be created in advance and pointing to this server.
-
-4. Start the service using:
-
-.. code:: shell
-
-    $ teamplify start
-
-What's it! It should be up and running in a few minutes. Open the browser
-printed at the end of ``teamplify start`` output, and it would guide you through
-the rest of the configuration.
-
-If you experience any problems, please check the `Troubleshooting`_ section. If
-it works fine, we recommend to check the `Upgrades`_ and `Backup and restore`_
-sections.
 
 
 System requirements
@@ -137,10 +91,10 @@ configuration file with the following command:
 
 This would create a configuration file with default settings in your home
 directory: ``~/.teamplify.ini``. Now, please use your favorite text editor and
-adjust the contents of this file. You can leave the most of the settings with
-their default values; however, you need to specify at least the following three:
-``product_key`` in the ``[main]`` section, and ``host`` and ``port`` in the
-``[web]`` section.
+adjust the contents of this file. You need to specify at least the following
+three settings: ``product_key`` in the ``[main]`` section, and ``host`` and
+``port`` in the ``[web]`` section. Others are optional and can stay with their
+default values.
 
 All configuration options explained:
 

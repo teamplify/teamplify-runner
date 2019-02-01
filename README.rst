@@ -301,7 +301,7 @@ Create a file named ``teamplify-maintenance.sh`` with the following contents:
         teamplify backup $BACKUP_LOCATION && \
         teamplify upgrade
 
-    # Remove old backups:
+    # If the upgrade was successful, clean up old backups:
     if [ $? -eq 0 ]; then
       find $BACKUP_LOCATION -type f -mmin +$((60 * 24 * $BACKUP_STORE_DAYS)) \
           -name 'teamplify_*.sql.gz' -execdir rm -- '{}' \;

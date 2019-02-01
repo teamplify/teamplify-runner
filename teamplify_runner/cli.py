@@ -27,7 +27,11 @@ def _start(env):
     click.echo('Starting services...')
     run('mkdir -p %s' % env['DB_BACKUP_MOUNT'])
     with cd(BASE_DIR):
-        run('docker-compose up -d --remove-orphans', env=env)
+        run(
+            'docker-compose up -d --remove-orphans',
+            capture_output=False,
+            env=env,
+        )
     root_url = _root_url(env)
     click.echo(
         'Done. It may take a few moments for the app to come online at:\n'
@@ -52,7 +56,7 @@ def _start(env):
 def _stop(env):
     click.echo('Stopping services...')
     with cd(BASE_DIR):
-        run('docker-compose rm --stop --force', env=env)
+        run('docker-compose rm --stop --force', capture_output=False, env=env)
 
 
 def _running(env):

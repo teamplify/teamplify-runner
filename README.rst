@@ -84,43 +84,43 @@ Install the latest version of Teamplify runner with pip:
 Configuration
 -------------
 
-Teamplify requires a configuration file to run. You could create an initial
+Teamplify requires a configuration file to run. You can create an initial
 configuration file with the following command:
 
 .. code:: shell
 
   $ teamplify configure
 
-This would create a configuration file with default settings in your home
-directory: ``~/.teamplify.ini``. Now, please use your favorite text editor and
+This will create a configuration file with default settings in your home
+directory: ``~/.teamplify.ini``. Now, please use your favorite text editor to
 adjust the contents of this file. You need to specify at least the following
 three settings: ``product_key`` in the ``[main]`` section, and ``host`` and
-``port`` in the ``[web]`` section. Others are optional and can stay with their
-default values.
+``port`` in the ``[web]`` section. Other parameters are optional and can keep
+their default values.
 
 All configuration options explained:
 
 ``[main]``
 
-- ``product_key`` - product key of your installation, required. Please email us
-  at `support@teamplify.com <mailto:support@teamplify.com>`_ to get the product
-  key;
+- ``product_key`` - the product key of your installation. This is required.
+  Please email us at `support@teamplify.com <mailto:support@teamplify.com>`_ to
+  get the product key;
 
 ``[web]``
 
-- ``host`` - domain name on which Teamplify web interface would be running. It
+- ``host`` - domain name on which Teamplify web interface will be running. It
   must be created in advance and pointing to the server on which you have
   installed Teamplify;
-- ``port`` - port on which Teamplify web interface would be running;
-- ``use_ssl`` - the only supported value at the moment is ``no``. Built-in SSL
+- ``port`` - port on which Teamplify web interface will be running;
+- ``use_ssl`` - at the moment, ``no`` is the only supported value. Built-in SSL
   support will be available in future versions;
 
 ``[db]``
 
-- ``host`` - defaults to ``builtin_db``, which means use the DB instance that is
-  shipped with Teamplify. You can also switch to an external MySQL 5.7 database
-  by providing its hostname instead of ``builtin_db`` and specifying other DB
-  connection parameters below;
+- ``host`` - defaults to ``builtin_db``, which means using the DB instance that
+  is shipped with Teamplify. You can also switch to an external MySQL 5.7
+  database by providing its hostname instead of ``builtin_db`` and specifying
+  other DB connection parameters below;
 - ``name`` - the database name to use. Must be ``teamplify`` if ``builtin_db``
   is used;
 - ``port`` - the database port. Must be ``3306`` for ``builtin_db``;

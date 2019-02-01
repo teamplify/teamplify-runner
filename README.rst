@@ -36,8 +36,9 @@ About
 `Teamplify <https://teamplify.com>`_ is a personal assistant for your
 development team that helps you to track the work progress and automatically
 notify the team about situations that may require their attention. It is
-available in two deployment options: `in the cloud <https://teamplify.com>`_ or
-on-premise. This package is the installer for the on-premise version.
+available in two options: `in the cloud <https://teamplify.com>`_ or on-premise
+installation. This package is the installer and runner for the on-premise
+version.
 
 
 System requirements
@@ -48,8 +49,8 @@ deploy it on Mac OS X, and it should work too. Windows is not supported. Before
 you proceed to the installation, please make sure that your system has the
 following components installed:
 
-- Docker version 1.13 and above;
-- Python 3.4 and above.
+- `Docker version 1.13 and above <https://docs.docker.com/install/>`_;
+- `Python 3.4 and above <https://www.python.org/downloads/>`_.
 
 You can check to see if the required versions are installed with the following
 commands (shown with example output):
@@ -64,9 +65,9 @@ commands (shown with example output):
 In terms of hardware, we recommend 4GB of RAM, 2 CPU cores and 30 GB of disk
 space (SSD is strongly recommended) as a default server configuration. For most
 small-to-medium organizations (up to a few dozen people), this should be enough.
-Larger workloads, however, may need a more powerful server. The recommended
-strategy is to start from the default server configuration, and later tune it up
-or down basing on the workload.
+Larger workloads, however, may need more resources. The recommended strategy is
+to start with the default server configuration, and later tune it up or down
+basing on the workload.
 
 
 Installation
@@ -124,9 +125,9 @@ All configuration options explained:
 - ``port`` - the database port. Must be ``3306`` for ``builtin_db``;
 - ``user`` - DB user. Must be ``root`` for ``builtin_db``;
 - ``password`` - DB password. Must be ``teamplify`` for ``builtin_db``;
-- ``backup_mount`` - a directory on the server which would be mounted into the
-  built-in DB instance container. It is used as a temporary directory in the
-  process of making and restoring backups;
+- ``backup_mount`` - a path to a directory on the server which would be mounted
+  into the built-in DB instance container. It is used as a temporary directory
+  in the process of making and restoring backups;
 
 ``[email]``
 
@@ -198,11 +199,11 @@ After you created the configuration file, start Teamplify with:
     $ teamplify start
 
 During the first run, it may take a while before the application starts since
-it would need to download and configure a bunch of Docker images. When the
-command has finished working, open Teamplify in your browser using the ``host``
-and the ``port`` which you provided in ``[web]`` section of the configuration.
-After starting the service, it may take a few more moments before it finally
-comes online. If you have problems starting Teamplify, please see the
+it would need to download and configure a bunch of Docker images. Wait for the
+command to complete and open Teamplify in your browser using the ``host`` and
+the ``port`` which you provided in ``[web]`` section of the configuration. After
+starting the service, it may take a minute or two before it finally comes
+online. If you have problems starting Teamplify, please see the
 `Troubleshooting`_ section below.
 
 If you need to stop Teamplify, run:
@@ -277,7 +278,40 @@ for backups or restore that would connect to that database directly.
 Troubleshooting
 ---------------
 
-What could possibly go wrong:
+\- What could possibly go wrong?..
+
+
+Teamplify doesn't start
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Please check the following:
+
+* The service won't start if the configuration file is missing or contains
+  errors. In such case ``teamplify start`` command would report a problem,
+  please inspect its output;
+* There could be a problem with domain name configuration. If
+  ``teamplify start`` command has completed successfully, you should see
+  Teamplify interface in the browser when you open an address specified in
+  ``host`` and ``port`` parameters in ``[web]`` section of the `Configuration`_.
+  If that doesn't happen, i.e. browser says that it can't find the server or
+  the server is not responding, then most likely this is a problem with either
+  domain name or firewall configuration. Please make sure that the domain exists
+  and points to Teamplify server, and that the port is open in the firewall;
+* If you see "Teamplify is starting" message, you should give it a minute or
+  two to finally come online. If that doesn't happen after a few minutes, there
+  could be a problem during application start. Application logs may contain
+  additional information:
+
+.. code:: shell
+
+    $ docker logs teamplify_app
+
+Please let us know about the problem and attach the output from the command
+above. You can either
+`open an issue on Github <https://github.com/teamplify/teamplify-runner/issues>`_,
+or contact us at `support@teamplify.com <mailto:support@teamplify.com>`_, or
+use live chat on `teamplify.com <https://teamplify.com>`_.
+
 
 Email delivery issues
 ~~~~~~~~~~~~~~~~~~~~~
@@ -287,9 +321,9 @@ a demo version of Teamplify at your desktop at home, this is very likely to
 happen, since IPs of home internet providers have a large chance of being
 blacklisted in spam databases. We recommend that you check the following:
 
-* If you're going to use the built-in SMTP server, run Teamplify on a server
-  hosted in a data center or your office, not at home. Make sure that you've
-  added the IP of Teamplify server to
+* If you're going to use the built-in SMTP server, consider running Teamplify
+  on a server hosted in a data center or at your office, but not at home. Next,
+  please make sure that you've added the IP of Teamplify server to
   the `SPF record <http://www.openspf.org/SPF_Record_Syntax>`_ of the domain
   used in ``address_from`` setting in the configuration file;
 * Some email providers, for example, Google Mail, would explicitly reject emails
@@ -301,39 +335,8 @@ blacklisted in spam databases. We recommend that you check the following:
     $ docker logs teamplify_smtp
 
 * Alternatively, if you have another SMTP server which is already configured and
-  can reliably send emails, you can switch to it. See ``[email]`` section in
-  `Configuration`_ for details;
-
-
-Teamplify doesn't start
-~~~~~~~~~~~~~~~~~~~~~~~
-
-Please check the following:
-
-* Service wouldn't start if the configuration file is missing or contains
-  errors. In such case ``teamplify start`` command would report a problem,
-  please check its output;
-* There could be a problem with domain name configuration. If
-  ``teamplify start`` command has completed successfully, you should see
-  the "Teamplify is starting" message in the browser when you open an address
-  specified in ``host`` and ``port`` parameters in ``[web]`` section of the
-  `Configuration`_. If that doesn't happen, then most likely it is a problem
-  with either domain name or firewall configuration. Please make sure that the
-  domain exists and points to Teamplify server, and that the port is open in the
-  firewall.
-* If you see "Teamplify is starting" message, you should let it a minute or
-  two to finally come online. If that doesn't happen after a few minutes, there
-  could be a problem during application start. Check the logs with the following
-  command:
-
-.. code:: shell
-
-    $ docker logs teamplify_app
-
-Please let us know about the problem and attach the output from the command
-above. You can either
-`open an issue on Github <https://github.com/teamplify/teamplify-runner/issues>`_
-or contact us at `support@teamplify.com <mailto:support@teamplify.com>`_.
+  can reliably send emails, you can switch Teamplify to use it instead of
+  built-in SMTP. See ``[email]`` section in `Configuration`_ for details;
 
 
 Other
@@ -342,15 +345,15 @@ Other
 If you experience a problem that is not listed above, or the suggested solution
 doesn't work, please don't hesitate to
 `open an issue on Github <https://github.com/teamplify/teamplify-runner/issues>`_
-or contact us at `support@teamplify.com <mailto:support@teamplify.com>`_. We're
-ready to help!
+or contact us at `support@teamplify.com <mailto:support@teamplify.com>`_, or use
+our live chat on `teamplify.com <https://teamplify.com>`_. We're ready to help!
 
 
 License
 -------
 
 Teamplify runner is available under MIT license. Please note that MIT license
-applies to Teamplify runner only, but not to Teamplify itself. Docker images
-downloaded by Teamplify runner would contain a proprietary code which is not
-open source and is distributed under its
+applies to Teamplify runner only, but not to the main Teamplify product. Docker
+images downloaded by Teamplify runner would contain a proprietary code which is
+not open source and is distributed under its
 own `terms and conditions <http://teamplify.com/terms/>`_.

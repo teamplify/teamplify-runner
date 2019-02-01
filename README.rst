@@ -240,8 +240,8 @@ latest features and bugfixes. The upgrade process and consists of two steps:
 
     $ teamplify upgrade
 
-When a new version is downloaded, you should run ``teamplify restart`` to
-replace your current running version with a new one.
+The latter command would automatically detect if a new version was downloaded
+and would restart the service if necessary.
 
 
 Backup and restore

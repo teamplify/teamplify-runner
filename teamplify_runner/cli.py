@@ -55,6 +55,16 @@ def _stop(env):
         run('docker-compose rm --stop --force', env=env)
 
 
+def _running(env):
+    with cd(BASE_DIR):
+        output = run(
+            'docker-compose ps -q app',
+            suppress_output=True,
+            env=env,
+        ).stdout_lines
+    return bool(output)
+
+
 def _assert_builtin_db(env):
     db_host = env['DB_HOST']
     if db_host != Configurator.defaults['db']['host']:
@@ -248,16 +258,33 @@ def restore(ctx, filename, quiet):
     _restore(env, filename)
 
 
+def _image_id(name):
+    try:
+        return run(
+            'docker image ls -q --no-trunc %s' % name,
+            suppress_output=True,
+        ).stdout_lines[0]
+    except IndexError:
+        return None
+
+
 @cli.command()
 @click.pass_context
 def upgrade(ctx):
     """
     Upgrade to the latest version
     """
-    run('docker pull teamplify/server:latest')
     env = ctx.obj['config'].env()
-    _stop(env)
-    _start(env)
+    image_name = 'teamplify/server:latest'
+    if _running(env):
+        current_image = _image_id(image_name)
+        run('docker pull %s' % image_name, capture_output=False)
+        new_image = _image_id(image_name)
+        if current_image != new_image:
+            _stop(env)
+            _start(env)
+    else:
+        run('docker pull %s' % image_name)
 
 
 def main():

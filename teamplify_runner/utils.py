@@ -17,28 +17,29 @@ def cd(path):
         os.chdir(cwd)
 
 
-def run(cmd, raise_on_error=True, **kwargs):
+def run(cmd, raise_on_error=True, capture_output=True, suppress_output=False,
+        **kwargs):
     """
     Wrapper around sarge.run which can raise errors and capture stdout.
     """
-    result = sarge.run(
-        cmd,
-        stdout=sarge.Capture(),
-        stderr=sarge.Capture(),
-        **kwargs
-    )
-    stdout = result.stdout.read()
-    stderr = result.stderr.read()
-    if stdout:
-        click.echo(stdout)
-    if stderr:
-        click.echo(stderr, err=True)
+    if capture_output:
+        kwargs['stdout'] = sarge.Capture()
+        kwargs['stderr'] = sarge.Capture()
+    result = sarge.run(cmd, **kwargs)
     code = result.returncode
     if code and raise_on_error:
         raise RuntimeError('Command failed, exit code %s' % code)
-    result.stdout_lines = stdout.decode().split('\n')
-    if result.stdout_lines[-1] == '':
-        result.stdout_lines = result.stdout_lines[:-1]
+    if capture_output:
+        stdout = result.stdout.read()
+        result.stdout_lines = stdout.decode().split('\n')
+        if result.stdout_lines[-1] == '':
+            result.stdout_lines = result.stdout_lines[:-1]
+        if not suppress_output:
+            if stdout:
+                click.echo(stdout)
+            stderr = result.stderr.read()
+            if stderr:
+                click.echo(stderr, err=True)
     return result
 
 

@@ -280,7 +280,7 @@ Maintenance script
 ------------------
 
 Backing up the data and keeping the software up-to-date are routine operations
-and we recommend to have it automated. Below is the sample script which you
+and we recommend to have it automated. Below is a sample script which you
 can use for that.
 
 Create a file named ``teamplify-maintenance.sh`` with the following contents:
@@ -302,8 +302,10 @@ Create a file named ``teamplify-maintenance.sh`` with the following contents:
         teamplify upgrade
 
     # Remove old backups:
-    find $BACKUP_LOCATION -type f -mmin +$((60 * 24 * $BACKUP_STORE_DAYS)) \
-        -name 'teamplify_*.sql.gz' -execdir rm -- '{}' \;
+    if [ $? -eq 0 ]; then
+      find $BACKUP_LOCATION -type f -mmin +$((60 * 24 * $BACKUP_STORE_DAYS)) \
+          -name 'teamplify_*.sql.gz' -execdir rm -- '{}' \;
+    fi
 
 
     # The final step, which is optional, but recommended. Add your code that

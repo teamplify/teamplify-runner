@@ -26,6 +26,7 @@ send you an update once it's ready.
 * `Starting and stopping the service`_
 * `Upgrades`_
 * `Backup and restore`_
+* `Maintenance script`_
 * `Troubleshooting`_
 * `License`_
 
@@ -273,6 +274,68 @@ To restore the built-in Teamplify database from a gzipped backup, run:
 Please note that the commands above would work with the built-in database only.
 If you're running Teamplify with an external database, please use other tools
 for backups or restore that would connect to that database directly.
+
+
+Maintenance script
+------------------
+
+Backing up the data and keeping the software up-to-date are routine operations
+and we recommend to have it automated. Below is the sample script which you
+can use for that.
+
+Create a file named ``teamplify-maintenance.sh`` with the following contents:
+
+.. code:: shell
+
+    #!/usr/bin/env bash
+
+    # Backups directory:
+    BACKUP_LOCATION=/backups/teamplify/
+
+    # How many days should we store the backups:
+    BACKUP_STORE_DAYS=14
+
+    # Back up Teamplify DB and upgrade Teamplify:
+    mkdir -p $BACKUP_LOCATION && \
+        pip3 install -U teamplify && \
+        teamplify backup $BACKUP_LOCATION && \
+        teamplify upgrade
+
+    # Remove old backups:
+    find $BACKUP_LOCATION -type f -mmin +$((60 * 24 * $BACKUP_STORE_DAYS)) \
+        -name 'teamplify_*.sql.gz' -execdir rm -- '{}' \;
+
+
+    # The final step, which is optional, but recommended. Add your code that
+    # would sync contents of $BACKUP_LOCATION to a physically remote location.
+    #
+    #   ... add your backups sync code below:
+
+In the code above, please adjust the path for BACKUP_LOCATION and the value for
+BACKUP_STORE_DAYS as necessary. At the end of the script, you can add your code
+that would sync your backups to a remote location. This is optional, but a
+highly recommended step that would help you to recover in the case of a
+disaster. For example, you can use
+`aws s3 sync <https://docs.aws.amazon.com/cli/latest/reference/s3/sync.html>`_
+to upload the backups to AWS S3.
+
+When the maintenance script is ready, make it executable with
+``chmod +x teamplify-maintenance.sh`` and set it as a cron job to run daily.
+Open the crontab schedule:
+
+.. code:: shell
+
+    $ crontab -e
+
+Append the following entry (remember to replace the path to the script):
+
+.. code:: shell
+
+    0 3 * * * /path/to/the/script/teamplify-maintenance.sh
+
+In the example above, it is scheduled to run daily at 3 AM. See
+`cron syntax <https://en.wikipedia.org/wiki/Cron>`_ for a detailed explanation.
+When ready, save and close the file.
 
 
 Troubleshooting

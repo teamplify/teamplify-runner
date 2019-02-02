@@ -231,9 +231,9 @@ two steps:
 
 The latter command will automatically detect if a new version was downloaded 
 and will restart the service if necessary. Service restart causes a short
-service downtime, so ideally upgrades should be done in a period of low users
-traffic on the site. Teamplify `upgrade` command restarts the service only when
-necessary. If there was no upgrade downloaded, there will be no restart and
+downtime, so ideally upgrades should be done in periods of low users activity
+on the site. Teamplify `upgrade` command restarts the service only when
+necessary. If no upgrade was downloaded, there would be no restart and
 therefore no service interruption.
 
 

@@ -404,4 +404,4 @@ Teamplify runner is available under MIT license. Please note that MIT license
 applies to Teamplify runner only, but not to the main Teamplify product. Some 
 of Docker images downloaded by Teamplify runner will contain a proprietary code 
 that is not open source and is distributed under its own 
-[terms and conditions](http://teamplify.com/terms/).
+[terms and conditions](https://teamplify.com/terms/).

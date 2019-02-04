@@ -397,8 +397,11 @@ check the following:
 
 ### Other
 
-If you are experiencing a problem that is not listed above, or the suggested 
-solution doesn't work, don't hesitate to 
+For any issue with Teamplify, we recommend that you try to [upgrade](#upgrades) 
+first. We release updates frequently. It's quite possible that the problem that 
+you encountered is already addressed in a newer version.
+
+If the suggested solutions above don't work, please don't hesitate to 
 [open an issue on Github](https://github.com/teamplify/teamplify-runner/issues) 
 or contact us at [support@teamplify.com](mailto:support@teamplify.com). You can
 also use the live chat on [teamplify.com](https://teamplify.com). We're ready 

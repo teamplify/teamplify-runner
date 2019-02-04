@@ -56,6 +56,7 @@ services:
       - repos:/repos/
     environment:
       - MAIN_PRODUCT_KEY
+      - SEND_CRASH_REPORTS
       - WEB_HOST
       - WEB_PORT
       - DB_HOST
@@ -87,6 +88,7 @@ services:
     environment:
       - C_FORCE_ROOT=1
       - MAIN_PRODUCT_KEY
+      - SEND_CRASH_REPORTS
       - WEB_HOST
       - WEB_PORT
       - DB_HOST
@@ -118,6 +120,7 @@ services:
     environment:
       - C_FORCE_ROOT=1
       - MAIN_PRODUCT_KEY
+      - SEND_CRASH_REPORTS
       - WEB_HOST
       - WEB_PORT
       - DB_HOST
@@ -146,6 +149,7 @@ services:
       - repos:/repos/
     environment:
       - MAIN_PRODUCT_KEY
+      - SEND_CRASH_REPORTS
       - WEB_HOST
       - WEB_PORT
       - DB_HOST

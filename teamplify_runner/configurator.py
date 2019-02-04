@@ -88,6 +88,7 @@ class Configurator:
     defaults = OrderedDict((
         ('main', OrderedDict((
             ('product_key', ''),
+            ('send_crash_reports', 'yes'),
         ))),
         ('web', OrderedDict((
             ('host', 'localhost'),
@@ -200,6 +201,8 @@ class Configurator:
         if section == 'main':
             if option == 'product_key':
                 validate_product_key(value)
+            elif option == 'send_crash_reports':
+                validate_boolean(value)
         elif section == 'web':
             if option == 'host':
                 validate_hostname(value)

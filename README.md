@@ -97,6 +97,11 @@ All configuration options explained:
   Please email us at [support@teamplify.com](mailto:support@teamplify.com) to 
   get the product key;
 
+- `send_crash_reports` - possible values are `yes` or `no`, defaults to `yes`. 
+  When set to `yes` the system will automatically send application crash 
+  reports to the developer. We recommend to keep this option enabled, it helps
+  us to detect bugs faster and faster ship fixes for them;
+
 `[web]`
 
 - `host` - domain name on which Teamplify web interface will be running. It 

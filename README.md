@@ -128,17 +128,18 @@ All configuration options explained:
 
 `[email]`
 
-- `address_from` - email address used by Teamplify in FROM field of its email 
-  messages. It could be either a plain email address or an email address with 
-  a display name, like this: `Teamplify <teamplify@your-company-domain.com>`;
+- `address_from` - email address used by Teamplify in the FROM field of its 
+  email messages. It could be either a plain email address or an email address 
+  with a display name, like this: 
+  `Teamplify <teamplify@your-company-domain.com>`;
 - `smtp_host` - hostname of an SMTP server used to send emails. Defaults to 
   `builtin_smtp` which means using the SMTP server that is shipped with 
   Teamplify. Built-in SMTP for Teamplify is based on Postfix, and it is 
   production-ready. However, if you plan to use it, we strongly recommend that 
-  you add the address of Teamplify server to the 
+  you add the address of Teamplify's server to the 
   [SPF record](http://www.openspf.org/SPF_Record_Syntax) of the domain used 
-  in `address_from` setting, to prevent Teamplify emails from being marked as 
-  spam. Or, you can configure Teamplify to use an external SMTP server by 
+  in the `address_from` setting, to prevent Teamplify emails from being marked 
+  as spam. Or, you can configure Teamplify to use an external SMTP server by 
   providing its hostname instead of `builtin_smtp` and configuring other 
   SMTP connection settings below;
 - `smtp_protocol` - SMTP protocol to use. Can be `plain`, `ssl`, or `tls`. 
@@ -153,9 +154,9 @@ All configuration options explained:
 - `signing_key` - the random secret string used by Teamplify for signing 
   cookies and generating CSRF protection tokens. It is automatically generated 
   when you run `teamplify configure`, and typically you don't need to change 
-  it unless you think that it may be compromised. In such case replace it with 
-  another 50-characters random string made of Latin characters and numbers 
-  (please note that it would force all existing users to log in to the system 
+  it unless you think that it may be compromised. In such cases, replace it with 
+  another 50-character random string made of Latin characters and numbers 
+  (please note that this will force all existing users to log in to the system 
   again).
 
 
@@ -164,7 +165,7 @@ All configuration options explained:
 When you run `teamplify configure` it will create a configuration file at 
 `~/.teamplify.ini`. However, this is not the only possible location. Teamplify 
 will look in the following locations (listed in the order of their priority, 
-from the highest to the lowest):
+from highest to lowest):
 
 1. The location specified in the `--config` parameter in the command line. 
    Example:
@@ -185,7 +186,7 @@ from the highest to the lowest):
 
 # Starting and stopping the service
 
-After you created the configuration file, start Teamplify with:
+After you have created the configuration file, start Teamplify with:
 
 ``` shell
 $ teamplify start
@@ -194,7 +195,7 @@ $ teamplify start
 During the first run, it may take a while before the application starts since 
 it will have to download and configure a bunch of Docker images. Wait for the 
 command to complete and open Teamplify in your browser using the `host` and 
-the `port` which you provided in `[web]` section of the configuration. After 
+the `port` that you provided in the `[web]` section of the configuration. After 
 starting the service, it may take a minute or two before it finally comes 
 online. If you have problems starting Teamplify, please see the 
 [Troubleshooting](#troubleshooting) section below.
@@ -206,7 +207,7 @@ $ teamplify stop
 ```
 
 There's also a convenient command to stop the service and start it again. It 
-could be useful to apply the changes made to the configuration:
+could be useful for applying changes made to the configuration:
 
 ``` shell
 $ teamplify restart
@@ -215,12 +216,11 @@ $ teamplify restart
 
 # Upgrades
 
-Teamplify installation consists of Teamplify runner and Teamplify product 
-itself, which is shipped in the form of Docker images. We follow the concept 
-of rolling updates, releasing new versions of the product often (up to a few 
-times a week). We recommend that you use the most recent version to keep up 
-with the latest features and bugfixes. The upgrade process and consists of 
-two steps:
+Teamplify installation consists of the Teamplify runner and the Teamplify 
+product itself, which is shipped in the form of Docker images. We follow the 
+concept of rolling updates, and so we release updates often (up to a few times 
+a week). We recommend that you use the most recent version to keep up with the 
+latest features and bugfixes. The upgrade process consists of two steps:
 
 1. Upgrade Teamplify runner:
 
@@ -234,12 +234,12 @@ two steps:
    $ teamplify upgrade
    ```
 
-The latter command will automatically detect if a new version was downloaded 
-and will restart the service if necessary. Service restart causes a short
-downtime, so ideally upgrades should be done in periods of low users activity
-on the site. Teamplify `upgrade` command restarts the service only when
-necessary. If no upgrade was downloaded, there would be no restart and
-therefore no service interruption.
+The latter command will automatically detect if a new version has been 
+downloaded and will restart the service if necessary. A service restart causes 
+a short downtime, so ideally upgrades should be done in periods of low user 
+activity. The `upgrade` command restarts the service only when necessary. If no 
+upgrade has been downloaded, there will be no restart and therefore no service 
+interruption.
 
 
 # Backup and restore
@@ -257,8 +257,8 @@ $ teamplify backup [optional-backup-file-or-directory]
 If launched without parameters, it will make a gzipped backup of the DB and 
 store it in the current working directory under a name in the format
 `teamplify_<current-date>.sql.gz`, for example, 
-`teamplify_2019-01-31_06-58-57.sql.gz`. You can optionally specify a directory 
-or a path to a file where you'd like to save the backup.
+`teamplify_2019-01-31_06-58-57.sql.gz`. You have the option of specifying a 
+directory or path to the file where you'd like to save your backup.
 
 To restore the built-in Teamplify database from a gzipped backup, run:
 
@@ -267,15 +267,15 @@ $ teamplify restore <path-to-a-backup-file>
 ```
 
 Please note that the commands above will work with the built-in database only. 
-If you're running Teamplify with an external database, please use other tools 
-for backups or restore that would connect to that database directly.
+If you're running Teamplify with an external database, you'll need to use other 
+tools for backups or restores that connect to that database directly.
 
 
 # Maintenance script
 
 Backing up the data and keeping the software up-to-date are routine operations 
-and we recommend to have it automated. Below is a sample script which you can 
-use for that.
+and we recommend automating these processes. Below is a sample script you can 
+use to do so.
 
 Create a file named `teamplify-maintenance.sh` with the following contents:
 
@@ -285,7 +285,7 @@ Create a file named `teamplify-maintenance.sh` with the following contents:
 # Backups directory:
 BACKUP_LOCATION=/backups/teamplify/
 
-# How many days should we store the backups:
+# How many days should we store the backups for:
 BACKUP_STORE_DAYS=14
 
 # Back up Teamplify DB and upgrade Teamplify:
@@ -301,8 +301,8 @@ if [ $? -eq 0 ]; then
 fi
 
 
-# The final step, which is optional, but recommended. Add your code that
-# would sync contents of $BACKUP_LOCATION to a physically remote location.
+# The final step is optional but recommended. Add your code so that would 
+# sync contents of $BACKUP_LOCATION to a physically remote location.
 #
 #   ... add your backups sync code below:
 ```
@@ -310,8 +310,8 @@ fi
 In the code above, please adjust the path for BACKUP\_LOCATION and the value 
 for BACKUP\_STORE\_DAYS as necessary. At the end of the script, you can add 
 your code that would sync your backups to a remote location. This is optional, 
-but a highly recommended step that would help you to recover in the case of a 
-disaster. For example, you can use 
+but it's a highly recommended precaution that would help you to recover your 
+backup in the case of a disaster. For example, you can use 
 [aws s3 sync](https://docs.aws.amazon.com/cli/latest/reference/s3/sync.html) to
 upload the backups to AWS S3.
 
@@ -336,27 +336,28 @@ When ready, save and close the file.
 
 # Troubleshooting
 
-\- What could possibly go wrong?..
+So what could possibly go wrong?
 
 ### Teamplify doesn't start
 
 Please check the following:
 
 - The service won't start if the configuration file is missing or contains 
-  errors. In such case `teamplify start` command will report a problem, please 
-  inspect its output;
-- There could be a problem with domain name configuration. If `teamplify start` 
-  command has completed successfully, you should see Teamplify interface in the 
-  browser when you open an address specified in `host` and `port` parameters in 
-  `[web]` section of the [Configuration](#configuration). If that doesn't 
-  happen, i.e. browser says that it can't find the server or the server is not 
-  responding, then most likely this is a problem with either domain name or 
-  firewall configuration. Please make sure that the domain exists and points to 
+  errors. In such cases, the `teamplify start` command will report a problem. 
+  Please inspect its output;
+- There could be a problem with the domain name configuration. If the 
+  `teamplify start` command has completed successfully, you should see 
+  Teamplify's interface in the browser when you open an address specified in 
+  `host` and `port` parameters in the `[web]` section of the 
+  [Configuration](#configuration). If that doesn't happen, i.e. if browser says 
+  that it can't find the server or the server is not responding, then most 
+  likely this is a problem with either the domain name or firewall 
+  configuration. Please make sure that the domain exists and points to 
   Teamplify server, and that the port is open in the firewall;
-- If you see "Teamplify is starting" message, you should give it a minute or 
-  two to finally come online. If that doesn't happen after a few minutes, there 
-  could be a problem during application start. Application logs may contain 
-  additional information:
+- If you see the "Teamplify is starting" message, you should give it a minute 
+  or two to come online. If nothing happens after a few minutes, there could be 
+  a problem during application start. Application logs may contain additional 
+  information:
 
   ``` shell
   $ docker logs teamplify_app
@@ -366,12 +367,12 @@ Please check the following:
   above. You can either 
   [open an issue on Github](https://github.com/teamplify/teamplify-runner/issues), 
   or contact us at [support@teamplify.com](mailto:support@teamplify.com), or 
-  use live chat on [teamplify.com](https://teamplify.com).
+  use the live chat on [teamplify.com](https://teamplify.com).
 
 ### Email delivery issues
 
-Emails can go to spam or sometimes not being delivered at all. If you're
-running a demo version of Teamplify at your desktop at home, this is
+Emails can go to spam or sometimes aren't delivered at all. If you're
+running a demo version of Teamplify on your desktop at home, this is
 very likely to happen, since IPs of home internet providers have a large
 chance of being blacklisted in spam databases. We recommend that you
 check the following:
@@ -381,32 +382,33 @@ check the following:
   please make sure that you've added the IP of Teamplify server to the 
   [SPF record](http://www.openspf.org/SPF_Record_Syntax) of the domain used
   in `address_from` setting in the configuration file;
-- Some email providers, for example, Google Mail, would explicitly reject 
-  emails sent from blacklisted IPs. It might be helpful to examine SMTP server 
-  logs to see if that's the case that is happening:
+- Some email providers, for example, Google Mail, explicitly reject emails 
+  sent from blacklisted IPs. It might be helpful to examine SMTP server 
+  logs to see if that's what's happening:
 
   ``` shell
   $ docker logs teamplify_smtp
   ```
 
-- Alternatively, if you have another SMTP server which is already configured 
-  and can reliably send emails, you can switch Teamplify to use it instead of 
-  built-in SMTP. See `[email]` section in [Configuration](#configuration) for 
-  details;
+- Alternatively, if you have another SMTP server that is already configured 
+  and can reliably send emails, you can configure Teamplify to use this server 
+  instead of the built-in SMTP. See `[email]` section in 
+  [Configuration](#configuration) for details;
 
 ### Other
 
-If you experience a problem that is not listed above, or the suggested solution 
-doesn't work, please don't hesitate to 
+If you are experiencing a problem that is not listed above, or the suggested 
+solution doesn't work, don't hesitate to 
 [open an issue on Github](https://github.com/teamplify/teamplify-runner/issues) 
-or contact us at [support@teamplify.com](mailto:support@teamplify.com), or use 
-our live chat on [teamplify.com](https://teamplify.com). We're ready to help!
+or contact us at [support@teamplify.com](mailto:support@teamplify.com). You can
+also use the live chat on [teamplify.com](https://teamplify.com). We're ready 
+to help!
 
 
 # License
 
-Teamplify runner is available under MIT license. Please note that MIT license 
-applies to Teamplify runner only, but not to the main Teamplify product. Some 
-of Docker images downloaded by Teamplify runner will contain a proprietary code 
-that is not open source and is distributed under its own 
+Teamplify runner is available under the MIT license. Please note that the MIT 
+license applies to Teamplify runner only, but not to the main Teamplify product. 
+Some Docker images downloaded by Teamplify runner will contain a proprietary 
+code that is not open source and is distributed under its own 
 [terms and conditions](https://teamplify.com/terms/).

@@ -38,8 +38,9 @@ def _start(env):
         ' -> %s\n\n'
         'If it isn\'t available immediately, please check again after '
         'a minute or two. If you experience any problems with the '
-        'installation, please feel free to open an issue on Github:\n'
-        ' -> https://github.com/teamplify/teamplify-runner/issues' % root_url,
+        'installation, please check the Troubleshooting guide:\n'
+        ' -> https://github.com/teamplify/teamplify-runner/#troubleshooting'
+        '' % root_url,
     )
     if env['WEB_HOST'].lower() == 'localhost':
         click.echo(

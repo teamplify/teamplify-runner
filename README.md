@@ -5,10 +5,10 @@
 
 # WIP, NOT READY YET
 
-The planned release date of the on-premise version of Teamplify is 
-February 2019. If you see this message, it means that it's not ready yet and 
-that the installer will not work. If you're interested in trying on-premise 
-version of [Teamplify](https://teamplify.com), please drop us a line 
+The planned release date of the on-premise version of 
+[Teamplify](https://teamplify.com) is February 2019. If you see this message, 
+it means that it's not ready yet and that the installer will not work. If 
+you're interested in trying Teamplify on-premise, please drop us a line 
 at [support@teamplify.com](mailto:support@teamplify.com) and we'll be happy to 
 send you an update once it's ready.
 
@@ -30,16 +30,16 @@ send you an update once it's ready.
 # About
 
 [Teamplify](https://teamplify.com) is a personal assistant for your development 
-team that helps you to track the work progress and automatically notify the 
-team about situations that may require their attention. It is available in two 
-options: [in the cloud](https://teamplify.com) or on-premise installation. 
-This package is the installer and runner for the on-premise version.
+team that helps you track work progress and notify your team about situations 
+that may require their attention. It is available in two options: 
+[in the cloud](https://teamplify.com) or as on-premise installation. This 
+package is the installer and runner for the on-premise version.
 
 
 # System requirements
 
-Teamplify was designed to run on Linux. For demonstration purposes, you can 
-also deploy it on Mac OS X, and it should work too. Windows is not supported. 
+Teamplify was designed to run on Linux. It should also work if you wish to 
+deploy it on Mac OS X for demonstration purposes. Windows is not supported. 
 Before you proceed to the installation, please make sure that your system has 
 the following components installed:
 
@@ -60,8 +60,8 @@ In terms of hardware, we recommend 4GB of RAM, 2 CPU cores and 30 GB of disk
 space (SSD is strongly recommended) as a default server configuration. For most 
 small-to-medium organizations (up to a few dozen people), this should be 
 enough. Larger workloads, however, may need more resources. The recommended 
-strategy is to start with the default server configuration, and later scale it 
-up or down basing on the workload.
+strategy is to start with the default server configuration and scale up or 
+down depending on the workload.
 
 
 # Installation
@@ -84,10 +84,9 @@ $ teamplify configure
 
 This will create a configuration file with default settings in your home
 directory: `~/.teamplify.ini`. Now, please use your favorite text editor to 
-adjust the contents of this file. You need to specify at least the following 
-three settings: `product_key` in the `[main]` section, and `host` and `port` 
-in the `[web]` section. Other parameters are optional and can keep their 
-default values.
+adjust the contents of this file. You need to specify `product_key` in the 
+`[main]` section and `host` and `port` in the `[web]` section. Other parameters 
+are optional and can keep their default values.
 
 All configuration options explained:
 
@@ -97,10 +96,10 @@ All configuration options explained:
   Please email us at [support@teamplify.com](mailto:support@teamplify.com) to 
   get the product key;
 
-- `send_crash_reports` - possible values are `yes` or `no`, defaults to `yes`. 
+- `send_crash_reports` - possible values are `yes` and `no`, defaults to `yes`. 
   When set to `yes` the system will automatically send application crash 
-  reports to the developer. We recommend to keep this option enabled, it helps
-  us to detect bugs faster and faster ship fixes for them;
+  reports to the developer. We recommend keeping this option enabled as it 
+  helps us to detect bugs faster and faster ship fixes for them; 
 
 `[web]`
 
@@ -138,7 +137,7 @@ All configuration options explained:
   production-ready. However, if you plan to use it, we strongly recommend that 
   you add the address of Teamplify's server to the 
   [SPF record](http://www.openspf.org/SPF_Record_Syntax) of the domain used 
-  in the `address_from` setting, to prevent Teamplify emails from being marked 
+  in the `address_from` setting to prevent Teamplify emails from being marked 
   as spam. Or, you can configure Teamplify to use an external SMTP server by 
   providing its hostname instead of `builtin_smtp` and configuring other 
   SMTP connection settings below;

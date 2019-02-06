@@ -163,7 +163,7 @@ All configuration options explained:
 
 When you run `teamplify configure`, it will create a configuration file at 
 `~/.teamplify.ini`. However, this is not the only possible location. Teamplify 
-will look in the following locations (listed in the order of their priority, 
+will search the following locations (listed in the order of their priority, 
 from highest to lowest):
 
 1. The location specified in the `--config` parameter in the command line. 

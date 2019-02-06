@@ -32,7 +32,7 @@ send you an update once it's ready.
 [Teamplify](https://teamplify.com) is a personal assistant for your development 
 team that helps you track work progress and notify your team about situations 
 that may require their attention. It is available in two options: 
-[in the cloud](https://teamplify.com) or as on-premise installation. This 
+[in the cloud](https://teamplify.com) or as an on-premise installation. This 
 package is the installer and runner for the on-premise version.
 
 

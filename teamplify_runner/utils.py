@@ -20,7 +20,7 @@ def cd(path):
 def run(cmd, raise_on_error=True, capture_output=True, suppress_output=False,
         **kwargs):
     """
-    Wrapper around sarge.run which can raise errors and capture stdout.
+    Wrapper around sarge.run that can raise errors and capture stdout.
     """
     if capture_output:
         kwargs['stdout'] = sarge.Capture()

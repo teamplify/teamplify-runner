@@ -265,7 +265,7 @@ To restore the built-in Teamplify database from a gzipped backup, run:
 $ teamplify restore <path-to-a-backup-file>
 ```
 
-Please note that the commands above will work with the built-in database only. 
+Please note that the commands above will work with only a built-in database. 
 If you're running Teamplify with an external database, you'll need to use other 
 tools for backups or restores that connect to that database directly.
 

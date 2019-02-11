@@ -217,7 +217,7 @@ $ teamplify restart
 
 Teamplify installation consists of the Teamplify runner and the Teamplify 
 product itself, which is shipped in the form of Docker images. We follow the 
-concept of rolling updates, and so we release updates often (up to a few times 
+concept of rolling updates, so we release updates often (up to a few times 
 a week). We recommend that you use the most recent version to keep up with the 
 latest features and bugfixes. The upgrade process consists of two steps:
 

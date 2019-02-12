@@ -99,7 +99,7 @@ All configuration options explained:
 - `send_crash_reports` - possible values are `yes` and `no`, defaults to `yes`. 
   When set to `yes` the system will automatically send application crash 
   reports to the developer. We recommend keeping this option enabled as it 
-  helps us to detect bugs faster and faster ship fixes for them; 
+  helps us to detect bugs faster and ship fixes for them more quickly; 
 
 `[web]`
 
@@ -333,7 +333,7 @@ When ready, save and close the file.
 
 So what could possibly go wrong?
 
-### Teamplify wont't start
+### Teamplify won't start
 
 Please check the following:
 

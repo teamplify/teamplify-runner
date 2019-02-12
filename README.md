@@ -337,7 +337,7 @@ When ready, save and close the file.
 
 So what could possibly go wrong?
 
-### Teamplify doesn't start
+### Teamplify wont't start
 
 Please check the following:
 

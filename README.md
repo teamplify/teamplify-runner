@@ -308,11 +308,7 @@ fi
 
 In the code above, please adjust the path for BACKUP\_LOCATION and the value 
 for BACKUP\_STORE\_DAYS as necessary. At the end of the script, you can add 
-your own code that would sync your backups to a remote location. This is optional, 
-but it's a highly recommended precaution that would help you to recover your 
-backup in the case of a disaster. For example, you can use 
-[aws s3 sync](https://docs.aws.amazon.com/cli/latest/reference/s3/sync.html) to
-upload the backups to AWS S3.
+your own code that would sync your backups to a remote location. This is an optional but highly recommended precaution that would help you to recover your backup in the case of a disaster. For example, you can use aws s3 sync to upload the backups to AWS S3.
 
 When the maintenance script is ready, make it executable with 
 `chmod +x teamplify-maintenance.sh` and set it as a cron job to run daily. Open

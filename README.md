@@ -374,7 +374,7 @@ Emails can go to spam or sometimes aren't delivered at all. If you're
 running a demo version of Teamplify on your desktop at home, this is
 very likely to happen, since IPs of home internet providers have a large
 chance of being blacklisted in spam databases. We recommend that you
-check the following:
+try the following:
 
 - If you're going to use the built-in SMTP server, consider running Teamplify 
   on a server hosted in a data center or at your office, but not at home. Next, 

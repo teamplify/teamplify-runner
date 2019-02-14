@@ -20,7 +20,7 @@ send you an update once it's ready.
   - [Configuration](#configuration)
   - [Configuration file locations](#configuration-file-locations)
   - [Starting and stopping the service](#starting-and-stopping-the-service)
-  - [Upgrades](#upgrades)
+  - [Updates](#updates)
   - [Backup and restore](#backup-and-restore)
   - [Maintenance script](#maintenance-script)
   - [Troubleshooting](#troubleshooting)
@@ -213,31 +213,31 @@ $ teamplify restart
 ```
 
 
-# Upgrades
+# Updates
 
 Teamplify installation consists of the Teamplify runner and the Teamplify 
 product itself, which is shipped in the form of Docker images. We follow the 
 concept of rolling updates, so we release updates often (up to a few times 
 a week). We recommend that you use the most recent version to keep up with the 
-latest features and bugfixes. The upgrade process consists of two steps:
+latest features and bugfixes. The update process consists of two steps:
 
-1. Upgrade Teamplify runner:
+1. Update Teamplify runner:
 
    ``` shell
    $ pip3 install -U teamplify
    ```
 
-2. Upgrade Teamplify itself:
+2. Update Teamplify itself:
 
    ``` shell
-   $ teamplify upgrade
+   $ teamplify update
    ```
 
 The latter command will automatically detect if a new version has been 
 downloaded and will restart the service if necessary. A service restart causes 
-a short downtime, so ideally upgrades should be done in periods of low user 
-activity. The `upgrade` command restarts the service only when necessary. If no 
-upgrade has been downloaded, there will be no restart and therefore no service 
+a short downtime, so ideally updates should be done in periods of low user 
+activity. The `update` command restarts the service only when necessary. If no 
+update has been downloaded, there will be no restart and therefore no service 
 interruption.
 
 
@@ -396,9 +396,10 @@ try the following:
 
 ### Other
 
-For any issue with Teamplify, we recommend that you try to [upgrade](#upgrades) 
-first. We release updates frequently. It's quite possible that the problem that 
-you encountered is already addressed in a newer version.
+For any issue with Teamplify, we recommend that you try to 
+[check for updates](#updates) first. We release updates frequently. It's quite 
+possible that the problem that you encountered is already addressed in a newer 
+version.
 
 If the suggested solutions above don't work, please don't hesitate to 
 [open an issue on Github](https://github.com/teamplify/teamplify-runner/issues) 

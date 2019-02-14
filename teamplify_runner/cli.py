@@ -275,9 +275,9 @@ def _image_id(name):
 
 @cli.command()
 @click.pass_context
-def upgrade(ctx):
+def update(ctx):
     """
-    Upgrade to the latest version
+    Update to the latest version
     """
     env = ctx.obj['config'].env()
     image_name = 'teamplify/server:latest'

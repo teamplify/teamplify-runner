@@ -280,7 +280,7 @@ def update(ctx):
     Update to the latest version
     """
     env = ctx.obj['config'].env()
-    image_name = 'teamplify/server:latest'
+    image_name = 'teamplify/server:%s' % env['MAIN_UPDATE_CHANNEL']
     if _running(env):
         current_image = _image_id(image_name)
         run('docker pull %s' % image_name, capture_output=False)

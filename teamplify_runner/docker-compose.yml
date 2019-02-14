@@ -44,7 +44,7 @@ services:
     restart: always
 
   app:
-    image: teamplify/server:latest
+    image: teamplify/server:${MAIN_UPDATE_CHANNEL}
     container_name: teamplify_app
     depends_on:
       - builtin_db

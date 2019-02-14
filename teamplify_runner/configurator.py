@@ -68,6 +68,16 @@ def validate_boolean(value):
         )
 
 
+def validate_choice(value, choices):
+    if value not in choices:
+        raise ConfigurationError(
+            'Must be one of the following: %s. You provided: %s' % (
+                ', '.join(choices),
+                value,
+            ),
+        )
+
+
 def validate_email(value):
     """
     Not going to write insane regex here,
@@ -88,6 +98,7 @@ class Configurator:
     defaults = OrderedDict((
         ('main', OrderedDict((
             ('product_key', ''),
+            ('update_channel', 'stable'),
             ('send_crash_reports', 'yes'),
         ))),
         ('web', OrderedDict((
@@ -203,6 +214,8 @@ class Configurator:
                 validate_product_key(value)
             elif option == 'send_crash_reports':
                 validate_boolean(value)
+            elif option == 'update_channel':
+                validate_choice(value, ['stable', 'latest'])
         elif section == 'web':
             if option == 'host':
                 validate_hostname(value)
@@ -226,14 +239,7 @@ class Configurator:
             if option == 'smtp_host' and value.lower() != 'builtin_smtp':
                 validate_hostname(value)
             elif option == 'smtp_protocol':
-                smtp_protocols = ('plain', 'ssl', 'tls')
-                if value not in smtp_protocols:
-                    raise ConfigurationError(
-                        'Must be one of the following: %s. You provided: %s' % (
-                            ', '.join(smtp_protocols),
-                            value,
-                        ),
-                    )
+                validate_choice(value, ['plain', 'ssl', 'tls'])
             elif option == 'smtp_port':
                 validate_port(value)
             elif option == 'address_from':

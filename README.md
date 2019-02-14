@@ -244,7 +244,7 @@ latest features and bugfixes. The update process consists of two steps:
 
 The latter command will automatically detect if a new version has been 
 downloaded and will restart the service if necessary. A service restart causes 
-a short downtime, so ideally updates should be done in periods of low user 
+a short downtime, so ideally updates should be made in periods of low user 
 activity. The `update` command restarts the service only when necessary. If no 
 update has been downloaded, there will be no restart and therefore no service 
 interruption.

@@ -296,13 +296,13 @@ BACKUP_LOCATION=/backups/teamplify/
 # How many days should we store the backups for:
 BACKUP_STORE_DAYS=14
 
-# Back up Teamplify DB and upgrade Teamplify:
+# Back up Teamplify DB and update Teamplify:
 mkdir -p $BACKUP_LOCATION && \
     pip3 install -U teamplify && \
     teamplify backup $BACKUP_LOCATION && \
-    teamplify upgrade
+    teamplify update
 
-# If the upgrade was successful, clean up old backups:
+# If the update was successful, clean up old backups:
 if [ $? -eq 0 ]; then
   find $BACKUP_LOCATION -type f -mmin +$((60 * 24 * $BACKUP_STORE_DAYS)) \
       -name 'teamplify_*.sql.gz' -execdir rm -- '{}' \;

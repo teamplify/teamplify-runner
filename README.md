@@ -96,8 +96,8 @@ All configuration options explained:
   Please email us at [support@teamplify.com](mailto:support@teamplify.com) to 
   get the product key;
 
-- `update_channel` - the application distribution channel to use. Can be 
-  `stable` or `latest`, the default is `stable` (recommended for most users). 
+- `update_channel` - the application distribution channel to use. Can be set to
+  `stable` or `latest`. The default setting is `stable` (recommended for most users). 
   With the `stable` channel, you may expect up to a few updates per month. 
   Updates in the latest channel are more frequent and contain all of the latest 
   features and bug-fixes. However, they also have a higher chance of 

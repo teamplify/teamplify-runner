@@ -97,13 +97,14 @@ All configuration options explained:
   get the product key;
 
 - `update_channel` - the application distribution channel to use. Can be set to
-  `stable` or `latest`. The default setting is `stable` (recommended for most users). 
-  With the `stable` channel, you should expect a few updates per month. 
+  `stable` or `latest`. The default setting is `stable` (recommended for most 
+  users). With the `stable` channel, you should expect a few updates per month. 
   Updates in the latest channel are more frequent and contain all of the latest 
   features and bug-fixes. However, they also have a higher chance of 
   introducing new bugs. Please note that Teamplify doesn't update itself 
-  automatically unless you've explicitly configured it to do so. See the [Updates](#updates) 
-  and [Maintenance script](#maintenance-script) sections below;
+  automatically unless you've explicitly configured it to do so. See the 
+  [Updates](#updates) and [Maintenance script](#maintenance-script) sections 
+  below;
 
 - `send_crash_reports` - possible values are `yes` and `no`, defaults to `yes`. 
   When set to `yes` the system will automatically send application crash 

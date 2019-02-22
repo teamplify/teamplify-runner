@@ -34,7 +34,7 @@ def _start(env):
         )
     root_url = _root_url(env)
     click.echo(
-        'Done. It may take a few moments for the app to come online at:\n'
+        '\nDone. It may take a few moments for the app to come online at:\n'
         ' -> %s\n\n'
         'If it isn\'t available immediately, please check again after '
         'a minute or two. If you experience any problems with the '

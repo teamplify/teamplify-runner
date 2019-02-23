@@ -10,14 +10,10 @@ from teamplify_runner.utils import cd, run
 
 
 def _root_url(env):
-    host = env['WEB_HOST']
     port = env['WEB_PORT']
-    if env['WEB_USE_SSL'].lower() in ('yes', 'true', '1'):
-        root_url = 'https://' + host
-    else:
-        root_url = 'http://' + host
-        if port != '80':
-            root_url += ':' + port
+    root_url = 'http://' + env['WEB_HOST']
+    if port != '80':
+        root_url += ':' + port
     return root_url
 
 

@@ -107,7 +107,7 @@ class Configurator:
         ))),
         ('web', OrderedDict((
             ('host', 'localhost'),
-            ('port', 8228),
+            ('port', 80),
             ('use_ssl', 'no'),
         ))),
         ('db', OrderedDict((

@@ -68,6 +68,10 @@ def validate_boolean(value):
         )
 
 
+def str_to_bool(s):
+    return s.lower() in ('yes', 'y', 'true', '1')
+
+
 def validate_choice(value, choices):
     if value not in choices:
         raise ConfigurationError(
@@ -172,14 +176,16 @@ class Configurator:
             self.parser.write(fp)
             return fp.getvalue()
 
+    def use_ssl(self):
+        return str_to_bool(self.parser.get('web', 'use_ssl', fallback=''))
+
     def env(self):
         env = {}
         for section in self.parser.sections():
             for option in self.parser.options(section):
                 name = section.upper() + '_' + option.upper()
                 env[name] = str(self.parser.get(section, option, fallback=''))
-        use_ssl = self.parser.get('web', 'use_ssl', fallback=False)
-        env['LETSENCRYPT_HOST'] = env['WEB_HOST'] if use_ssl else ''
+        env['LETSENCRYPT_HOST'] = env['WEB_HOST'] if self.use_ssl() else ''
         return env
 
     def validate(self):
@@ -228,8 +234,7 @@ class Configurator:
                         'Can\'t use port 443 because it\'s reserved for '
                         'SSL-enabled configuration. Please choose another port',
                     )
-                use_ssl = self.parser.get('web', 'use_ssl', fallback=False)
-                if use_ssl and value != '80':
+                if value != '80' and self.use_ssl():
                     raise ConfigurationError(
                         'For SSL-enabled configuration port must be set to 80. '
                         'You provided: %s' % value,

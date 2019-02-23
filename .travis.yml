@@ -10,4 +10,5 @@ install:
   - pip install -e ".[tests]"
 script: flake8 --isort-show-traceback && py.test
 notifications:
-  slack: ivelum:BK5tmHAiON50wnqsamRLXaw0
+  slack:
+    secure: "t7pzJSWMXKl1hQCZPKWN8stOK+Y3ldEuXh7HmBjmsZuDfCCn4FG+ZEi2k6Z7AiZS7rp5Y4tFnUVEmkhnjk8CAIdMfCaW+Uap5aLKI25teHkB7k2mzdhE9wprPJ/b9VAKWHLuZeXi2Ycv3dGUKlFhtUvfSBD89DUWsrcOvLTxq1u4LdVldjKggclXdTr6VwkZnvLHpegdtOxNSbM+Oky+XCbu+caii878eFn+g+QT3hJIJVgLUp4rOv0Ziaa0QNqLdSA1WIUZvRaBawQn5oLgcYq5kEMYSC3oh2ddElOo7rO6p6RWyU/6v248F4/t5oLOV5ywgUQjsEOKbgmbEpQ5Knzm/XPdzlAt1evLhCT9UPjWVUhC/dJegraezjXschIycxERipn0M+zukfGCmRSZejxQxTPWj6Y8WEbiv5oZnGlFKg8S5EZKjwh9DIgY/w6aXPX9VJPbZU39rlfD/3g62CTJIfmYPQ+8WwpqAjSuNDn7LS/IJ0wX/SzkJxxyXJS0wNVyNfh5pPQUaJ87dOl2yumOlhbyi5tuR04QWIHEshcqMnLUCnQ5ArMuZD+6E7X1794b91EsbIC07Cx3juiEzF24iuYYwmKS7xTL1fTUukmfXTXyz/guqwB7JUBAU7Kd9xd1F9pn9t74oHRR0VQyYxycgGGzL+dLwi7zyDBpyjY="

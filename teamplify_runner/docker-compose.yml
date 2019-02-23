@@ -75,6 +75,7 @@ services:
       - VIRTUAL_PORT=8211
       - VIRTUAL_PROTO=uwsgi
       - LETSENCRYPT_HOST=${LETSENCRYPT_HOST}
+      - HSTS=off
 
       - MAIN_PRODUCT_KEY
       - MAIN_SEND_CRASH_REPORTS

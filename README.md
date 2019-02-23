@@ -116,9 +116,13 @@ All configuration options explained:
 - `host` - domain name on which Teamplify web interface will be running. It 
   must be created in advance and pointing to the server on which you have 
   installed Teamplify;
-- `port` - port on which Teamplify web interface will be running;
-- `use_ssl` - at the moment, `no` is the only supported value. Built-in SSL 
-  support will be available in future versions;
+- `port` - port on which Teamplify web interface will be running, the default 
+  is `80`. If `use_ssl` is set to `yes` then `80` is the only allowed option;
+- `use_ssl` - possible values are `yes` and `no`, defaults to `no`. When set to
+  `yes` all traffic to Teamplify server will be redirected to HTTPS on port 
+  `443`. Teamplify runner will use [Let's Encrypt](https://letsencrypt.org) to 
+  automatically generate and renew SSL certificates for the domain that you
+  specified in `host` parameter above;
 
 `[db]`
 
@@ -403,6 +407,31 @@ try the following:
   and can reliably send emails, you can configure Teamplify to use this server 
   instead of the built-in SMTP. See `[email]` section in 
   [Configuration](#configuration) for details;
+  
+  
+### The connection is not trusted in SSL-enabled mode
+
+During the first start, Teamplify runner generates a temporary self-issued SSL 
+certificate (not trusted) and then tries to create a valid certificate via
+[Let's Encrypt](https://letsencrypt.org) that would replace a temporary one. If 
+you open Teamplify in your browser and see that the connection is not trusted, 
+it either means that certificate generation is still in progress, or it has 
+failed. If you have just started the server, please give it a minute and refresh 
+the page in your browser. If the certificate generation was still in progress, 
+the problem should resolve itself soon. If the problem persists, it probably 
+means that the certificate generation has failed. Please check the following:
+
+1. The domain that you specified in `host` parameter can be resolved from 
+   public Internet and is pointing to the server on which you have installed 
+   Teamplify;
+2. Ports `80` and `443` are not blocked in the firewall.
+
+Also, it might be helpful to check the logs:
+
+``` shell
+$ docker logs teamplify_letsencrypt
+```
+
 
 ### Other
 

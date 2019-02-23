@@ -409,21 +409,28 @@ try the following:
   [Configuration](#configuration) for details;
   
   
-### The connection is not trusted in SSL-enabled mode
+### The connection is refused or not trusted in SSL-enabled mode
 
 During the first start, Teamplify runner generates a temporary self-issued SSL 
-certificate (not trusted) and then tries to create a valid certificate via
-[Let's Encrypt](https://letsencrypt.org) that would replace a temporary one. If 
-you open Teamplify in your browser and see that the connection is not trusted, 
-it either means that certificate generation is still in progress, or it has 
-failed. If you have just started the server, please give it a minute and refresh 
-the page in your browser. If the certificate generation was still in progress, 
-the problem should resolve itself soon. If the problem persists, it probably 
-means that the certificate generation has failed. Please check the following:
+certificate (not trusted) and then tries to create a valid certificate for your 
+domain via [Let's Encrypt](https://letsencrypt.org) that would replace a 
+temporary one. Besides that, it also creates a new set of 2048-bit DH parameters 
+for A+ rating of your SSL configuration. This process is rather slow and may 
+take a few minutes to complete. If you open Teamplify in your browser and see 
+that the SSL connection can't be established or is not trusted, it could be 
+caused by DH params or SSL certificate generation that are still in progress.
+When DH params and SSL certificate are successfully generated, they are saved
+for future use, and subsequent restarts of the server should be much faster.
+
+If you have just started the server for the very first time, please give it a 
+few minutes to complete the initialization and then refresh the page in your 
+browser. If after a few minutes you see that the connection is not trusted, it 
+probably means that the certificate generation has failed. Please check the 
+following:
 
 1. The domain that you specified in `host` parameter can be resolved from 
-   public Internet and is pointing to the server on which you have installed 
-   Teamplify;
+   the public Internet and is pointing to the server on which you have 
+   installed Teamplify;
 2. Ports `80` and `443` are not blocked in the firewall.
 
 Also, it might be helpful to check the logs:

@@ -22,19 +22,34 @@ services:
     restart: always
 
   nginx:
-    image: nginx:1.15.7
+    image: jwilder/nginx-proxy:latest
     container_name: teamplify_nginx
     depends_on:
       - app
-    links:
-      - app
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - nginx_certs:/etc/nginx/certs:ro
+      - nginx_dhparam:/etc/nginx/dhparam
+      - /etc/nginx/vhost.d
+      - /usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./vhost.conf:/etc/nginx/vhost.d/${WEB_HOST}:ro
     volumes_from:
       - app:ro
     ports:
       - ${WEB_PORT}:80
+      - 443:443
     restart: always
+
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion:latest
+    container_name: teamplify_letsencrypt
+    depends_on:
+      - nginx
+    volumes:
+      - nginx_certs:/etc/nginx/certs
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    volumes_from:
+      - nginx
 
   builtin_smtp:
     image: instrumentisto/postfix:3.1.3
@@ -55,10 +70,17 @@ services:
     volumes:
       - repos:/repos/
     environment:
+      # nginx-proxy & Let's Encrypt configuration:
+      - VIRTUAL_HOST=${WEB_HOST}
+      - VIRTUAL_PORT=8211
+      - VIRTUAL_PROTO=uwsgi
+      - LETSENCRYPT_HOST=${LETSENCRYPT_HOST}
+
       - MAIN_PRODUCT_KEY
       - MAIN_SEND_CRASH_REPORTS
       - WEB_HOST
       - WEB_PORT
+      - WEB_USE_SSL
       - DB_HOST
       - DB_PORT
       - DB_USER
@@ -167,5 +189,7 @@ services:
     restart: always
 
 volumes:
+  nginx_certs:
+  nginx_dhparam:
   mysql_data:
   repos:

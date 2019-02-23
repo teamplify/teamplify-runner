@@ -14,8 +14,6 @@ def _root_url(env):
     port = env['WEB_PORT']
     if env['WEB_USE_SSL'].lower() in ('yes', 'true', '1'):
         root_url = 'https://' + host
-        if port != '443':
-            root_url += ':' + port
     else:
         root_url = 'http://' + host
         if port != '80':

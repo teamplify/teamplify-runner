@@ -178,6 +178,8 @@ class Configurator:
             for option in self.parser.options(section):
                 name = section.upper() + '_' + option.upper()
                 env[name] = str(self.parser.get(section, option, fallback=''))
+        use_ssl = self.parser.get('web', 'use_ssl', fallback=False)
+        env['LETSENCRYPT_HOST'] = env['WEB_HOST'] if use_ssl else ''
         return env
 
     def validate(self):
@@ -221,6 +223,17 @@ class Configurator:
                 validate_hostname(value)
             elif option == 'port':
                 validate_port(value)
+                if value == '443':
+                    raise ConfigurationError(
+                        'Can\'t use port 443 because it\'s reserved for '
+                        'SSL-enabled configuration. Please choose another port',
+                    )
+                use_ssl = self.parser.get('web', 'use_ssl', fallback=False)
+                if use_ssl and value != '80':
+                    raise ConfigurationError(
+                        'For SSL-enabled configuration port must be set to 80. '
+                        'You provided: %s' % value,
+                    )
             elif option == 'use_ssl':
                 validate_boolean(value)
         elif section == 'db':

@@ -411,9 +411,6 @@ try the following:
   
 ### The connection is refused or not trusted in SSL-enabled mode
 
-During the first start, Teamplify runner generates a temporary self-issued SSL certificate (not trusted) and then tries to create a valid certificate for your domain via Let's Encrypt that would replace ~a~ *the* temporary one. Besides that, it also creates a new set of 2048-bit DH parameters ~for to~ *to give your SSL configuration an*  A+ rating of your SSL configuration. This process is rather slow and may take a few minutes to complete. If you open Teamplify in your browser and see that the SSL connection can't be established or is not trusted, it ~could~ may be caused by DH params or SSL certificate generation that are still in progress. When DH params and SSL certificate ~are~ *have been* successfully generated, they are saved for future use and subsequent restarts of the server should be much faster.
-
-
 During the first start, Teamplify runner generates a temporary self-issued SSL 
 certificate (not trusted) and then tries to create a valid certificate for your 
 domain via [Let's Encrypt](https://letsencrypt.org) that would replace the 

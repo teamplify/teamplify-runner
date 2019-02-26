@@ -418,22 +418,22 @@ temporary one. Besides that, it also creates a new set of 2048-bit DH parameters
 to give your SSL configuration an A+ rating. This process is rather slow and may 
 take a few minutes to complete. If you open Teamplify in your browser and see 
 that the SSL connection can't be established or is not trusted, the problem may be 
-caused by DH params or SSL certificate generation that are still in progress.
-When DH params and SSL certificate are successfully generated, they are saved
+caused by DH params or the SSL certificate generation that are still in progress.
+When DH params and the SSL certificate are successfully generated, they are saved
 for future use, and subsequent restarts of the server should be much faster.
 
 If you have just started the server for the very first time, please give it a 
 few minutes to complete the initialization and then refresh the page in your 
-browser. If after a few minutes you see that the connection is not trusted, it 
+browser. If after a few minutes, the browser reports that the connection is not trusted, it 
 probably means that the certificate generation has failed. Please check the 
 following:
 
-1. The domain that you specified in `host` parameter can be resolved from 
+1. That the domain that you specified in the `host` parameter can be resolved from 
    the public Internet and is pointing to the server on which you have 
    installed Teamplify;
-2. Ports `80` and `443` are not blocked in the firewall.
+2. That ports `80` and `443` are not blocked in the firewall.
 
-Also, it might be helpful to check the logs:
+It also might be helpful to check the logs:
 
 ``` shell
 $ docker logs teamplify_letsencrypt

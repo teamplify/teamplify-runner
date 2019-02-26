@@ -418,13 +418,13 @@ temporary one. Besides that, it also creates a new set of 2048-bit DH parameters
 to give your SSL configuration an A+ rating. This process is rather slow and may 
 take a few minutes to complete. If you open Teamplify in your browser and see 
 that the SSL connection can't be established or is not trusted, the problem may be 
-caused by DH params or the SSL certificate generation that are still in progress.
-When DH params and the SSL certificate are successfully generated, they are saved
-for future use, and subsequent restarts of the server should be much faster.
+caused by DH params or the SSL certificate generations that are still in progress.
+After DH params and the SSL certificate have been successfully generated, they are saved
+for future use and subsequent restarts of the server should be much faster.
 
 If you have just started the server for the very first time, please give it a 
 few minutes to complete the initialization and then refresh the page in your 
-browser. If after a few minutes, the browser reports that the connection is not trusted, it 
+browser. If after a few minutes the browser reports that the connection is not trusted, it 
 probably means that the certificate generation has failed. Please check the 
 following:
 

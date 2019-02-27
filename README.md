@@ -97,8 +97,8 @@ All configuration options explained:
 
 - `send_crash_reports` - possible values are `yes` and `no`, defaults to `yes`. 
   When set to `yes` the system will automatically send application crash 
-  reports to the developer. We recommend keeping this option enabled as it 
-  helps us to detect bugs faster and ship fixes for them more quickly; 
+  reports to our team. We recommend keeping this option enabled as it helps us 
+  to detect bugs faster and ship fixes for them more quickly; 
 
 `[web]`
 
@@ -219,10 +219,9 @@ $ teamplify restart
 # Updates
 
 Teamplify installation consists of the Teamplify runner and the Teamplify 
-product itself, which is shipped in the form of Docker images. We follow the 
-concept of rolling updates, so we release updates often (up to a few times 
-a week). We recommend that you use the most recent version to keep up with the 
-latest features and bugfixes. The update process consists of two steps:
+product itself, which is shipped in the form of Docker images. We recommend 
+that you use the most recent version to keep up with the latest features and 
+bugfixes. The update process consists of two steps:
 
 1. Update Teamplify runner:
 

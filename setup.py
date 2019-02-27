@@ -36,6 +36,8 @@ setup(
         'tests': get_requirements('tests'),
     },
     packages=['teamplify_runner'],
+    package_data={'': ['backup/*.txt', '*.yml', '*.cnf', '*.cf', '*.conf']},
+    include_package_data=True,
     python_requires=">=%s" % MIN_PYTHON_STR,
     license=open('LICENSE').read(),
     entry_points={

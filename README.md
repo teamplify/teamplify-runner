@@ -3,17 +3,6 @@
 [![image](https://travis-ci.org/teamplify/teamplify-runner.svg?branch=master)](https://travis-ci.org/teamplify/teamplify-runner)
 
 
-# WIP, NOT READY YET
-
-The planned release date of the on-premise version of 
-[Teamplify](https://teamplify.com) is February 2019. If you see this message, 
-it means that it's not ready yet and that the installer will not work. If 
-you're interested in trying Teamplify on-premise, please drop us a line 
-at [support@teamplify.com](mailto:support@teamplify.com) and we'll be happy to 
-send you an update once it's ready.
-
------
-
   - [About](#about)
   - [System requirements](#system-requirements)
   - [Installation](#installation)
@@ -417,19 +406,20 @@ domain via [Let's Encrypt](https://letsencrypt.org) that would replace the
 temporary one. Besides that, it also creates a new set of 2048-bit DH parameters 
 to give your SSL configuration an A+ rating. This process is rather slow and may 
 take a few minutes to complete. If you open Teamplify in your browser and see 
-that the SSL connection can't be established or is not trusted, the problem may be 
-caused by DH params or the SSL certificate generations that are still in progress.
-After DH params and the SSL certificate have been successfully generated, they are saved
-for future use and subsequent restarts of the server should be much faster.
+that the SSL connection can't be established or is not trusted, the problem may 
+be caused by DH params or the SSL certificate generations that are still in 
+progress. After DH params and the SSL certificate have been successfully 
+generated, they are saved for future use and subsequent restarts of the server 
+should be much faster.
 
 If you have just started the server for the very first time, please give it a 
 few minutes to complete the initialization and then refresh the page in your 
-browser. If after a few minutes the browser reports that the connection is not trusted, it 
-probably means that the certificate generation has failed. Please check the 
-following:
+browser. If after a few minutes the browser reports that the connection is not 
+trusted, it probably means that the certificate generation has failed. Please 
+check the following:
 
-1. That the domain that you specified in the `host` parameter can be resolved from 
-   the public Internet and is pointing to the server on which you have 
+1. That the domain that you specified in the `host` parameter can be resolved 
+   from the public Internet and is pointing to the server on which you have 
    installed Teamplify;
 2. That ports `80` and `443` are not blocked in the firewall.
 

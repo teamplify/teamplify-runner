@@ -173,7 +173,7 @@ from highest to lowest):
    Example:
 
    ``` shell
-   $ teamplify start --config /path/to/configuration/file
+   $ teamplify --config /path/to/configuration/file start
    ```
 
 2. An environment variable named `TEAMPLIFY_CONF`. Example:

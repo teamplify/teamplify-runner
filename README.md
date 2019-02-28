@@ -5,7 +5,8 @@
 
   - [About](#about)
   - [System requirements](#system-requirements)
-  - [Installation](#installation)
+  - [Install on Linux](#install-on-linux)
+  - [Install on Mac OS X](#install-on-mac-os-x)
   - [Configuration](#configuration)
   - [Configuration file locations](#configuration-file-locations)
   - [Starting and stopping the service](#starting-and-stopping-the-service)
@@ -53,7 +54,7 @@ strategy is to start with the default server configuration and scale up or
 down depending on the workload.
 
 
-# Installation
+# Install on Linux
 
 Install the latest version of Teamplify runner with pip:
 
@@ -61,6 +62,32 @@ Install the latest version of Teamplify runner with pip:
 $ pip3 install -U teamplify
 ```
 
+
+# Install on Mac OS X
+
+For Mac OS X, we recommend installing Teamplify into Python virtual environment
+located in your home directory. The reason for this is that Teamplify needs to 
+mount its configuration files inside Docker containers, and on Mac OS X only 
+`/Users` folder is shared with Docker by default. 
+
+Create a new Python virtual environment for Teamplify in your home directory: 
+
+``` shell
+$ python3 -m venv ~/.venv/teamplify
+```
+
+Activate it:
+
+``` shell
+$ source ~/.venv/teamplify/bin/activate
+```
+
+At this point, `pip` command will be linked to the virtual environment that you
+just created. Install Teamplify runner with `pip`: 
+
+``` shell
+$ pip install teamplify
+```
 
 # Configuration
 

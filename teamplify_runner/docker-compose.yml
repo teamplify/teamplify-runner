@@ -97,7 +97,7 @@ services:
     restart: always
 
   worker_slim:
-    image: teamplify/server:latest
+    image: teamplify/server:${MAIN_UPDATE_CHANNEL}
     container_name: teamplify_worker_slim
     depends_on:
       - app
@@ -129,7 +129,7 @@ services:
     restart: always
 
   worker_fat:
-    image: teamplify/server:latest
+    image: teamplify/server:${MAIN_UPDATE_CHANNEL}
     container_name: teamplify_worker_fat
     depends_on:
       - app
@@ -161,7 +161,7 @@ services:
     restart: always
 
   beat:
-    image: teamplify/server:latest
+    image: teamplify/server:${MAIN_UPDATE_CHANNEL}
     container_name: teamplify_beat
     depends_on:
       - app

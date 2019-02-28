@@ -4,6 +4,7 @@ from datetime import datetime
 
 import click
 
+from teamplify_runner import __version__
 from teamplify_runner.configurator import BASE_DIR, ConfigurationError, \
     Configurator
 from teamplify_runner.utils import cd, run
@@ -156,10 +157,6 @@ def _restore(env, filename):
     click.echo('Done.')
 
 
-@click.group()
-@click.option('--config', type=click.Path(exists=True, dir_okay=False),
-              default=None, help='Optional, config file to use')
-@click.pass_context
 def cli(ctx, config):
     config = Configurator(config).load()
     if config.config_path:
@@ -174,6 +171,16 @@ def cli(ctx, config):
             click.echo('Command aborted.', err=True)
             exit(1)
     ctx.obj['config'] = config
+
+
+cli.__doc__ = 'Teamplify runner v%s' % __version__
+
+
+cli = click.group()(
+    click.option('--config', type=click.Path(exists=True, dir_okay=False),
+                 default=None, help='Optional, config file to use')(
+        click.pass_context(cli)
+    ))
 
 
 @cli.command()

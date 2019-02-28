@@ -36,7 +36,6 @@ setup(
         'tests': get_requirements('tests'),
     },
     packages=['teamplify_runner'],
-    include_package_data=True,
     python_requires=">=%s" % MIN_PYTHON_STR,
     license='MIT',
     entry_points={

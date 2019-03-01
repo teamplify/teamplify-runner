@@ -65,9 +65,9 @@ $ pip3 install -U teamplify
 
 # Install on Mac OS X
 
-For Mac OS X, we recommend installing Teamplify into Python virtual environment
+For Mac OS X, we recommend installing Teamplify into a Python virtual environment
 located in your home directory. This is because Teamplify needs to 
-mount its configuration files inside Docker containers, and on Mac OS X only the
+mount its configuration files into Docker containers, and on Mac OS X only the
 `/Users` folder is shared with Docker by default. 
 
 Create a new Python virtual environment for Teamplify in your home directory: 
@@ -82,7 +82,7 @@ Activate it:
 $ source ~/.venv/teamplify/bin/activate
 ```
 
-At this point, `pip` command will be linked to the virtual environment that you
+At this point, a `pip` command will be linked to the virtual environment that you
 just created. Install Teamplify runner with `pip`: 
 
 ``` shell

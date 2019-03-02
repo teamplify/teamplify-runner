@@ -39,6 +39,7 @@ services:
       - ${WEB_PORT}:80
       - 443:443
     restart: always
+    entrypoint: bash -c "find /etc/nginx/dhparam/dhparam.pem -empty -delete || true && /app/docker-entrypoint.sh forego start -r"
 
   letsencrypt:
     image: jrcs/letsencrypt-nginx-proxy-companion:latest

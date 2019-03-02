@@ -5,7 +5,7 @@ version: '2'
 services:
 
   builtin_db:
-    image: mysql:5.7.21
+    image: ${IMAGE_DB}
     container_name: teamplify_db
     environment:
       MYSQL_DATABASE: ${DB_NAME}
@@ -17,12 +17,12 @@ services:
     restart: always
 
   redis:
-    image: redis:3.0
+    image: ${IMAGE_REDIS}
     container_name: teamplify_redis
     restart: always
 
   nginx:
-    image: jwilder/nginx-proxy:latest
+    image: ${IMAGE_NGINX}
     container_name: teamplify_nginx
     depends_on:
       - app
@@ -42,7 +42,7 @@ services:
     entrypoint: bash -c "find /etc/nginx/dhparam/dhparam.pem -empty -delete || true && /app/docker-entrypoint.sh forego start -r"
 
   letsencrypt:
-    image: jrcs/letsencrypt-nginx-proxy-companion:latest
+    image: ${IMAGE_LETSENCRYPT}
     container_name: teamplify_letsencrypt
     depends_on:
       - nginx
@@ -53,14 +53,14 @@ services:
       - nginx
 
   builtin_smtp:
-    image: instrumentisto/postfix:3.1.3
+    image: ${IMAGE_SMTP}
     container_name: teamplify_smtp
     volumes:
       - ./postfix.cf:/etc/postfix/main.cf.d/10-custom.cf:ro
     restart: always
 
   app:
-    image: teamplify/server:${MAIN_UPDATE_CHANNEL}
+    image: ${IMAGE_APP}
     container_name: teamplify_app
     depends_on:
       - builtin_db
@@ -98,7 +98,7 @@ services:
     restart: always
 
   worker_slim:
-    image: teamplify/server:${MAIN_UPDATE_CHANNEL}
+    image: ${IMAGE_APP}
     container_name: teamplify_worker_slim
     depends_on:
       - app
@@ -130,7 +130,7 @@ services:
     restart: always
 
   worker_fat:
-    image: teamplify/server:${MAIN_UPDATE_CHANNEL}
+    image: ${IMAGE_APP}
     container_name: teamplify_worker_fat
     depends_on:
       - app
@@ -162,7 +162,7 @@ services:
     restart: always
 
   beat:
-    image: teamplify/server:${MAIN_UPDATE_CHANNEL}
+    image: ${IMAGE_APP}
     container_name: teamplify_beat
     depends_on:
       - app

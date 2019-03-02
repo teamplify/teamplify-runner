@@ -10,6 +10,16 @@ from teamplify_runner.configurator import BASE_DIR, ConfigurationError, \
 from teamplify_runner.utils import cd, run
 
 
+IMAGES = {
+    'db': 'mysql:5.7.21',
+    'redis': 'redis:3.0',
+    'nginx': 'jwilder/nginx-proxy:latest',
+    'letsencrypt': 'jrcs/letsencrypt-nginx-proxy-companion:latest',
+    'smtp': 'instrumentisto/postfix:3.1.3',
+    'app': 'teamplify/server',
+}
+
+
 def _root_url(env):
     port = env['WEB_PORT']
     root_url = 'http://' + env['WEB_HOST']
@@ -191,6 +201,11 @@ def cli(ctx, config):
             click.echo('Command aborted.', err=True)
             exit(1)
     ctx.obj['config'] = config
+    env = config.env()
+    for image_id, reference in IMAGES.items():
+        env['IMAGE_%s' % image_id.upper()] = reference
+    env['IMAGE_APP'] += ':' + env['MAIN_UPDATE_CHANNEL']
+    ctx.obj['env'] = env
 
 
 cli.__doc__ = 'Teamplify runner v%s' % __version__
@@ -227,7 +242,7 @@ def start(ctx):
     """
     Start Teamplify
     """
-    _start(ctx.obj['config'].env())
+    _start(ctx.obj['env'])
 
 
 @cli.command()
@@ -236,7 +251,7 @@ def stop(ctx):
     """
     Stop Teamplify
     """
-    _stop(ctx.obj['config'].env())
+    _stop(ctx.obj['env'])
 
 
 @cli.command()
@@ -245,7 +260,7 @@ def restart(ctx):
     """
     Restart Teamplify
     """
-    env = ctx.obj['config'].env()
+    env = ctx.obj['env']
     _stop(env)
     _start(env)
 
@@ -257,7 +272,7 @@ def backup(ctx, filename):
     """
     Backup Teamplify DB to a GZipped archive
     """
-    env = ctx.obj['config'].env()
+    env = ctx.obj['env']
     _assert_builtin_db(env)
     _backup(env, filename)
 
@@ -270,7 +285,7 @@ def restore(ctx, filename, quiet):
     """
     Restore Teamplify DB from a GZipped archive
     """
-    env = ctx.obj['config'].env()
+    env = ctx.obj['env']
     _assert_builtin_db(env)
     if not quiet:
         confirm = input(
@@ -300,7 +315,7 @@ def update(ctx):
     """
     Update to the latest version
     """
-    env = ctx.obj['config'].env()
+    env = ctx.obj['env']
     image_name = 'teamplify/server:%s' % env['MAIN_UPDATE_CHANNEL']
     if _running(env):
         current_image = _image_id(image_name)
@@ -312,6 +327,45 @@ def update(ctx):
     else:
         run('docker pull %s' % image_name)
     _remove_unused_images()
+    click.echo('Done.')
+
+
+@cli.command()
+@click.option('--quiet', 'quiet', flag_value='quiet', default=None)
+@click.pass_context
+def erase(ctx, quiet):
+    """
+    Erase all of Teamplify data and Docker images
+    """
+    if not quiet:
+        confirm = input(
+            '\nIMPORTANT: This command will erase all of the data stored in '
+            'built-in Teamplify DB, and also remove all Docker images and '
+            'volumes used by Teamplify.\n\n'
+            'Do you confirm erasing all of Teamplify data (y/N)? ',
+        )
+        if confirm.lower() != 'y':
+            click.echo('Erase command cancelled, exiting')
+            return
+    env = ctx.obj['env']
+    _stop(env)
+    click.echo('')
+    networks = run(
+        'docker network ls -f name=teamplify_runner* -q',
+        suppress_output=True,
+    ).stdout_lines
+    if networks:
+        click.echo('Removing %s Docker network(s):' % len(networks))
+        run('docker network rm %s' % ' '.join(networks), raise_on_error=False)
+    volumes = run(
+        'docker volume ls -f name=teamplify_runner* -q',
+        suppress_output=True,
+    ).stdout_lines
+    if volumes:
+        click.echo('Removing %s Docker volume(s):' % len(volumes))
+        run('docker volume rm %s' % ' '.join(volumes), raise_on_error=False)
+    click.echo('Removing Docker images:')
+    run('docker rmi %s' % ' '.join(IMAGES.values()), raise_on_error=False)
     click.echo('Done.')
 
 

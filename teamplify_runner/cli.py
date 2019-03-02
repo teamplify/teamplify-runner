@@ -168,6 +168,7 @@ def _remove_unused_images():
         # that some images are still used
         run(
             'docker rmi %s' % ' '.join(unused_images),
+            suppress_output=True,
             raise_on_error=False,
         )
 

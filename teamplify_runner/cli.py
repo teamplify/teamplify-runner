@@ -315,16 +315,6 @@ def update(ctx):
     click.echo('Done.')
 
 
-@cli.command()
-@click.pass_context
-def erase(ctx):
-    """
-    Erase all Teamplify data and
-    """
-    env = ctx.obj['config'].env()
-
-
-
 def main():
     cli(obj={})
 

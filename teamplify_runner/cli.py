@@ -157,6 +157,21 @@ def _restore(env, filename):
     click.echo('Done.')
 
 
+def _remove_unused_images():
+    unused_images = run(
+        'docker images -f reference=teamplify/server -f dangling=true -q',
+        suppress_output=True,
+    ).stdout_lines
+    click.echo('Cleanup: %s stale image(s) found' % len(unused_images))
+    if unused_images:
+        # Suppress errors because it might be possible
+        # that some images are still used
+        run(
+            'docker rmi %s' % ' '.join(unused_images),
+            raise_on_error=False,
+        )
+
+
 def cli(ctx, config):
     config = Configurator(config).load()
     if config.config_path:
@@ -291,6 +306,8 @@ def update(ctx):
             _start(env)
     else:
         run('docker pull %s' % image_name)
+    _remove_unused_images()
+    click.echo('Done.')
 
 
 def main():

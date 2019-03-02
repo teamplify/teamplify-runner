@@ -52,7 +52,11 @@ def _start(env):
 def _stop(env):
     click.echo('Stopping services...')
     with cd(BASE_DIR):
-        run('docker-compose rm --stop --force', capture_output=False, env=env)
+        run(
+            'docker-compose rm -v --stop --force',
+            capture_output=False,
+            env=env,
+        )
 
 
 def _running(env):
@@ -309,6 +313,16 @@ def update(ctx):
         run('docker pull %s' % image_name)
     _remove_unused_images()
     click.echo('Done.')
+
+
+@cli.command()
+@click.pass_context
+def erase(ctx):
+    """
+    Erase all Teamplify data and
+    """
+    env = ctx.obj['config'].env()
+
 
 
 def main():

@@ -45,7 +45,7 @@ def _start(env):
             'network. If you\'d like to make it available on the network, you '
             'should provide a publicly visible domain name that points to this '
             'server. To specify a domain name for Teamplify please run:\n'
-            ' -> teamplify configure'
+            ' -> teamplify configure',
         )
 
 
@@ -199,7 +199,7 @@ cli.__doc__ = 'Teamplify runner v%s' % __version__
 cli = click.group()(
     click.option('--config', type=click.Path(exists=True, dir_okay=False),
                  default=None, help='Optional, config file to use')(
-        click.pass_context(cli)
+        click.pass_context(cli),
     ))
 
 

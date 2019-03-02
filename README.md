@@ -14,6 +14,7 @@
   - [Backup and restore](#backup-and-restore)
   - [Maintenance script](#maintenance-script)
   - [Troubleshooting](#troubleshooting)
+  - [Uninstall](#uninstall)
   - [License](#license)
 
 
@@ -468,6 +469,26 @@ If the suggested solutions above don't work, please don't hesitate to
 or contact us at [support@teamplify.com](mailto:support@teamplify.com). You can
 also use the live chat on [teamplify.com](https://teamplify.com). We're ready 
 to help!
+
+
+# Uninstall
+
+If you'd like to uninstall Teamplify, please follow the steps below. IMPORTANT: 
+the uninstall procedure would erase all of the data stored in Teamplify,
+so before doing this, please consider making a [backup](#backup-and-restore) 
+first.
+
+Remove all Teamplify data, Docker images, volumes, and networks:
+
+``` shell
+$ teamplify erase
+```
+
+Uninstall Teamplify runner:
+
+``` shell
+$ pip3 uninstall teamplify
+```
 
 
 # License

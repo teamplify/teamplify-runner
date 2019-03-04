@@ -474,7 +474,7 @@ to help!
 # Uninstall
 
 If you'd like to uninstall Teamplify, please follow the steps below. IMPORTANT: 
-the uninstall procedure will erase all of the data stored in Teamplify, so please consider making a [backup](#backup-and-restore) before doing this, .
+the uninstall procedure will erase all of the data stored in Teamplify, so please consider making a [backup](#backup-and-restore) before doing this.
 
 Remove all Teamplify data, Docker images, volumes, and networks:
 

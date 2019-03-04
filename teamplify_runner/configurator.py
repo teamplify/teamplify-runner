@@ -98,6 +98,13 @@ def validate_product_key(value):
         raise ConfigurationError('Invalid product key: %s' % value)
 
 
+def validate_signing_key(value):
+    if not value:
+        raise ConfigurationError('Signing key is missing')
+    if not re.match('^[A-Za-z0-9]{50}$', value):
+        raise ConfigurationError('Invalid signing key: %s' % value)
+
+
 class Configurator:
     defaults = OrderedDict((
         ('main', OrderedDict((
@@ -201,7 +208,6 @@ class Configurator:
                     self.validate_option(
                         section=section,
                         option=option,
-                        value=self.parser.get(section, option),
                     )
                 except ConfigurationError as e:
                     errors.append('[%s] %s: %s' % (section, option, str(e)))
@@ -209,7 +215,7 @@ class Configurator:
             raise ConfigurationError(errors)
         return self
 
-    def validate_option(self, section, option, value):
+    def validate_option(self, section, option):
         if section not in self.defaults:
             raise ConfigurationError('Unknown section: [%s]' % section)
 
@@ -262,6 +268,9 @@ class Configurator:
                 validate_port(value)
             elif option == 'address_from':
                 validate_email(value)
+        elif section == 'crypto':
+            if option == 'signing_key':
+                validate_signing_key(value)
 
     def remove_unknown(self):
         unknown_sections = []

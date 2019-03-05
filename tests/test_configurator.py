@@ -49,7 +49,6 @@ def test_deeply_invalid_configuration():
         '[email] address_from: Invalid email: not even a email',
         '[email] smtp_protocol: Must be one of the following: plain, ssl, tls. '
         'You provided: tcp',
-        '[crypto] signing_key: Invalid signing key: wrong_key',
         'Unknown section: [unknown_section]',
     ]
     try:

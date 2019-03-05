@@ -340,8 +340,8 @@ def erase(ctx, quiet):
     if not quiet:
         confirm = input(
             '\nIMPORTANT: This command will erase all of the data stored in '
-            'built-in Teamplify DB, and also remove all Docker images and '
-            'volumes used by Teamplify.\n\n'
+            'built-in Teamplify DB, and also remove all Docker images, '
+            'volumes, and networks used by Teamplify.\n\n'
             'Do you confirm erasing all of Teamplify data (y/N)? ',
         )
         if confirm.lower() != 'y':

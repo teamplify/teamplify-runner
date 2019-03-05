@@ -231,7 +231,7 @@ class Configurator:
                 validate_port(value)
                 if value == '443':
                     raise ConfigurationError(
-                        'Can\'t use port 443 because it\'s reserved for '
+                        'Can\'t use port 443 because it\'s reserved for the '
                         'SSL-enabled configuration. Please choose another port',
                     )
                 if value != '80' and self.use_ssl():

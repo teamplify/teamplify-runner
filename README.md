@@ -63,6 +63,11 @@ Install the latest version of Teamplify runner with pip:
 $ pip3 install -U teamplify
 ```
 
+Note for Ubuntu users: if after the installation `teamplify` command can't be 
+found in path, please try exiting the terminal and opening it again. This will 
+force the terminal to update its path configuration, and the problem might go 
+away. 
+
 
 # Install on Mac OS X
 

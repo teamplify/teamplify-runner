@@ -57,6 +57,10 @@ down depending on the workload.
 
 # Install on Linux
 
+After installing Docker, please check [Post-installation steps for Linux](https://docs.docker.com/install/linux/linux-postinstall/).
+You'll probably want to make sure that you're able to run Docker commands 
+without `sudo`, and that Docker is configured to start on boot.
+
 Install the latest version of Teamplify runner with pip:
 
 ``` shell

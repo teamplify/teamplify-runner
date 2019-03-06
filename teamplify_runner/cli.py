@@ -53,9 +53,8 @@ def _start(env):
             'probably OK if you only need to run a demo on your local machine. '
             'However, in this mode it will not be available to anyone from the '
             'network. If you\'d like to make it available on the network, you '
-            'should provide a publicly visible domain name that points to this '
-            'server. To specify a domain name for Teamplify please run:\n'
-            ' -> teamplify configure',
+            'need to provide a publicly visible domain name that points to '
+            'this server.',
         )
 
 
@@ -83,12 +82,13 @@ def _assert_builtin_db(env):
     db_host = env['DB_HOST']
     if db_host != Configurator.defaults['db']['host']:
         click.echo(
-            '\nWe are sorry, "teamplify backup" and "teamplify restore" '
-            'commands are designed to work with "builtin_db" only. Current '
-            'configuration specifies external DB at:\n'
+            '\nWe are sorry, but the "teamplify backup" and '
+            '"teamplify restore" commands are designed to work with '
+            '"builtin_db" only. The current configuration specifies an '
+            'external DB at:\n'
             ' -> %s\n'
-            'Please connect to this DB server directly to perform backup or '
-            'restore operations.\n\n'
+            'To perform backup or restore operations, please use tools that '
+            'connect to this DB server directly.\n\n'
             'Command aborted.' % db_host,
             err=True,
         )
@@ -190,7 +190,7 @@ def _remove_unused_images():
 def cli(ctx, config):
     config = Configurator(config).load()
     if config.config_path:
-        click.echo('Using configuration file at %s' % config.config_path)
+        click.echo('Using the configuration file at %s' % config.config_path)
     if ctx.invoked_subcommand != 'configure':
         try:
             config.validate()
@@ -340,9 +340,9 @@ def erase(ctx, quiet):
     if not quiet:
         confirm = input(
             '\nIMPORTANT: This command will erase all of the data stored in '
-            'built-in Teamplify DB, and also remove all Docker images, '
+            'the built-in Teamplify DB, and also remove all Docker images, '
             'volumes, and networks used by Teamplify.\n\n'
-            'Do you confirm erasing all of Teamplify data (y/N)? ',
+            'Do you want to confirm the deletion of all Teamplify data (y/N)? ',
         )
         if confirm.lower() != 'y':
             click.echo('Erase command cancelled, exiting')

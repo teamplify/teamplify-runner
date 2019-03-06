@@ -57,9 +57,9 @@ down depending on the workload.
 
 # Install on Linux
 
-After installing Docker, please check [Post-installation steps for Linux](https://docs.docker.com/install/linux/linux-postinstall/).
+After installing Docker, please check the [Post-installation steps for Linux](https://docs.docker.com/install/linux/linux-postinstall/).
 You'll probably want to make sure that you're able to run Docker commands 
-without `sudo`, and that Docker is configured to start on boot.
+without `sudo` and that Docker is configured to start on boot.
 
 Install the latest version of Teamplify runner with pip:
 
@@ -67,9 +67,9 @@ Install the latest version of Teamplify runner with pip:
 $ pip3 install -U teamplify
 ```
 
-Note for Ubuntu users: if after the installation `teamplify` command can't be 
-found in path, please try exiting the terminal and opening it again. This will 
-force the terminal to update its path configuration, and the problem might go 
+Note for Ubuntu users: if the `teamplify` command can't be 
+found in path after the installation, please try exiting the terminal and opening it again. This will 
+force the terminal to update its path configuration, and the problem should go 
 away. 
 
 

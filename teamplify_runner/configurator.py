@@ -176,8 +176,13 @@ class Configurator:
             self.parser.write(fp)
             return fp.getvalue()
 
-    def use_ssl(self):
-        return str_to_bool(self.parser.get('web', 'use_ssl', fallback=''))
+    def ssl_mode(self):
+        use_ssl = self.parser.get('web', 'use_ssl', fallback='').lower()
+        if use_ssl in ('builtin', 'external'):
+            return use_ssl
+        elif str_to_bool(use_ssl):
+            return 'builtin'
+        return ''
 
     def env(self):
         env = {}
@@ -185,7 +190,10 @@ class Configurator:
             for option in self.parser.options(section):
                 name = section.upper() + '_' + option.upper()
                 env[name] = str(self.parser.get(section, option, fallback=''))
-        env['LETSENCRYPT_HOST'] = env['WEB_HOST'] if self.use_ssl() else ''
+        if self.ssl_mode() == 'builtin':
+            env['LETSENCRYPT_HOST'] = env['WEB_HOST']
+        else:
+            env['LETSENCRYPT_HOST'] = ''
         return env
 
     def validate(self):
@@ -234,13 +242,13 @@ class Configurator:
                         'Can\'t use port 443 because it\'s reserved for the '
                         'SSL-enabled configuration. Please choose another port',
                     )
-                if value != '80' and self.use_ssl():
+                if value != '80' and self.ssl_mode():
                     raise ConfigurationError(
                         'For SSL-enabled configuration port must be set to 80. '
                         'You provided: %s' % value,
                     )
             elif option == 'use_ssl':
-                validate_boolean(value)
+                validate_choice(value, ['no', 'builtin', 'external'])
         elif section == 'db':
             if option == 'host' and value.lower() != 'builtin_db':
                 validate_hostname(value)

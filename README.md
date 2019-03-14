@@ -146,13 +146,14 @@ All configuration options explained:
 - `port` - port on which Teamplify web interface will be running, the default 
   is `80`. If `use_ssl` is set to `yes` then `80` is the only allowed option;
 - `use_ssl` - possible values are `no`, `builtin`, and `external`, defaults to 
-  `no`. When set to `builtin` or `external`, all traffic to your Teamplify server will 
-  be redirected to HTTPS on port `443`. When set to `builtin`, Teamplify runner 
-  will use [Let's Encrypt](https://letsencrypt.org) to automatically generate 
-  and renew SSL certificates for the domain that you specified in the `host` 
-  parameter above. If you're hosting Teamplify behind a proxy or load balancer
-  that is already configured for SSL support, please set this parameter to 
-  `external`;
+  `no`. When set to `builtin` or `external`, all traffic to your Teamplify 
+  server will be redirected to HTTPS on port `443`. When set to `builtin`, 
+  Teamplify runner will use [Let's Encrypt](https://letsencrypt.org) to 
+  automatically generate and renew SSL certificates for the domain that you 
+  specified in the `host` parameter above. If you're hosting Teamplify behind a 
+  proxy or load balancer that is already configured for SSL support, please set 
+  this parameter to `external`, and also make sure that your proxy correctly
+  sets `X-Forwarded-Proto` HTTP header;
 
 `[db]`
 

@@ -33,6 +33,7 @@ services:
       - /usr/share/nginx/html
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ./vhost.conf:/etc/nginx/vhost.d/${WEB_HOST}:ro
+      - ./uwsgi_params:/etc/nginx/uwsgi_params:ro
     volumes_from:
       - app:ro
     ports:

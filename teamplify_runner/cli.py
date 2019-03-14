@@ -324,6 +324,7 @@ def update(ctx):
         if current_image != new_image:
             _stop(env)
             _start(env)
+            click.echo('')
     else:
         run('docker pull %s' % image_name)
     _remove_unused_images()

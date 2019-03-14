@@ -146,10 +146,10 @@ All configuration options explained:
 - `port` - port on which Teamplify web interface will be running, the default 
   is `80`. If `use_ssl` is set to `yes` then `80` is the only allowed option;
 - `use_ssl` - possible values are `no`, `builtin`, and `external`, defaults to 
-  `no`. When set to `builtin` or `external` all traffic to Teamplify server will 
+  `no`. When set to `builtin` or `external`, all traffic to Teamplify server will 
   be redirected to HTTPS on port `443`. When set to `builtin`, Teamplify runner 
   will use [Let's Encrypt](https://letsencrypt.org) to automatically generate 
-  and renew SSL certificates for the domain that you specified in `host` 
+  and renew SSL certificates for the domain that you specified in the `host` 
   parameter above. If you're hosting Teamplify behind a proxy or load balancer
   that is already configured for SSL support, please set this parameter to 
   `external`;
@@ -389,7 +389,7 @@ Please check the following:
   Please inspect its output;
 - There could be a problem with the domain name configuration. If the 
   `teamplify start` command has completed successfully, you should see 
-  Teamplify's interface in the browser when you open an address specified in 
+  Teamplify's interface in the browser when you open an address specified in the
   `host` and `port` parameters in the `[web]` section of the 
   [Configuration](#configuration). If that doesn't happen, i.e. if browser says 
   that it can't find the server or the server is not responding, then most 

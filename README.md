@@ -146,7 +146,7 @@ All configuration options explained:
 - `port` - port on which Teamplify web interface will be running, the default 
   is `80`. If `use_ssl` is set to `yes` then `80` is the only allowed option;
 - `use_ssl` - possible values are `no`, `builtin`, and `external`, defaults to 
-  `no`. When set to `builtin` or `external`, all traffic to Teamplify server will 
+  `no`. When set to `builtin` or `external`, all traffic to your Teamplify server will 
   be redirected to HTTPS on port `443`. When set to `builtin`, Teamplify runner 
   will use [Let's Encrypt](https://letsencrypt.org) to automatically generate 
   and renew SSL certificates for the domain that you specified in the `host` 
@@ -394,7 +394,7 @@ Please check the following:
   [Configuration](#configuration). If that doesn't happen, i.e. if browser says 
   that it can't find the server or the server is not responding, then most 
   likely this is a problem with either the domain name or firewall 
-  configuration. Please make sure that the domain exists and points to 
+  configuration. Please make sure that the domain exists and points to the
   Teamplify server, and that the port is open in the firewall;
 - If you see the "Teamplify is starting" message, you should give it a minute 
   or two to come online. If nothing happens after a few minutes, there could be 
@@ -421,7 +421,7 @@ try the following:
 
 - If you're going to use the built-in SMTP server, consider running Teamplify 
   on a server hosted in a data center or at your office, but not at home. Next, 
-  please make sure that you've added the IP of Teamplify server to the 
+  please make sure that you've added the IP of your Teamplify server to the 
   [SPF record](http://www.openspf.org/SPF_Record_Syntax) of the domain used
   in `address_from` setting in the configuration file;
 - Some email providers, for example, Google Mail, explicitly reject emails 

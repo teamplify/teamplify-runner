@@ -35,7 +35,8 @@ Before you proceed to the installation, please make sure that your system has
 the following components installed:
 
   - [Docker version 1.13 and above](https://docs.docker.com/install/);
-  - [Python 3.4 and above](https://www.python.org/downloads/).
+  - [Python 3.4 and above](https://www.python.org/downloads/);
+  - [pip for Python 3](https://packaging.python.org/tutorials/installing-packages/#ensure-you-can-run-pip-from-the-command-line)
 
 You can check to see if the required versions are installed with the following 
 commands (shown with example output):
@@ -45,14 +46,32 @@ $ docker -v
 Docker version 18.06.1-ce, build e68fc7a215d7133c34aa18e3b72b4a21fd0c6136
 $ python3 --version
 Python 3.7.2
+$ pip3 --version
+pip 9.0.3 from /usr/lib/python3.7/site-packages (python 3.7)
 ```
 
-In terms of hardware, we recommend 4GB of RAM, 2 CPU cores and 30 GB of disk 
-space (SSD is strongly recommended) as a default server configuration. For most 
-small-to-medium organizations (up to a few dozen people), this should be 
-enough. Larger workloads, however, may need more resources. The recommended 
-strategy is to start with the default server configuration and scale up or 
-down depending on the workload.
+**Note for Ubuntu users**
+
+On most systems, `Python 3` comes with `pip3` already pre-installed. However,
+Ubuntu is different - `Python 3` and `pip3` are installed separately. To install
+`pip3` run:
+
+```shell
+$ sudo apt install python3-pip
+```
+
+Important: after the installation, please exit the terminal and open it again. 
+This will force the terminal to update its path configuration, so that command
+line tools later installed with `pip3` could be found in path. 
+
+**Hardware**
+
+We recommend 4GB of RAM, 2 CPU cores and 30 GB of disk space (SSD is strongly 
+recommended) as a default server configuration. For most small-to-medium 
+organizations (up to a few dozen people), this should be enough. Larger 
+workloads, however, may need more resources. The recommended strategy is to 
+start with the default server configuration and scale up or down depending on 
+the workload.
 
 
 # Install on Linux
@@ -67,11 +86,6 @@ Install the latest version of Teamplify runner with pip:
 ``` shell
 $ pip3 install -U teamplify
 ```
-
-Note for Ubuntu users: if the `teamplify` command can't be found in path after 
-the installation, please try exiting the terminal and opening it again. This 
-will force the terminal to update its path configuration, and the problem should 
-go away. 
 
 
 # Install on Mac OS X

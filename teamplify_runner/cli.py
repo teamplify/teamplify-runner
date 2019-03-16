@@ -366,7 +366,14 @@ def erase(ctx, quiet):
         click.echo('Removing %s Docker volume(s):' % len(volumes))
         run('docker volume rm %s' % ' '.join(volumes), raise_on_error=False)
     click.echo('Removing Docker images:')
-    run('docker rmi %s' % ' '.join(IMAGES.values()), raise_on_error=False)
+    images = []
+    for image_id, reference in IMAGES.items():
+        if image_id == 'app':
+            for channel in ('stable', 'latest'):
+                images.append('%s:%s' % (reference, channel))
+        else:
+            images.append(reference)
+    run('docker rmi %s' % ' '.join(images), raise_on_error=False)
     click.echo('Done.')
 
 

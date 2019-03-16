@@ -50,7 +50,7 @@ $ pip3 --version
 pip 9.0.3 from /usr/lib/python3.7/site-packages (python 3.7)
 ```
 
-**Note for Ubuntu users**
+### Note for Ubuntu users
 
 On most systems, `Python 3` comes with `pip3` already pre-installed. However,
 Ubuntu is different - `Python 3` and `pip3` are installed separately. To install
@@ -64,7 +64,7 @@ Important: after the installation, please exit the terminal and open it again.
 This will force the terminal to update its path configuration, so that command
 line tools later installed with `pip3` could be found in path. 
 
-**Hardware**
+### Hardware
 
 We recommend 4GB of RAM, 2 CPU cores and 30 GB of disk space (SSD is strongly 
 recommended) as a default server configuration. For most small-to-medium 

@@ -52,8 +52,8 @@ pip 9.0.3 from /usr/lib/python3.7/site-packages (python 3.7)
 
 ### Note for Ubuntu users
 
-On most systems, `Python 3` comes with `pip3` already pre-installed. However,
-Ubuntu is different - `Python 3` and `pip3` are installed separately. To install
+On most systems, `Python 3` comes with `pip3`  pre-installed. However,
+in Ubuntu `Python 3` and `pip3` are installed separately. To install
 `pip3` run:
 
 ```shell
@@ -61,8 +61,8 @@ $ sudo apt install python3-pip
 ```
 
 Important: after the installation, please exit the terminal and open it again. 
-This will force the terminal to update its path configuration, so that command
-line tools later installed with `pip3` could be found in path. 
+This will force the terminal to update its path configuration so that command
+line tools installed with `pip3` later will be able to be found in path. 
 
 ### Hardware
 

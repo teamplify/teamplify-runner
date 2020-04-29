@@ -6,7 +6,7 @@ from setuptools import setup
 import teamplify_runner
 
 
-MIN_PYTHON_VER = (3, 4)
+MIN_PYTHON_VER = (3, 5)
 MIN_PYTHON_STR = '.'.join(map(str, MIN_PYTHON_VER))
 
 if sys.version_info < MIN_PYTHON_VER:

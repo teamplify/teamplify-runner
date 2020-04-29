@@ -70,6 +70,7 @@ services:
       - builtin_db
       - redis
     volumes:
+      - media:/media/
       - repos:/repos/
     environment:
       # nginx-proxy & Let's Encrypt configuration:
@@ -109,6 +110,7 @@ services:
       - redis
       - builtin_smtp
     volumes:
+      - media:/media/
       - repos:/repos/
     environment:
       - C_FORCE_ROOT=1
@@ -116,6 +118,7 @@ services:
       - MAIN_SEND_CRASH_REPORTS
       - WEB_HOST
       - WEB_PORT
+      - WEB_USE_SSL
       - DB_HOST
       - DB_PORT
       - DB_USER
@@ -141,6 +144,7 @@ services:
       - redis
       - builtin_smtp
     volumes:
+      - media:/media/
       - repos:/repos/
     environment:
       - C_FORCE_ROOT=1
@@ -148,6 +152,7 @@ services:
       - MAIN_SEND_CRASH_REPORTS
       - WEB_HOST
       - WEB_PORT
+      - WEB_USE_SSL
       - DB_HOST
       - DB_PORT
       - DB_USER
@@ -171,12 +176,14 @@ services:
       - builtin_db
       - redis
     volumes:
+      - media:/media/
       - repos:/repos/
     environment:
       - MAIN_PRODUCT_KEY
       - MAIN_SEND_CRASH_REPORTS
       - WEB_HOST
       - WEB_PORT
+      - WEB_USE_SSL
       - DB_HOST
       - DB_PORT
       - DB_USER
@@ -194,5 +201,6 @@ services:
 volumes:
   nginx_certs:
   nginx_dhparam:
+  media:
   mysql_data:
   repos:

@@ -35,7 +35,7 @@ Before you proceed to the installation, please make sure that your system has
 the following components installed:
 
   - [Docker version 1.13 and above](https://docs.docker.com/install/);
-  - [Python 3.4 and above](https://www.python.org/downloads/);
+  - [Python 3.5 and above](https://www.python.org/downloads/);
   - [pip for Python 3](https://packaging.python.org/tutorials/installing-packages/#ensure-you-can-run-pip-from-the-command-line)
 
 You can check to see if the required versions are installed with the following 

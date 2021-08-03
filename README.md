@@ -42,9 +42,9 @@ also deploy on Mac OS X. Windows is not supported.
 
 Before you install, make sure that your system has the following components:
 
-  - [Docker version 1.13 and above](https://docs.docker.com/install/);
-  - [Python 3.6 and above](https://www.python.org/downloads/);
-  - [pip for Python 3](https://packaging.python.org/tutorials/installing-packages/#ensure-you-can-run-pip-from-the-command-line)
+* [Docker version 1.13 and above](https://docs.docker.com/install/);
+* [Python 3.6 and above](https://www.python.org/downloads/);
+* [pip for Python 3](https://packaging.python.org/tutorials/installing-packages/#ensure-you-can-run-pip-from-the-command-line)
 
 To check that the required versions are installed, run these commands (shown
 with example output):
@@ -81,11 +81,9 @@ workloads, however, may need more resources. The recommended strategy is to
 start with the default server configuration and scale up or down depending on
 the workload.
 
-
 ## Installing
 
 ### Installing on Linux
-
 
 After installing Docker, check Docker's
 [post-installation steps for Linux](https://docs.docker.com/install/linux/linux-postinstall/).
@@ -337,7 +335,6 @@ activity. The `update` command restarts the service only when necessary. If no
 update has been downloaded, there is no restart and therefore no service
 interruption.
 
-
 ## Backup and restore
 
 Teamplify stores your data in a MySQL database. As with any other database, it
@@ -520,7 +517,6 @@ It also might be helpful to check the logs:
 $ docker logs teamplify_letsencrypt
 ```
 
-
 ### Other
 
 For any issue with Teamplify, we recommend that you try to
@@ -533,7 +529,6 @@ If the suggested solutions above don't work, please don't hesitate to
 or contact us at [support@teamplify.com](mailto:support@teamplify.com). You can
 also use the live chat on [teamplify.com](https://teamplify.com). We're ready
 to help!
-
 
 ## Uninstall
 
@@ -552,8 +547,7 @@ Uninstall Teamplify runner:
 $ pip3 uninstall teamplify
 ```
 
-
-# License
+## License
 
 Teamplify runner is available under the MIT license. Please note that the MIT
 license applies to Teamplify runner only, but not to the main Teamplify product.

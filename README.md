@@ -10,31 +10,32 @@ that may require their attention. It is available
 This package is the installer and runner for the on-premise version.
 
 * [System requirements](#system-requirements)
-  * [On Ubuntu, be sure to install pip3](#on-ubuntu-be-sure-to-install-pip3)
-  * [Hardware](#hardware)
+   * [On Ubuntu, be sure to install pip3](#on-ubuntu-be-sure-to-install-pip3)
+   * [Hardware](#hardware)
 * [Installing](#installing)
-  * [Installing on Linux](#installing-on-linux)
-* [Installing on Mac OS X](#installing-on-mac-os-x)
+   * [Installing on Linux](#installing-on-linux)
+   * [Installing on Mac OS X](#installing-on-mac-os-x)
 * [Configuration](#configuration)
-  * [A reference of all configuration options:](#a-reference-of-all-configuration-options)
-  * [Where are configuration files located?](#where-are-configuration-files-located)
+   * [Where are configuration files located?](#where-are-configuration-files-located)
+   * [A reference of all configuration options:](#a-reference-of-all-configuration-options)
 * [Starting and stopping the service](#starting-and-stopping-the-service)
 * [What to do after the first run?](#what-to-do-after-the-first-run)
-  * [Creating an admin account](#creating-an-admin-account)
+   * [Creating an admin account](#creating-an-admin-account)
 * [Updating Teamplify](#updating-teamplify)
 * [Backup and restore](#backup-and-restore)
 * [A Sample maintenance script](#a-sample-maintenance-script)
-* [Troubleshooting](#troubleshooting)
-  * [Teamplify won't start](#teamplify-wont-start)
-  * [Email delivery issues](#email-delivery-issues)
-  * [The connection is refused or not trusted in SSL-enabled mode](#the-connection-is-refused-or-not-trusted-in-ssl-enabled-mode)
-  * [Other](#other)
 * [Uninstall](#uninstall)
+* [Troubleshooting](#troubleshooting)
+   * [Teamplify won't start](#teamplify-wont-start)
+   * [Email delivery issues](#email-delivery-issues)
+   * [The connection is refused or not trusted in SSL-enabled mode](#the-connection-is-refused-or-not-trusted-in-ssl-enabled-mode)
+   * [Other](#other)
 * [License](#license)
+
 
 ## System requirements
 
-Teamplify is designed to run on Linux. For a quick demonstration, it should
+Teamplify is designed to run on Linux. For demonstration purposes, it should
 also deploy on Mac OS X. Windows is not supported.
 
 Before you install, make sure that your system has the following components:
@@ -93,7 +94,7 @@ Install the latest version of Teamplify runner with pip:
 $ pip3 install -U teamplify
 ```
 
-## Installing on Mac OS X
+### Installing on Mac OS X
 
 On Mac OS X, we recommend installing Teamplify in a Python virtual
 environment located in your home directory. This is because Teamplify needs to
@@ -138,6 +139,32 @@ You need to specify the following parameters:
 * `host` and `port` in the `[web]` section
 
 Other parameters are optional and can keep their default values.
+
+### Where are configuration files located?
+
+When you run `teamplify configure`, it creates a configuration file.
+Typically, this file is at `~/.teamplify.ini`.
+
+However, that is not the only
+possible location. Teamplify searches the following locations (listed from
+highest priority to lowest priority):
+
+1. First, it checks the location specified in the `--config` parameter in the
+command line. Example:
+
+   ``` shell
+   $ teamplify --config /path/to/configuration/file start
+   ```
+
+2. An environment variable named `TEAMPLIFY_CONF`. Example:
+
+   ``` shell
+   $ TEAMPLIFY_CONF=/path/to/configuration/file teamplify start
+   ```
+
+3. In the home directory of the current user: `~/.teamplify.ini`;
+4. At `/etc/teamplify/teamplify.ini`.
+
 
 ### A reference of all configuration options:
 
@@ -226,32 +253,6 @@ Other parameters are optional and can keep their default values.
   another 50-character random string made of Latin characters and numbers
   (please note that this will force all existing users to log in to the system
   again).
-
-### Where are configuration files located?
-
-When you run `teamplify configure`, it creates a configuration file.
-Typically, this file is at `~/.teamplify.ini`.
-
-However, that is not the only
-possible location. Teamplify searches the following locations (listed from
-highest priority to lowest priority):
-
-1. First, it checks the location specified in the `--config` parameter in the
-command line. Example:
-
-   ``` shell
-   $ teamplify --config /path/to/configuration/file start
-   ```
-
-2. An environment variable named `TEAMPLIFY_CONF`. Example:
-
-   ``` shell
-   $ TEAMPLIFY_CONF=/path/to/configuration/file teamplify start
-   ```
-
-3. In the home directory of the current user: `~/.teamplify.ini`;
-4. At `/etc/teamplify/teamplify.ini`.
-
 
 ## Starting and stopping the service
 
@@ -420,6 +421,22 @@ In the example above, the script is scheduled to run daily at 3 AM. See
 [cron syntax](https://en.wikipedia.org/wiki/Cron) for a detailed explanation.
 When ready, save and close the file.
 
+## Uninstall
+
+If you'd like to uninstall Teamplify, please follow the steps below. IMPORTANT:
+the uninstall procedure will erase all of the data stored in Teamplify, so please consider making a [backup](#backup-and-restore) before doing this.
+
+Remove all Teamplify data, Docker images, volumes, and networks:
+
+``` shell
+$ teamplify erase
+```
+
+Uninstall Teamplify runner:
+
+``` shell
+$ pip3 uninstall teamplify
+```
 
 ## Troubleshooting
 
@@ -526,23 +543,6 @@ If the suggested solutions above don't work, please don't hesitate to
 or contact us at [support@teamplify.com](mailto:support@teamplify.com). You can
 also use the live chat on [teamplify.com](https://teamplify.com). We're ready
 to help!
-
-## Uninstall
-
-If you'd like to uninstall Teamplify, please follow the steps below. IMPORTANT:
-the uninstall procedure will erase all of the data stored in Teamplify, so please consider making a [backup](#backup-and-restore) before doing this.
-
-Remove all Teamplify data, Docker images, volumes, and networks:
-
-``` shell
-$ teamplify erase
-```
-
-Uninstall Teamplify runner:
-
-``` shell
-$ pip3 uninstall teamplify
-```
 
 ## License
 

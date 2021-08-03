@@ -11,12 +11,12 @@ from teamplify_runner.utils import cd, run
 
 
 IMAGES = {
-    'db': 'mysql:5.7.21',
-    'redis': 'redis:3.0',
+    'db': 'mysql:8.0.23',
+    'redis': 'redis:6.0.5',
     'nginx': 'jwilder/nginx-proxy:latest',
     'letsencrypt': 'jrcs/letsencrypt-nginx-proxy-companion:latest',
     'smtp': 'instrumentisto/postfix:3.1.3',
-    'app': 'teamplify/server',
+    'app': 'public.ecr.aws/q5a3z0t4/teamplify/server',
 }
 
 
@@ -173,7 +173,7 @@ def _restore(env, filename):
 
 def _remove_unused_images():
     unused_images = run(
-        'docker images -f reference=teamplify/server -f dangling=true -q',
+        'docker images -f reference=%s -f dangling=true -q' % (IMAGES['app']),
         suppress_output=True,
     ).stdout_lines
     click.echo('Cleanup: %s stale image(s) found' % len(unused_images))
@@ -316,17 +316,16 @@ def update(ctx):
     Update to the latest version
     """
     env = ctx.obj['env']
-    image_name = 'teamplify/server:%s' % env['MAIN_UPDATE_CHANNEL']
     if _running(env):
-        current_image = _image_id(image_name)
-        run('docker pull %s' % image_name, capture_output=False)
-        new_image = _image_id(image_name)
+        current_image = _image_id(env['IMAGE_APP'])
+        run('docker pull %s' % env['IMAGE_APP'], capture_output=False)
+        new_image = _image_id(env['IMAGE_APP'])
         if current_image != new_image:
             _stop(env)
             _start(env)
             click.echo('')
     else:
-        run('docker pull %s' % image_name)
+        run('docker pull %s' % env['IMAGE_APP'])
     _remove_unused_images()
     click.echo('Done.')
 

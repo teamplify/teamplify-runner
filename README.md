@@ -2,7 +2,13 @@
 
 [![image](https://travis-ci.org/teamplify/teamplify-runner.svg?branch=master)](https://travis-ci.org/teamplify/teamplify-runner)
 
-* [About](#about)
+[Teamplify](https://teamplify.com) is a personal assistant for your development
+team. It helps you track work progress and notify your team about situations
+that may require their attention. It is available
+[in the cloud](https://teamplify.com) or as an on-premise installation.
+
+This package is the installer and runner for the on-premise version.
+
 * [System requirements](#system-requirements)
   * [On Ubuntu, be sure to install pip3](#on-ubuntu-be-sure-to-install-pip3)
   * [Hardware](#hardware)
@@ -25,15 +31,6 @@
   * [Other](#other)
 * [Uninstall](#uninstall)
 * [License](#license)
-
-## About
-
-[Teamplify](https://teamplify.com) is a personal assistant for your development
-team. It helps you track work progress and notify your team about situations
-that may require their attention. It is available
-[in the cloud](https://teamplify.com) or as an on-premise installation.
-
-This package is the installer and runner for the on-premise version.
 
 ## System requirements
 

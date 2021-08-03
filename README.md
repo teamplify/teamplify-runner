@@ -10,6 +10,7 @@
   - [Configuration](#configuration)
   - [Configuration file locations](#configuration-file-locations)
   - [Starting and stopping the service](#starting-and-stopping-the-service)
+  - [What to do after the first run](#what-to-do-after-the-first-run)
   - [Updates](#updates)
   - [Backup and restore](#backup-and-restore)
   - [Maintenance script](#maintenance-script)
@@ -264,12 +265,33 @@ If you need to stop Teamplify, run:
 $ teamplify stop
 ```
 
+After running Teamplify for the first time, 
+[follow the instructions to create an admin account](#create-an-admin-account)
+
 There's also a convenient command to stop the service and start it again. It 
 could be useful for applying changes made to the configuration:
 
 ``` shell
 $ teamplify restart
 ```
+
+
+# What to do after the first run?
+
+## Create an admin account
+
+To be able to login and use the app, you need to create an admin user. 
+After the application first starts, run the following command:
+
+``` shell
+$ teamplify createadmin --email <admin@email> --full-name <Full Name>
+```
+
+Please check the output to make sure that no errors occurred.
+
+With the `createadmin` command, you can create as many 
+admin account as you want. However, after the first one, it might be more convenient 
+to create the others through the Teamplify UI.
 
 
 # Updates

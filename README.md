@@ -102,20 +102,17 @@ mount its configuration files into Docker containers. By default on Mac OS X,
 only the `/Users` folder is shared with Docker.
 
 1. Create a new Python virtual environment for Teamplify in your home directory:
-
 ``` shell
 $ python3 -m venv ~/.venv/teamplify
 ```
 
-1. Activate it:
-
+2. Activate it:
 ``` shell
 $ source ~/.venv/teamplify/bin/activate
 ```
 
-1. At this point, a `pip` command is linked to the virtual environment that
+3. At this point, a `pip` command is linked to the virtual environment that
 you just created. Install Teamplify runner with `pip`:
-
 ``` shell
 $ pip install teamplify
 ```
@@ -124,28 +121,21 @@ $ pip install teamplify
 
 Teamplify requires a configuration file to run.
 
-1. To create an initial configuration file, run the following command:
-
+1. Run the following command to create the initial file:
 ``` shell
 $ teamplify configure
 ```
+  _This creates a configuration file with default settings in your home
+directory: `~/.teamplify.ini`. You can specify the location of
+your file with the `--config` option._
 
-_To specify the config file's location, you MAY add the flag
-`--config <file-path>`._
-
-
-This creates a configuration file with default settings in your home
-directory: `~/.teamplify.ini`.
-
-2. Please use your favorite text editor to  adjust the contents of this file.
-You need to specify the following parameters:
-
-* `product_key` in the  `[main]` section
-* `host` and `port` in the `[web]` section
-
-Other parameters are optional and can keep their default values.
-You can review them at [the reference of all configuration options](#A-reference-of-all-configuration-options)
-
+2. Use your text editor to  adjust the contents of this file.
+  You need to specify the following parameters:
+  * `product_key` in the  `[main]` section
+  * `host` and `port` in the `[web]` section
+  
+  Other parameters are optional and can keep their default values.
+  You can review them at [the reference of all configuration options](#A-reference-of-all-configuration-options)
 
 ### Where are configuration files located?
 

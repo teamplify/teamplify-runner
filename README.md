@@ -17,7 +17,7 @@ This package is the installer and runner for the on-premise version.
    * [Installing on Mac OS X](#installing-on-mac-os-x)
 * [Configuration](#configuration)
    * [Where are configuration files located?](#where-are-configuration-files-located)
-   * [A reference of all configuration options:](#a-reference-of-all-configuration-options)
+   * [A reference of all configuration options](#a-reference-of-all-configuration-options)
 * [Starting and stopping the service](#starting-and-stopping-the-service)
 * [What to do after the first run?](#what-to-do-after-the-first-run)
    * [Creating an admin account](#creating-an-admin-account)
@@ -101,19 +101,19 @@ environment located in your home directory. This is because Teamplify needs to
 mount its configuration files into Docker containers. By default on Mac OS X,
 only the `/Users` folder is shared with Docker.
 
-Create a new Python virtual environment for Teamplify in your home directory:
+1. Create a new Python virtual environment for Teamplify in your home directory:
 
 ``` shell
 $ python3 -m venv ~/.venv/teamplify
 ```
 
-Activate it:
+1. Activate it:
 
 ``` shell
 $ source ~/.venv/teamplify/bin/activate
 ```
 
-At this point, a `pip` command is linked to the virtual environment that
+1. At this point, a `pip` command is linked to the virtual environment that
 you just created. Install Teamplify runner with `pip`:
 
 ``` shell
@@ -122,23 +122,30 @@ $ pip install teamplify
 
 ## Configuration
 
-Teamplify requires a configuration file to run. You can create an initial
-configuration file with the following command:
+Teamplify requires a configuration file to run.
+
+1. To create an initial configuration file, run the following command:
 
 ``` shell
 $ teamplify configure
 ```
 
+_To specify the config file's location, you MAY add the flag
+`--config <file-path>`._
+
+
 This creates a configuration file with default settings in your home
 directory: `~/.teamplify.ini`.
 
-Please use your favorite text editor to  adjust the contents of this file.
+2. Please use your favorite text editor to  adjust the contents of this file.
 You need to specify the following parameters:
 
 * `product_key` in the  `[main]` section
 * `host` and `port` in the `[web]` section
 
 Other parameters are optional and can keep their default values.
+You can review them at [the reference of all configuration options](#A-reference-of-all-configuration-options)
+
 
 ### Where are configuration files located?
 
@@ -166,18 +173,18 @@ command line. Example:
 4. At `/etc/teamplify/teamplify.ini`.
 
 
-### A reference of all configuration options:
+### A reference of all configuration options
 
 `[main]`
 
 - `product_key` - the product key of your installation. This is required.
-  Please email us at [support@teamplify.com](mailto:support@teamplify.com) to
-  get the product key;
+  To get the product key, please email us at
+  [support@teamplify.com](mailto:support@teamplify.com);
 
 - `update_channel` - the application distribution channel to use. Can be set to
   `stable` or `latest`. The default setting is `stable` (recommended for most
   users). With the `stable` channel, you should expect a few updates per month.
-  Updates in the latest channel are more frequent and contain all of the latest
+  Updates in the latest channel are more frequent and contain all the latest
   features and bug-fixes. However, they also have a higher chance of
   introducing new bugs. Please note that Teamplify doesn't update itself
   automatically unless you've explicitly configured it to do so. See the
@@ -185,14 +192,14 @@ command line. Example:
   below;
 
 - `send_crash_reports` - possible values are `yes` and `no`, defaults to `yes`.
-  When set to `yes` the system will automatically send application crash
+  When set to `yes`, the system automatically sends application crash
   reports to our team. We recommend keeping this option enabled as it helps us
   to detect bugs faster and ship fixes for them more quickly;
 
 `[web]`
 
-- `host` - domain name on which Teamplify web interface will be running. It
-  must be created in advance and pointing to the server on which you have
+- `host` - domain name on which the Teamplify web interface will be running. It
+  must be created in advance, and pointed to the server where you have
   installed Teamplify;
 - `port` - port on which Teamplify web interface will be running, the default
   is `80`. If `use_ssl` is set to `yes` then `80` is the only allowed option;
@@ -208,7 +215,7 @@ command line. Example:
 
 `[db]`
 
-- `host` - defaults to `builtin_db`, which means using the DB instance that is
+- `host` - defaults to `builtin_db`, that is, using the DB instance that is
   shipped with Teamplify. You can also switch to an external MySQL 5.7
   compatible database by providing its hostname instead of `builtin_db` and
   specifying other DB connection parameters below;
@@ -262,12 +269,12 @@ After you have created the configuration file, start Teamplify with:
 $ teamplify start
 ```
 
-On the first run, the application may take a while to start. It has to download
-and configure many Docker images.
+On the first run, the application has to download and configure many Docker
+images. For this reason, the first run might take a while to start.
 
 After the command completes, open Teamplify in your browser using the `host` and
 the `port` that you provided in the `[web]` section of the configuration. After
-starting the service, it may take a minute or two before it finally comes
+starting the service, it might take a minute or two before it finally comes
 online.
 
 If you have problems starting Teamplify, please see the
@@ -345,10 +352,12 @@ $ teamplify backup [optional-backup-file-or-directory]
 ```
 
 If launched without parameters, it makes a gzipped backup of the DB and
-stores it in the current working directory, under a name in the format
-`teamplify_<current-date>.sql.gz`, for example,
-`teamplify_2019-01-31_06-58-57.sql.gz`. You have the option to specify a
-directory or path to the file where you'd like to save your backup.
+stores it in the current working directory, under a name in the format:
+
+* `teamplify_<current-date>.sql.gz`,
+  * for example, `teamplify_2019-01-31_06-58-57.sql.gz`.
+
+You may specify the directory or file path where you'd like to save your backup.
 
 To restore the built-in Teamplify database from a gzipped backup, run:
 
@@ -366,7 +375,7 @@ Backing up the data and keeping the software up-to-date are routine operations.
 We recommend automating these processes. Below is a sample script you can use to
 do so.
 
-Create a file named `teamplify-maintenance.sh` with the following contents:
+1. Create a file named `teamplify-maintenance.sh` with the following contents:
 
 ``` shell
 #!/usr/bin/env bash
@@ -403,9 +412,10 @@ backup in the case of a disaster. For example, you can use
 [aws s3 sync](https://docs.aws.amazon.com/cli/latest/reference/s3/sync.html) to
 upload the backups to AWS S3.
 
-When the maintenance script is ready, make it executable with
-`chmod +x teamplify-maintenance.sh` and set it as a cron job to run daily. Open
-the crontab schedule:
+2. When the maintenance script is ready, make it executable with
+`chmod +x teamplify-maintenance.sh`.
+
+3. Set the script to run as a daily cron job. Open the crontab schedule:
 
 ``` shell
 $ crontab -e
@@ -423,16 +433,18 @@ When ready, save and close the file.
 
 ## Uninstall
 
-If you'd like to uninstall Teamplify, please follow the steps below. IMPORTANT:
-the uninstall procedure will erase all of the data stored in Teamplify, so please consider making a [backup](#backup-and-restore) before doing this.
+If you'd like to uninstall Teamplify, use the following steps.
 
-Remove all Teamplify data, Docker images, volumes, and networks:
+**IMPORTANT**: The uninstall procedure erases all data stored in Teamplify.
+Before doing this, [consider making a backup](#backup-and-restore).
+
+1. Remove all Teamplify data, Docker images, volumes, and networks:
 
 ``` shell
 $ teamplify erase
 ```
 
-Uninstall Teamplify runner:
+2. Uninstall Teamplify runner:
 
 ``` shell
 $ pip3 uninstall teamplify
@@ -538,7 +550,7 @@ For any issue with Teamplify, we recommend that you try to
 possible that the problem that you encountered is already addressed in a newer
 version.
 
-If the suggested solutions above don't work, please don't hesitate to
+If these suggested solutions don't work, don't hesitate to
 [open an issue on Github](https://github.com/teamplify/teamplify-runner/issues)
 or contact us at [support@teamplify.com](mailto:support@teamplify.com). You can
 also use the live chat on [teamplify.com](https://teamplify.com). We're ready

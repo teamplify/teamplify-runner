@@ -25,8 +25,7 @@ jobs:
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
 
-  lint_and_tests:
-    needs: lint
+  lint-and-tests:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -68,7 +67,7 @@ jobs:
 
   notify-build-success:
     if: ${{ github.event_name == 'push' }}
-    needs: tests
+    needs: lint-and-tests
     runs-on: ubuntu-latest
     steps:
       # Send notification on build success

@@ -12,7 +12,7 @@ jobs:
     # Unfortunately, there's no way to explicitly check that a secret is
     # available, so we check for event_name instead:
     # https://github.com/actions/runner/issues/520
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ contains(["push", "workflow_dispatch"], github.event_name) }}
     runs-on: ubuntu-latest
     steps:
       # Send build notifications to Slack
@@ -66,7 +66,7 @@ jobs:
           color: danger
 
   notify-build-success:
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ contains(["push", "workflow_dispatch"], github.event_name) }}
     needs: lint-and-tests
     runs-on: ubuntu-latest
     steps:

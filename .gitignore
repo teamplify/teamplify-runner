@@ -2,6 +2,7 @@
 .cache
 .idea
 .pytest_cache
+.venv
 *.egg-info
 build
 dist

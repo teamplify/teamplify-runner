@@ -15,6 +15,7 @@ services:
       - ${DB_BACKUP_MOUNT}:/backup/
       - ./mysql.cnf:/etc/mysql/conf.d/teamplify.cnf:ro
     restart: always
+    command: mysqld --default-authentication-plugin=mysql_native_password
 
   redis:
     image: ${IMAGE_REDIS}

@@ -214,6 +214,10 @@ def cli(ctx, config):
     for image_id, reference in IMAGES.items():
         env['IMAGE_%s' % image_id.upper()] = reference
     env['IMAGE_APP'] += ':' + env['MAIN_UPDATE_CHANNEL']
+    if env['WEB_USE_SSL'] == 'builtin':
+        env['WEB_SSL_PORT'] = '443'
+    else:
+        env['WEB_SSL_PORT'] = '50443'
     ctx.obj['env'] = env
 
 

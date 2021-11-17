@@ -82,6 +82,7 @@ services:
       - HSTS=off
 
       - MAIN_PRODUCT_KEY
+      - MAIN_UPDATE_CHANNEL
       - MAIN_SEND_CRASH_REPORTS
       - WEB_HOST
       - WEB_PORT
@@ -116,6 +117,7 @@ services:
     environment:
       - C_FORCE_ROOT=1
       - MAIN_PRODUCT_KEY
+      - MAIN_UPDATE_CHANNEL
       - MAIN_SEND_CRASH_REPORTS
       - WEB_HOST
       - WEB_PORT
@@ -150,6 +152,7 @@ services:
     environment:
       - C_FORCE_ROOT=1
       - MAIN_PRODUCT_KEY
+      - MAIN_UPDATE_CHANNEL
       - MAIN_SEND_CRASH_REPORTS
       - WEB_HOST
       - WEB_PORT
@@ -181,6 +184,7 @@ services:
       - repos:/repos/
     environment:
       - MAIN_PRODUCT_KEY
+      - MAIN_UPDATE_CHANNEL
       - MAIN_SEND_CRASH_REPORTS
       - WEB_HOST
       - WEB_PORT

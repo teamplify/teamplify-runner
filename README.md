@@ -251,6 +251,17 @@ command line. Example:
   (please note that this will force all existing users to log in to the system
   again).
 
+`[worker]`
+
+- `slim_count` - number of workers doing background tasks such as sending
+  notifications, emails, etc. The default setting is `1`, which is sufficient
+  for most organizations.
+- `fat_count` - the number of workers doing resources synchronization such as
+  repositories, chats, issues, etc. If you have a lot of resources or it takes
+  a long time to sync them, you can increase this parameter. Essentially, it
+  controls how many resources are synchronized in parallel. The default setting
+  is `2`.
+
 ## Starting and stopping the service
 
 After you have created the configuration file, start Teamplify with:

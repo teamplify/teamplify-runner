@@ -2,6 +2,7 @@ import contextlib
 import os
 import random
 import string
+import traceback
 
 import click
 import sarge
@@ -18,28 +19,39 @@ def cd(path):
 
 
 def run(cmd, raise_on_error=True, capture_output=True, suppress_output=False,
-        **kwargs):
+        exit_on_error=True, **kwargs):
     """
     Wrapper around sarge.run that can raise errors and capture stdout.
     """
+    def echo_output(stdout, stderr):
+        if suppress_output:
+            return
+        if stdout:
+            click.echo(stdout)
+        if stderr:
+            click.echo(stderr, err=True)
+
     if capture_output:
         kwargs['stdout'] = sarge.Capture()
         kwargs['stderr'] = sarge.Capture()
     result = sarge.run(cmd, **kwargs)
     code = result.returncode
     if code and raise_on_error:
-        raise RuntimeError('Command failed, exit code %s' % code)
+        echo_output(result.stdout.read(), result.stderr.read())
+        # print two last traceback records: current line and run caller
+        traceback.print_stack(limit=2)
+        msg = 'Command failed, exit code %s' % code
+        if exit_on_error:
+            click.echo(msg)
+            exit(1)
+        else:
+            raise RuntimeError(msg)
     if capture_output:
         stdout = result.stdout.read()
         result.stdout_lines = stdout.decode().split('\n')
         if result.stdout_lines[-1] == '':
             result.stdout_lines = result.stdout_lines[:-1]
-        if not suppress_output:
-            if stdout:
-                click.echo(stdout)
-            stderr = result.stderr.read()
-            if stderr:
-                click.echo(stderr, err=True)
+        echo_output(stdout, result.stderr.read())
     return result
 
 

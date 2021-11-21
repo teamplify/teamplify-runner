@@ -134,13 +134,15 @@ def _backup(env, filename=None):
     click.echo('Making backup of Teamplify DB to:\n -> %s' % target_file)
     click.echo('Please wait...')
     try:
-        run('docker exec teamplify_db bash -c "{command}"'.format(
-            command=command,
-        ))
-    except RuntimeError as e:
+        run(
+            'docker exec teamplify_db bash -c "{command}"'.format(
+                command=command,
+            ),
+            exit_on_error=False,
+        )
+    except RuntimeError:
         if cleanup_on_error:
             run('rm %s' % target_file)
-        click.echo(str(e), err=True)
         exit(1)
     run('mv {source} {target}'.format(
         source=os.path.join(env['DB_BACKUP_MOUNT'], default_filename),

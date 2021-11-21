@@ -37,7 +37,8 @@ def run(cmd, raise_on_error=True, capture_output=True, suppress_output=False,
     result = sarge.run(cmd, **kwargs)
     code = result.returncode
     if code and raise_on_error:
-        echo_output(result.stdout.read(), result.stderr.read())
+        if capture_output:
+            echo_output(result.stdout.read(), result.stderr.read())
         # print two last traceback records: current line and run caller
         traceback.print_stack(limit=2)
         msg = 'Command failed, exit code %s' % code

@@ -116,11 +116,12 @@ def _backup(env, filename=None):
         target_file = os.path.join(filename, default_filename)
     else:
         target_file = filename
+    temp_filename = os.path.join('/backup', default_filename)
     cleanup_on_error = not os.path.exists(target_file)
-    try:
-        run('touch %s' % target_file)  # quick check for write access
-    except RuntimeError:
-        exit(1)
+    # check for write access on the host
+    run('touch %s' % target_file)
+    # check for write access inside docker
+    run('docker exec teamplify_db bash -c "touch %s"' % temp_filename)
     command = (
         'MYSQL_PWD={password} mysqldump --single-transaction -u{user} '
         '-h {host} {db} | gzip > {filename}'.format(

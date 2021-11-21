@@ -131,7 +131,7 @@ class Configurator:
         ))),
         ('worker', OrderedDict((
             ('slim_count', 1),
-            ('fat_count', 1),
+            ('fat_count', 2),
         ))),
     ))
     default_config_locations = [

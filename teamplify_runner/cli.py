@@ -33,7 +33,14 @@ def _start(env):
     run('mkdir -p %s' % env['DB_BACKUP_MOUNT'])
     with cd(BASE_DIR):
         run(
-            'docker-compose up -d --remove-orphans',
+            'docker-compose up '
+            '--detach '
+            '--remove-orphans '
+            '--scale worker_slim={worker_slim_count} '
+            '--scale worker_fat={worker_fat_count}'.format(
+                worker_slim_count=env['WORKER_SLIM_COUNT'],
+                worker_fat_count=env['WORKER_FAT_COUNT'],
+            ),
             capture_output=False,
             env=env,
         )

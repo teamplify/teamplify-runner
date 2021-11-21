@@ -103,7 +103,6 @@ services:
 
   worker_slim:
     image: ${IMAGE_APP}
-    container_name: teamplify_worker_slim
     depends_on:
       - app
       - builtin_smtp
@@ -138,7 +137,6 @@ services:
 
   worker_fat:
     image: ${IMAGE_APP}
-    container_name: teamplify_worker_fat
     depends_on:
       - app
       - builtin_smtp

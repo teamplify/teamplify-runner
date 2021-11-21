@@ -129,6 +129,10 @@ class Configurator:
         ('crypto', OrderedDict((
             ('signing_key', random_string(50)),
         ))),
+        ('worker', OrderedDict((
+            ('slim_count', 1),
+            ('fat_count', 1),
+        ))),
     ))
     default_config_locations = [
         os.environ.get('TEAMPLIFY_CONF', ''),
@@ -270,6 +274,9 @@ class Configurator:
                 validate_port(value)
             elif option == 'address_from':
                 validate_email(value)
+        elif section == 'workers':
+            if option in {'slim_count', 'fat_count'}:
+                validate_integer(value, 1)
 
     def remove_unknown(self):
         unknown_sections = []

@@ -24,8 +24,6 @@ def run(cmd, raise_on_error=True, capture_output=True, suppress_output=False,
     Wrapper around sarge.run that can raise errors and capture stdout.
     """
     def echo_output(stdout, stderr):
-        if suppress_output:
-            return
         if stdout:
             click.echo(stdout)
         if stderr:
@@ -52,7 +50,8 @@ def run(cmd, raise_on_error=True, capture_output=True, suppress_output=False,
         result.stdout_lines = stdout.decode().split('\n')
         if result.stdout_lines[-1] == '':
             result.stdout_lines = result.stdout_lines[:-1]
-        echo_output(stdout, result.stderr.read())
+        if not suppress_output:
+            echo_output(stdout, result.stderr.read())
     return result
 
 

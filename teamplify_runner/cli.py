@@ -11,7 +11,7 @@ from teamplify_runner.utils import cd, run
 
 
 IMAGES = {
-    'db': 'mysql:8.0.23',
+    'db': 'mysql:8.0.29-oracle',
     'redis': 'redis:6.0.5',
     'nginx': 'jwilder/nginx-proxy:latest',
     'letsencrypt': 'jrcs/letsencrypt-nginx-proxy-companion:latest',

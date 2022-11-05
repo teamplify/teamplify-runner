@@ -20,7 +20,10 @@ services:
   redis:
     image: ${IMAGE_REDIS}
     container_name: teamplify_redis
+    volumes:
+      - ./redis.cnf:/etc/redis/redis.conf:ro
     restart: always
+    command: redis-server /etc/redis/redis.conf
 
   nginx:
     image: ${IMAGE_NGINX}

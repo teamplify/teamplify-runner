@@ -6,7 +6,7 @@ import click
 
 from teamplify_runner import __version__
 from teamplify_runner.configurator import BASE_DIR, ConfigurationError, \
-    Configurator
+    Configurator, str_to_bool
 from teamplify_runner.utils import cd, run
 
 
@@ -56,14 +56,21 @@ def _start(env):
     )
     if env['WEB_HOST'].lower() == 'localhost':
         click.echo(
-            '\nWARNING: you\'re running Teamplify on localhost. This is '
-            'probably OK if you only need to run a demo on your local machine. '
-            'However, in this mode it will not be available to anyone from the '
-            'network. If you\'d like to make it available on the network, you '
-            'need to provide a publicly visible domain name that points to '
+            '\n\033[93mWARNING:\033[0m you\'re running Teamplify on localhost. This is\n'
+            'probably OK if you only need to run a demo on your local machine.\n'
+            'However, in this mode it will not be available to anyone from the\n'
+            'network. If you\'d like to make it available on the network, you\n'
+            'need to provide a publicly visible domain name that points to\n'
             'this server.',
         )
-
+    if str_to_bool(env['MAIN_BYPASS_EMAIL_CONFIRMATION']):
+        click.echo(
+            '\n\033[91mDANGER:\033[0m you\'re turned on the BYPASS_EMAIL_CONFIRMATION option.\n'
+            'When this option is on, Teamplify checks only the email address\n'
+            'for users\' authentication: no confirmation link is required.\n'
+            'It may cause unauthenticated access to your Teamplify installation.\n'
+            '\033[91mDON\'T TURN IT ON IN THE PRODUCTION ENVIRONMENTS!!!\033[0m',
+        )
 
 def _create_admin(env, email, full_name):
     click.echo('Creating admin...')

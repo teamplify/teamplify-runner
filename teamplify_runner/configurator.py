@@ -104,6 +104,7 @@ class Configurator:
             ('product_key', ''),
             ('update_channel', 'stable'),
             ('send_crash_reports', 'yes'),
+            ('bypass_email_confirmation', 'no'),
         ))),
         ('web', OrderedDict((
             ('host', 'localhost'),

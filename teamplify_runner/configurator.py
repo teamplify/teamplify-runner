@@ -173,8 +173,8 @@ class Configurator:
         with open(self.config_path, 'w') as f:
             self.parser.set(
                 'email',
-                '; please note: Teamplify does not require email address confirmation when '
-                'only the admin user is registered.'
+                '; please note: Teamplify does not require email address '
+                'confirmation when only the admin user is registered.'
             )
             self.parser.write(f)
         return self

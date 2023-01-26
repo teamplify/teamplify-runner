@@ -6,7 +6,7 @@ import click
 
 from teamplify_runner import __version__
 from teamplify_runner.configurator import BASE_DIR, ConfigurationError, \
-    Configurator, str_to_bool
+    Configurator
 from teamplify_runner.utils import cd, run
 
 

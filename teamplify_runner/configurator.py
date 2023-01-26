@@ -104,7 +104,6 @@ class Configurator:
             ('product_key', ''),
             ('update_channel', 'stable'),
             ('send_crash_reports', 'yes'),
-            ('bypass_email_confirmation', 'no'),
         ))),
         ('web', OrderedDict((
             ('host', 'localhost'),
@@ -151,7 +150,7 @@ class Configurator:
                 if os.path.isfile(path):
                     self.config_path = path
                     break
-        self.parser = ConfigParser()
+        self.parser = ConfigParser(allow_no_value=True)
         self.parser.read_dict(self.defaults)
 
     def load(self, config_path=None):
@@ -172,6 +171,11 @@ class Configurator:
                            or self.config_path \
                            or self.default_save_location
         with open(self.config_path, 'w') as f:
+            self.parser.set(
+                'email',
+                '; please note: Teamplify does not require email address confirmation when '
+                'only the admin user is registered.'
+            )
             self.parser.write(f)
         return self
 

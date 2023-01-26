@@ -56,20 +56,13 @@ def _start(env):
     )
     if env['WEB_HOST'].lower() == 'localhost':
         click.echo(
-            '\n\033[93mWARNING:\033[0m you\'re running Teamplify on localhost. This is\n'  # noqa e501
-            'probably OK if you only need to run a demo on your local machine.\n'          # noqa e501
-            'However, in this mode it will not be available to anyone from the\n'          # noqa e501
-            'network. If you\'d like to make it available on the network, you\n'
-            'need to provide a publicly visible domain name that points to\n'
+            click.style('\nWARNING:', fg='yellow') +
+            ' you\'re running Teamplify on localhost. This is '
+            'probably OK if you only need to run a demo on your local machine. '
+            'However, in this mode it will not be available to anyone from the '
+            'network. If you\'d like to make it available on the network, you '
+            'need to provide a publicly visible domain name that points to '
             'this server.',
-        )
-    if str_to_bool(env['MAIN_BYPASS_EMAIL_CONFIRMATION']):
-        click.echo(
-            '\n\033[91mDANGER:\033[0m you\'re turned on the BYPASS_EMAIL_CONFIRMATION option.\n'  # noqa e501
-            'When this option is on, Teamplify checks only the email address\n'
-            'for users\' authentication: no confirmation link is required.\n'
-            'It may cause unauthenticated access to your Teamplify installation.\n'               # noqa e501
-            '\033[91mDON\'T TURN IT ON IN THE PRODUCTION ENVIRONMENTS!!!\033[0m',                 # noqa e501
         )
 
 

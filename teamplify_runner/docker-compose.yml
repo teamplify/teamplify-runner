@@ -75,7 +75,6 @@ services:
       - redis
     volumes:
       - media:/media/
-      - repos:/repos/
     environment:
       # nginx-proxy & Let's Encrypt configuration:
       - VIRTUAL_HOST=${WEB_HOST}
@@ -116,7 +115,6 @@ services:
       - builtin_smtp
     volumes:
       - media:/media/
-      - repos:/repos/
     environment:
       - C_FORCE_ROOT=1
       - MAIN_PRODUCT_KEY
@@ -150,7 +148,6 @@ services:
       - builtin_smtp
     volumes:
       - media:/media/
-      - repos:/repos/
     environment:
       - C_FORCE_ROOT=1
       - MAIN_PRODUCT_KEY
@@ -183,7 +180,6 @@ services:
       - redis
     volumes:
       - media:/media/
-      - repos:/repos/
     environment:
       - MAIN_PRODUCT_KEY
       - MAIN_UPDATE_CHANNEL
@@ -210,4 +206,3 @@ volumes:
   nginx_dhparam:
   media:
   mysql_data:
-  repos:

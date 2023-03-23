@@ -42,7 +42,7 @@ def test_deeply_invalid_configuration():
         '[web] port: Must be an integer. You provided: gav',
         '[web] use_ssl: Must be one of the following: no, builtin, external. '
         'You provided: not sure',
-        '[db] host: Can\'t resolve hostname: -1 # comment after value',
+        "[db] host: Can't resolve hostname: -1 # comment after value",
         '[db] port: Must be less or equal to 65535. You provided: 70000',
         '[db] backup_mount: Must be a directory: not a valid path',
         '[db] unknown_key: Unknown option',

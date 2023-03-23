@@ -38,7 +38,7 @@ setup(
     },
     packages=['teamplify_runner'],
     include_package_data=True,
-    python_requires=">=%s" % MIN_PYTHON_STR,
+    python_requires='>=%s' % MIN_PYTHON_STR,
     license='MIT',
     entry_points={
         'console_scripts': [

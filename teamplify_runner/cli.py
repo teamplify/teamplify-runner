@@ -48,7 +48,7 @@ def _start(env):
     click.echo(
         '\nDone. It may take a few moments for the app to come online at:\n'
         ' -> %s\n\n'
-        'If it isn\'t available immediately, please check again after '
+        "If it isn't available immediately, please check again after "
         'a minute or two. If you experience any problems with the '
         'installation, please check the Troubleshooting guide:\n'
         ' -> https://github.com/teamplify/teamplify-runner/#troubleshooting'
@@ -57,10 +57,10 @@ def _start(env):
     if env['WEB_HOST'].lower() == 'localhost':
         click.echo(
             click.style('\nWARNING:', fg='yellow') +
-            ' you\'re running Teamplify on localhost. This is '
+            " you're running Teamplify on localhost. This is "
             'probably OK if you only need to run a demo on your local machine. '
             'However, in this mode it will not be available to anyone from the '
-            'network. If you\'d like to make it available on the network, you '
+            "network. If you'd like to make it available on the network, you "
             'need to provide a publicly visible domain name that points to '
             'this server.',
         )
@@ -270,7 +270,7 @@ def start(ctx):
 @click.option(
     '--email',
     required=True,
-    help="The email that the admin uses to sign in",
+    help='The email that the admin uses to sign in',
 )
 @click.option(
     '--full-name',

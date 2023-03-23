@@ -39,10 +39,10 @@ def validate_hostname(hostname):
     try:
         socket.gethostbyname(hostname)
     except socket.gaierror:
-        raise ConfigurationError('Can\'t resolve hostname: %s' % hostname)
+        raise ConfigurationError("Can't resolve hostname: %s" % hostname)
 
 
-def validate_integer(value, min=None, max=None):
+def validate_integer(value, min=None, max=None):    # noqa C901
     try:
         value = int(value)
     except ValueError:
@@ -176,7 +176,7 @@ class Configurator:
             self.parser.set(
                 'email',
                 '; please note: Teamplify does not require email address '
-                'confirmation when only the admin user is registered.'
+                'confirmation when only the admin user is registered.',
             )
             self.parser.write(f)
         return self
@@ -208,11 +208,13 @@ class Configurator:
             if self.parser.get('web', 'ssl_certs', fallback=''):
                 env['COMPOSE_PROFILES'] = 'ssl'
             else:
-                # deploy Let's Encrypt certificates if no SSL certs are provided
+                # deploy Let's Encrypt certificates if no SSL certs
+                # are provided
                 env['COMPOSE_PROFILES'] = 'ssl,letsencrypt'
         elif env['WEB_USE_SSL'] == 'external':
             # local SSL is disabled, but SSL is served by external proxy
-            # HTTP is redirected to external HTTPS if X-Forwarded-Proto is set to http
+            # HTTP is redirected to external HTTPS if X-Forwarded-Proto
+            # is set to http
             env['COMPOSE_PROFILES'] = 'nossl'
             env['HTTPS_METHOD'] = 'nohttps'
             env['HTTPS_EXTERNAL_REDIRECT'] = 'true'
@@ -221,7 +223,8 @@ class Configurator:
             env['COMPOSE_PROFILES'] = 'nossl'
             env['HTTPS_METHOD'] = 'nohttps'
 
-        # have to specify it in any case to avoid warnings in the NGINX container logs
+        # have to specify it in any case to avoid warnings in the NGINX
+        # container logs
         env['LETSENCRYPT_HOST'] = env['WEB_HOST']
         return env
 
@@ -272,28 +275,32 @@ class Configurator:
                 validate_port(value)
                 if value == '443':
                     raise ConfigurationError(
-                        'Can\'t use port 443 because it\'s reserved for the '
+                        "Can't use port 443 because it's reserved for the "
                         'SSL-enabled configuration. Please choose another port',
                     )
-                if value != '80' and self.ssl_mode() == 'builtin' and self.is_letsencrypt():
+                if value != '80'\
+                        and self.ssl_mode() == 'builtin' \
+                        and self.is_letsencrypt():
                     raise ConfigurationError(
-                        'For the built-in support of the SSL-enabled configuration '
-                        'if there is no SSL certificates provided, the web '
-                        'port must be set to 80. '
+                        'For the built-in support of the SSL-enabled '
+                        'configuration if there is no SSL certificates '
+                        'provided, the web port must be set to 80. '
                         'You provided: %s' % value,
                     )
             elif option == 'ssl_port':
                 validate_port(value)
                 if value == '80':
                     raise ConfigurationError(
-                        'Can\'t use port 80 because it\'s reserved for the '
+                        "Can't use port 80 because it's reserved for the "
                         'SSL-enabled configuration. Please choose another port',
                     )
-                if value != '443' and self.ssl_mode() == 'builtin' and self.is_letsencrypt():
+                if value != '443' \
+                        and self.ssl_mode() == 'builtin' \
+                        and self.is_letsencrypt():
                     raise ConfigurationError(
-                        'For the built-in support of the SSL-enabled configuration '
-                        'if there is no SSL certificates provided, the ssl '
-                        'port must be set to 443. '
+                        'For the built-in support of the SSL-enabled '
+                        'configuration if there is no SSL certificates '
+                        'provided, the ssl port must be set to 443. '
                         'You provided: %s' % value,
                     )
             elif option == 'use_ssl':

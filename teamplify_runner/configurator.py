@@ -108,6 +108,8 @@ class Configurator:
         ('web', OrderedDict((
             ('host', 'localhost'),
             ('port', 80),
+            ('ssl_port', 443),
+            ('ssl_certs', ''),
             ('use_ssl', 'no'),
         ))),
         ('db', OrderedDict((
@@ -199,10 +201,28 @@ class Configurator:
             for option in self.parser.options(section):
                 name = section.upper() + '_' + option.upper()
                 env[name] = str(self.parser.get(section, option, fallback=''))
-        if self.ssl_mode() == 'builtin':
-            env['LETSENCRYPT_HOST'] = env['WEB_HOST']
+
+        if env['WEB_USE_SSL'] == 'builtin':
+            # SSL is enabled and served by NGINX
+            env['HTTPS_METHOD'] = 'redirect'
+            if self.parser.get('web', 'ssl_certs', fallback=''):
+                env['COMPOSE_PROFILES'] = 'ssl'
+            else:
+                # deploy Let's Encrypt certificates if no SSL certs are provided
+                env['COMPOSE_PROFILES'] = 'ssl,letsencrypt'
+        elif env['WEB_USE_SSL'] == 'external':
+            # local SSL is disabled, but SSL is served by external proxy
+            # HTTP is redirected to external HTTPS if X-Forwarded-Proto is set to http
+            env['COMPOSE_PROFILES'] = 'nossl'
+            env['HTTPS_METHOD'] = 'nohttps'
+            env['HTTPS_EXTERNAL_REDIRECT'] = 'true'
         else:
-            env['LETSENCRYPT_HOST'] = ''
+            # SSL is disabled
+            env['COMPOSE_PROFILES'] = 'nossl'
+            env['HTTPS_METHOD'] = 'nohttps'
+
+        # have to specify it in any case to avoid warnings in the NGINX container logs
+        env['LETSENCRYPT_HOST'] = env['WEB_HOST']
         return env
 
     def validate(self):
@@ -226,6 +246,9 @@ class Configurator:
             raise ConfigurationError(errors)
         return self
 
+    def is_letsencrypt(self):
+        return self.parser.get('web', 'ssl_certs', fallback='') == ''
+
     def validate_option(self, section, option, value):
         if section not in self.defaults:
             raise ConfigurationError('Unknown section: [%s]' % section)
@@ -244,6 +267,7 @@ class Configurator:
         elif section == 'web':
             if option == 'host':
                 validate_hostname(value)
+                pass
             elif option == 'port':
                 validate_port(value)
                 if value == '443':
@@ -251,9 +275,25 @@ class Configurator:
                         'Can\'t use port 443 because it\'s reserved for the '
                         'SSL-enabled configuration. Please choose another port',
                     )
-                if value != '80' and self.ssl_mode():
+                if value != '80' and self.ssl_mode() == 'builtin' and self.is_letsencrypt():
                     raise ConfigurationError(
-                        'For SSL-enabled configuration port must be set to 80. '
+                        'For the built-in support of the SSL-enabled configuration '
+                        'if there is no SSL certificates provided, the web '
+                        'port must be set to 80. '
+                        'You provided: %s' % value,
+                    )
+            elif option == 'ssl_port':
+                validate_port(value)
+                if value == '80':
+                    raise ConfigurationError(
+                        'Can\'t use port 80 because it\'s reserved for the '
+                        'SSL-enabled configuration. Please choose another port',
+                    )
+                if value != '443' and self.ssl_mode() == 'builtin' and self.is_letsencrypt():
+                    raise ConfigurationError(
+                        'For the built-in support of the SSL-enabled configuration '
+                        'if there is no SSL certificates provided, the ssl '
+                        'port must be set to 443. '
                         'You provided: %s' % value,
                     )
             elif option == 'use_ssl':

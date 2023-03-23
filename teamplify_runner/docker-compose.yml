@@ -26,36 +26,61 @@ services:
     command: redis-server /etc/redis/redis.conf
 
   nginx:
+    &nginx
     image: ${IMAGE_NGINX}
     container_name: teamplify_nginx
     depends_on:
       - app
     volumes:
-      - nginx_certs:/etc/nginx/certs:ro
+      - ${WEB_SSL_CERTS:-nginx_certs}:/etc/nginx/certs:ro
       - nginx_dhparam:/etc/nginx/dhparam
       - /etc/nginx/vhost.d
       - /usr/share/nginx/html
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ./vhost.conf:/etc/nginx/vhost.d/${WEB_HOST}:ro
       - ./uwsgi_params.conf:/etc/nginx/uwsgi_params:ro
+      - ./nginx.tmpl:/app/nginx.tmpl:ro
     volumes_from:
       - app:ro
+    environment:
+      - HTTPS_METHOD
+      - HTTPS_PORT=${WEB_SSL_PORT}
+      - HTTP_PORT=${WEB_PORT}
+      - HTTPS_EXTERNAL_REDIRECT
+      - TRUST_DOWNSTREAM_PROXY=true
     ports:
-      - ${WEB_PORT}:80
-      - ${WEB_SSL_PORT}:443
+      - ${WEB_PORT}:${WEB_PORT}
     restart: always
     entrypoint: bash -c "find /etc/nginx/dhparam/dhparam.pem -empty -delete || true && /app/docker-entrypoint.sh forego start -r"
+    profiles:
+      - nossl
+
+  nginx-ssl:
+    <<: *nginx
+    environment:
+      - HTTPS_METHOD
+      - HTTPS_PORT=${WEB_SSL_PORT}
+      - HTTP_PORT=${WEB_PORT}
+      - HTTPS_EXTERNAL_REDIRECT
+      - TRUST_DOWNSTREAM_PROXY=true
+    ports:
+      - ${WEB_PORT}:${WEB_PORT}
+      - ${WEB_SSL_PORT}:${WEB_SSL_PORT}
+    profiles:
+      - ssl
 
   letsencrypt:
     image: ${IMAGE_LETSENCRYPT}
     container_name: teamplify_letsencrypt
     depends_on:
-      - nginx
+      - nginx-ssl
     volumes:
       - nginx_certs:/etc/nginx/certs
       - /var/run/docker.sock:/var/run/docker.sock:ro
     volumes_from:
-      - nginx
+      - nginx-ssl
+    profiles:
+      - letsencrypt
 
   builtin_smtp:
     image: ${IMAGE_SMTP}
@@ -89,7 +114,6 @@ services:
       - MAIN_BYPASS_EMAIL_CONFIRMATION
       - WEB_HOST
       - WEB_PORT
-      - WEB_USE_SSL
       - DB_HOST
       - DB_PORT
       - DB_USER
@@ -122,7 +146,6 @@ services:
       - MAIN_SEND_CRASH_REPORTS
       - WEB_HOST
       - WEB_PORT
-      - WEB_USE_SSL
       - DB_HOST
       - DB_PORT
       - DB_USER
@@ -155,7 +178,6 @@ services:
       - MAIN_SEND_CRASH_REPORTS
       - WEB_HOST
       - WEB_PORT
-      - WEB_USE_SSL
       - DB_HOST
       - DB_PORT
       - DB_USER
@@ -186,7 +208,6 @@ services:
       - MAIN_SEND_CRASH_REPORTS
       - WEB_HOST
       - WEB_PORT
-      - WEB_USE_SSL
       - DB_HOST
       - DB_PORT
       - DB_USER

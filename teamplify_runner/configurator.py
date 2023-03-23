@@ -57,6 +57,26 @@ def validate_integer(value, min=None, max=None):    # noqa C901
         )
 
 
+def validate_certs(path, hostname):
+    if not os.path.isdir(path):
+        raise ConfigurationError(
+            'The path to certificates directory must be valid. '
+            'You provided: %s' % path,
+        )
+
+    cert_filename = '%s.crt' % hostname
+    key_filename = '%s.key' % hostname
+    cert_found = os.path.isfile(os.path.join(path, cert_filename))
+    key_found = os.path.isfile(os.path.join(path, key_filename))
+    if not (cert_found and key_found):
+        raise ConfigurationError(
+            'The path to certificates directory must contain both '
+            'certificate and key files for the specified host '
+            "('%s', '%s'). "
+            'You provided: %s' % (cert_filename, key_filename, path),
+        )
+
+
 validate_port = partial(validate_integer, min=0, max=65535)
 
 
@@ -305,6 +325,10 @@ class Configurator:
                     )
             elif option == 'use_ssl':
                 validate_choice(value, ['no', 'builtin', 'external'])
+            elif option == 'ssl_certs':
+                hostname = self.parser.get('web', 'host', fallback='').lower()
+                if value and hostname and self.ssl_mode() == 'builtin':
+                    validate_certs(value, hostname)
         elif section == 'db':
             if option == 'host' and value.lower() != 'builtin_db':
                 validate_hostname(value)

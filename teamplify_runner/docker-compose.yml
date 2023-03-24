@@ -44,7 +44,7 @@ services:
       - app:ro
     environment:
       - HTTPS_METHOD
-      - HTTPS_PORT=${WEB_SSL_PORT}
+      - HTTPS_PORT
       - HTTP_PORT=${WEB_PORT}
       - HTTPS_EXTERNAL_REDIRECT
       - TRUST_DOWNSTREAM_PROXY=true
@@ -59,7 +59,7 @@ services:
     <<: *nginx
     environment:
       - HTTPS_METHOD
-      - HTTPS_PORT=${WEB_SSL_PORT}
+      - HTTPS_PORT
       - HTTP_PORT=${WEB_PORT}
       - HTTPS_EXTERNAL_REDIRECT
       - TRUST_DOWNSTREAM_PROXY=true

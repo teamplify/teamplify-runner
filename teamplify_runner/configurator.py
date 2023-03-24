@@ -225,6 +225,8 @@ class Configurator:
         if env['WEB_USE_SSL'] == 'builtin':
             # SSL is enabled and served by NGINX
             env['HTTPS_METHOD'] = 'redirect'
+            env['HTTPS_PORT'] = env['WEB_SSL_PORT']
+
             if self.parser.get('web', 'ssl_certs', fallback=''):
                 env['COMPOSE_PROFILES'] = 'ssl'
             else:
@@ -237,6 +239,7 @@ class Configurator:
             # is set to http
             env['COMPOSE_PROFILES'] = 'nossl'
             env['HTTPS_METHOD'] = 'nohttps'
+            env['HTTPS_PORT'] = env['WEB_SSL_PORT']
             env['HTTPS_EXTERNAL_REDIRECT'] = 'true'
         else:
             # SSL is disabled

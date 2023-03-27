@@ -171,12 +171,9 @@ command line. Example:
   To get the product key, please email us at
   [support@teamplify.com](mailto:support@teamplify.com);
 
-- `update_channel` - the application distribution channel to use. Can be set to
-  `stable` or `latest`. The default setting is `stable` (recommended for most
-  users). With the `stable` channel, you should expect a few updates per month.
-  Updates in the latest channel are more frequent and contain all the latest
-  features and bug-fixes. However, they also have a higher chance of
-  introducing new bugs. Please note that Teamplify doesn't update itself
+- `update_channel` - the application distribution channel to use. The recommended setting is `stable`.
+  With the `stable` channel, you should expect a few updates per month.
+  Please note that Teamplify doesn't update itself
   automatically unless you've explicitly configured it to do so. See the
   [Updates](#updates) and [Maintenance script](#maintenance-script) sections
   below;

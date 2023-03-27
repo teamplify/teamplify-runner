@@ -234,17 +234,19 @@ class Configurator:
                 # are provided
                 env['COMPOSE_PROFILES'] = 'ssl,letsencrypt'
         elif env['WEB_USE_SSL'] == 'external':
-            # local SSL is disabled, but SSL is served by external proxy
-            # HTTP is redirected to external HTTPS if X-Forwarded-Proto
-            # is set to http
+            # local SSL is disabled, but SSL is served by external proxy:
+            # configure Django to redirect to HTTPS
             env['COMPOSE_PROFILES'] = 'nossl'
             env['HTTPS_METHOD'] = 'nohttps'
-            env['HTTPS_PORT'] = env['WEB_SSL_PORT']
-            env['HTTPS_EXTERNAL_REDIRECT'] = 'true'
+            env['SECURE_SSL_REDIRECT'] = 'True'
         else:
             # SSL is disabled
             env['COMPOSE_PROFILES'] = 'nossl'
             env['HTTPS_METHOD'] = 'nohttps'
+
+        if env['WEB_SSL_PORT'] != '443':
+            ssl_host = env.get('WEB_SSL_HOST', None) or env['WEB_HOST']
+            env['WEB_SSL_HOST'] = '%s:%s' % (ssl_host, env['WEB_SSL_PORT'])
 
         # have to specify it in any case to avoid warnings in the NGINX
         # container logs

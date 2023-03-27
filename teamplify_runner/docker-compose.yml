@@ -39,14 +39,12 @@ services:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ./vhost.conf:/etc/nginx/vhost.d/${WEB_HOST}:ro
       - ./uwsgi_params.conf:/etc/nginx/uwsgi_params:ro
-      - ./nginx.tmpl:/app/nginx.tmpl:ro
     volumes_from:
       - app:ro
     environment:
       - HTTPS_METHOD
       - HTTPS_PORT
       - HTTP_PORT=${WEB_PORT}
-      - HTTPS_EXTERNAL_REDIRECT
       - TRUST_DOWNSTREAM_PROXY=true
     ports:
       - ${WEB_PORT}:${WEB_PORT}
@@ -61,7 +59,6 @@ services:
       - HTTPS_METHOD
       - HTTPS_PORT
       - HTTP_PORT=${WEB_PORT}
-      - HTTPS_EXTERNAL_REDIRECT
       - TRUST_DOWNSTREAM_PROXY=true
     ports:
       - ${WEB_PORT}:${WEB_PORT}
@@ -114,6 +111,8 @@ services:
       - MAIN_BYPASS_EMAIL_CONFIRMATION
       - WEB_HOST
       - WEB_PORT
+      - WEB_USE_SSL
+      - WEB_SSL_HOST
       - DB_HOST
       - DB_PORT
       - DB_USER

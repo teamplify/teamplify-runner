@@ -188,17 +188,30 @@ command line. Example:
 - `host` - domain name on which the Teamplify web interface will be running. It
   must be created in advance, and pointed to the server where you have
   installed Teamplify;
-- `port` - port on which Teamplify web interface will be running, the default
-  is `80`. If `use_ssl` is set to `yes` then `80` is the only allowed option;
-- `use_ssl` - possible values are `no`, `builtin`, and `external`, defaults to
-  `no`. When set to `builtin` or `external`, all traffic to your Teamplify
-  server will be redirected to HTTPS on port `443`. When set to `builtin`,
-  Teamplify runner will use [Let's Encrypt](https://letsencrypt.org) to
-  automatically generate and renew SSL certificates for the domain that you
-  specified in the `host` parameter above. If you're hosting Teamplify behind a
-  proxy or load balancer that is already configured for SSL support, please set
-  this parameter to `external`, and also make sure that your proxy correctly
-  sets `X-Forwarded-Proto` HTTP header;
+- `port` - the port on which Teamplify web interface will be running, the default
+  is `80`. If `use_ssl` is set to `builtin` and no SSL certificates path is specified
+  then `80` is the only allowed option;
+- `use_ssl` - SSL mode. Possible values are `no`, `builtin`, and `external`, defaults to
+  `no`. When set to `builtin`, Teamplify will serve HTTPS requests on the port specified 
+  in the `ssl_port` option below. All HTTP traffic will be redirected to this port.
+  If you're hosting Teamplify behind a proxy or load balancer that is already 
+  configured for SSL support, please set this parameter to `external`, 
+  and also make sure that your proxy correctly sets `X-Forwarded-Proto` HTTP header.
+  In this case, Teamplify will handle HTTP requests on the port number specified 
+  in the `port` option and redirect insecure requests to `https://<host>:<ssl_port>`.
+- `ssl_port` - the port on which Teamplify web interface will be running when SSL
+  is enabled, the default is `443`. If `use_ssl` is set to `builtin` and 
+  no SSL certificates path is specified, then `443` is the only allowed option;
+- `ssl_certs` (optional) - a path to a directory which contains SSL
+  certificates. The directory must contain certificate (.crt) and key (.key) files 
+  for the domain specified in the `host` option above. The filenames must be equal 
+  the domain name. For example, if the domain is `example.com`, the filenames 
+  must be `example.com.crt` and `example.com.key`. If no path is specified,
+  Teamplify runner will use [Let's Encrypt](https://letsencrypt.org) 
+  to generate and renew SSL certificates for the domain that you specified
+  in the `host` parameter above.
+
+`[runner]`
 
 `[db]`
 

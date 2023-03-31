@@ -68,12 +68,20 @@ def validate_certs(path, hostname):
     key_filename = '%s.key' % hostname
     cert_found = os.path.isfile(os.path.join(path, cert_filename))
     key_found = os.path.isfile(os.path.join(path, key_filename))
-    if not (cert_found and key_found):
+    cert_files_found = cert_found and key_found
+
+    cert_dirname = os.path.join(path, hostname)
+    cert_dir_exists = os.path.isdir(cert_dirname)
+    cert_dir_found = cert_dir_exists and any(
+        [fname.endswith('.pem') for fname in os.listdir(cert_dirname)],
+    )
+
+    if not (cert_files_found or cert_dir_found):
         raise ConfigurationError(
             'The path to certificates directory must contain both '
             'certificate and key files for the specified host '
-            "('%s', '%s'). "
-            'You provided: %s' % (cert_filename, key_filename, path),
+            "('%s', '%s') or '%s' directory with .pem files. "
+            'You provided: %s' % (cert_filename, key_filename, hostname, path),
         )
 
 
@@ -243,10 +251,6 @@ class Configurator:
             # SSL is disabled
             env['COMPOSE_PROFILES'] = 'nossl'
             env['HTTPS_METHOD'] = 'nohttps'
-
-        if env['WEB_SSL_PORT'] != '443':
-            ssl_host = env.get('WEB_SSL_HOST', None) or env['WEB_HOST']
-            env['WEB_SSL_HOST'] = '%s:%s' % (ssl_host, env['WEB_SSL_PORT'])
 
         # have to specify it in any case to avoid warnings in the NGINX
         # container logs

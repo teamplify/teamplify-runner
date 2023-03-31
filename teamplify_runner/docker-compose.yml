@@ -71,6 +71,9 @@ services:
     container_name: teamplify_letsencrypt
     depends_on:
       - nginx-ssl
+    environment:
+      - VIRTUAL_HOST=${WEB_HOST}
+      - LETSENCRYPT_HOST
     volumes:
       - nginx_certs:/etc/nginx/certs
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -112,7 +115,7 @@ services:
       - WEB_HOST
       - WEB_PORT
       - WEB_USE_SSL
-      - WEB_SSL_HOST
+      - WEB_SSL_PORT
       - DB_HOST
       - DB_PORT
       - DB_USER
@@ -145,6 +148,8 @@ services:
       - MAIN_SEND_CRASH_REPORTS
       - WEB_HOST
       - WEB_PORT
+      - WEB_USE_SSL
+      - WEB_SSL_PORT
       - DB_HOST
       - DB_PORT
       - DB_USER
@@ -177,6 +182,8 @@ services:
       - MAIN_SEND_CRASH_REPORTS
       - WEB_HOST
       - WEB_PORT
+      - WEB_USE_SSL
+      - WEB_SSL_PORT
       - DB_HOST
       - DB_PORT
       - DB_USER
@@ -207,6 +214,8 @@ services:
       - MAIN_SEND_CRASH_REPORTS
       - WEB_HOST
       - WEB_PORT
+      - WEB_USE_SSL
+      - WEB_SSL_PORT
       - DB_HOST
       - DB_PORT
       - DB_USER

@@ -185,6 +185,13 @@ command line. Example:
 
 `[web]`
 
+ > ⚠️ Please note that the built-in SSL option with certificates from
+ > Let's Encrypt requires standard ports for HTTP and HTTPS: `port = 80` and
+ > `ssl_port = 443`. This requirement comes from the
+ > [Let's Encrypt HTTP-01 challenge](https://letsencrypt.org/docs/challenge-types/#http-01-challenge),
+ > which does not support custom ports. However, you can still use custom HTTP and
+ > HTTPS ports if you provide your own SSL certificates.
+
 - `host` - domain name on which the Teamplify web interface will be running. It
   must be created in advance, and pointed to the server where you have
   installed Teamplify;

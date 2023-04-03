@@ -230,31 +230,27 @@ class Configurator:
                 name = section.upper() + '_' + option.upper()
                 env[name] = str(self.parser.get(section, option, fallback=''))
 
-        if env['WEB_USE_SSL'] == 'builtin':
-            # SSL is enabled and served by NGINX
-            env['HTTPS_METHOD'] = 'redirect'
-            env['HTTPS_PORT'] = env['WEB_SSL_PORT']
+        # have to specify LETSENCRYPT_HOST in any case
+        # to avoid warnings in the NGINX container logs
+        env['LETSENCRYPT_HOST'] = env['WEB_HOST']
+        env['COMPOSE_PROFILES'] = 'nossl'
+        env['HTTPS_METHOD'] = 'nohttps'
+        env['HTTPS_PORT'] = env['WEB_SSL_PORT']
 
+        # The 'external' SSL mode is handled by Django and does not need special configuration
+        _ssl_mode = self.ssl_mode()
+        if _ssl_mode == 'builtin':
+            env['HTTPS_METHOD'] = 'redirect'
+
+            # deploy Let's Encrypt certificates if no SSL certs
+            # are provided by the user
             if self.parser.get('web', 'ssl_certs', fallback=''):
                 env['COMPOSE_PROFILES'] = 'ssl'
             else:
-                # deploy Let's Encrypt certificates if no SSL certs
-                # are provided
                 env['COMPOSE_PROFILES'] = 'ssl,letsencrypt'
-        elif env['WEB_USE_SSL'] == 'external':
-            # local SSL is disabled, but SSL is served by external proxy:
-            # configure Django to redirect to HTTPS
-            env['COMPOSE_PROFILES'] = 'nossl'
-            env['HTTPS_METHOD'] = 'nohttps'
-            env['SECURE_SSL_REDIRECT'] = 'True'
-        else:
-            # SSL is disabled
-            env['COMPOSE_PROFILES'] = 'nossl'
-            env['HTTPS_METHOD'] = 'nohttps'
+        elif not _ssl_mode:
+            del env['WEB_SSL_PORT']
 
-        # have to specify it in any case to avoid warnings in the NGINX
-        # container logs
-        env['LETSENCRYPT_HOST'] = env['WEB_HOST']
         return env
 
     def validate(self):

@@ -62,7 +62,7 @@ services:
       - TRUST_DOWNSTREAM_PROXY=true
     ports:
       - ${WEB_PORT}:${WEB_PORT}
-      - ${WEB_SSL_PORT}:${WEB_SSL_PORT}
+      - ${HTTPS_PORT}:${HTTPS_PORT}
     profiles:
       - ssl
 
@@ -114,7 +114,6 @@ services:
       - MAIN_BYPASS_EMAIL_CONFIRMATION
       - WEB_HOST
       - WEB_PORT
-      - WEB_USE_SSL
       - WEB_SSL_PORT
       - DB_HOST
       - DB_PORT
@@ -148,7 +147,6 @@ services:
       - MAIN_SEND_CRASH_REPORTS
       - WEB_HOST
       - WEB_PORT
-      - WEB_USE_SSL
       - WEB_SSL_PORT
       - DB_HOST
       - DB_PORT
@@ -182,7 +180,6 @@ services:
       - MAIN_SEND_CRASH_REPORTS
       - WEB_HOST
       - WEB_PORT
-      - WEB_USE_SSL
       - WEB_SSL_PORT
       - DB_HOST
       - DB_PORT
@@ -214,7 +211,6 @@ services:
       - MAIN_SEND_CRASH_REPORTS
       - WEB_HOST
       - WEB_PORT
-      - WEB_USE_SSL
       - WEB_SSL_PORT
       - DB_HOST
       - DB_PORT

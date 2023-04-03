@@ -237,7 +237,8 @@ class Configurator:
         env['HTTPS_METHOD'] = 'nohttps'
         env['HTTPS_PORT'] = env['WEB_SSL_PORT']
 
-        # The 'external' SSL mode is handled by Django and does not need special configuration
+        # The 'external' SSL mode is handled by Django
+        # and does not need special configuration
         _ssl_mode = self.ssl_mode()
         if _ssl_mode == 'builtin':
             env['HTTPS_METHOD'] = 'redirect'

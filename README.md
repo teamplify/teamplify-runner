@@ -360,7 +360,7 @@ interruption.
 ## Backup and restore
 
 Teamplify stores your data in a MySQL database. As with any other database, it
-might be a good idea to make backups from time to time to time.
+might be a good idea to make backups from time to time.
 
 To back up the built-in Teamplify database, run:
 

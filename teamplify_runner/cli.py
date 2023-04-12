@@ -44,15 +44,21 @@ def _wait_for_teamplify_start(url, max_minutes=10, check_interval=5):
         if 'window.BUILD_NUMBER' in response:
             click.echo('\nTeamplify successfully started!')
             return
-        elif 'Welcome to nginx!' in response or 'Teamplify is starting...' in response:
+        elif any(
+            marker in response
+            for marker in (
+                'Welcome to nginx!',
+                'Teamplify is starting...',
+            )
+        ):
             time.sleep(check_interval)
             click.echo('.', nl=False)
             continue
         else:
             raise RuntimeError(
                 '\n\nUnexpected response from Teamplify: %s\n\n'
-                'Please check the Troubleshooting guide:\n'
-                ' -> https://github.com/teamplify/teamplify-runner/#troubleshooting'
+                'Please check the Troubleshooting guide:\n -> '
+                'https://github.com/teamplify/teamplify-runner/#troubleshooting'
                 % response,
             )
     else:

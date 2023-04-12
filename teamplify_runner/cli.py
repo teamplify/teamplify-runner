@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 import os
+import time
 from datetime import datetime
 
 import click
+import requests
 
 from teamplify_runner import __version__
 from teamplify_runner.configurator import BASE_DIR, ConfigurationError, \
@@ -28,7 +30,41 @@ def _root_url(env):
     return root_url
 
 
-def _start(env):
+def _wait_for_teamplify_start(url, max_minutes=10, check_interval=5):
+    click.echo(
+        '\nWaiting for Teamplify to start at %s,'
+        ' checking every %s seconds...' % (url, check_interval),
+        nl=False,
+    )
+
+    start_time = time.time()
+    while time.time() < start_time + max_minutes * 60:
+        response = requests.get(url).text
+
+        if 'window.BUILD_NUMBER' in response:
+            click.echo('\nTeamplify successfully started!')
+            return
+        elif 'Welcome to nginx!' in response or 'Teamplify is starting...' in response:
+            time.sleep(check_interval)
+            click.echo('.', nl=False)
+            continue
+        else:
+            raise RuntimeError(
+                '\n\nUnexpected response from Teamplify: %s\n\n'
+                'Please check the Troubleshooting guide:\n'
+                ' -> https://github.com/teamplify/teamplify-runner/#troubleshooting'
+                % response,
+            )
+    else:
+        raise RuntimeError(
+            "\n\nTeamplify didn't start in %s minutes. "
+            'Please check the Troubleshooting guide:\n'
+            ' -> https://github.com/teamplify/teamplify-runner/#troubleshooting'
+            % max_minutes,
+        )
+
+
+def _start(env, wait_for_start=False):
     click.echo('Starting services...')
     run('mkdir -p %s' % env['DB_BACKUP_MOUNT'])
     with cd(BASE_DIR):
@@ -44,16 +80,7 @@ def _start(env):
             capture_output=False,
             env=env,
         )
-    root_url = _root_url(env)
-    click.echo(
-        '\nDone. It may take a few moments for the app to come online at:\n'
-        ' -> %s\n\n'
-        "If it isn't available immediately, please check again after "
-        'a minute or two. If you experience any problems with the '
-        'installation, please check the Troubleshooting guide:\n'
-        ' -> https://github.com/teamplify/teamplify-runner/#troubleshooting'
-        '' % root_url,
-    )
+
     if env['WEB_HOST'].lower() == 'localhost':
         click.echo(
             click.style('\nWARNING:', fg='yellow') +
@@ -63,6 +90,24 @@ def _start(env):
             "network. If you'd like to make it available on the network, you "
             'need to provide a publicly visible domain name that points to '
             'this server.',
+        )
+
+    root_url = _root_url(env)
+    if wait_for_start:
+        try:
+            _wait_for_teamplify_start(root_url)
+        except RuntimeError as e:
+            click.echo(click.style(str(e), fg='red'))
+            exit(1)
+    else:
+        click.echo(
+            '\nDone. It may take a few moments for the app to come online at:\n'
+            ' -> %s\n\n'
+            "If it isn't available immediately, please check again after "
+            'a minute or two. If you experience any problems with the '
+            'installation, please check the Troubleshooting guide:\n'
+            ' -> https://github.com/teamplify/teamplify-runner/#troubleshooting'
+            '' % root_url,
         )
 
 
@@ -257,12 +302,13 @@ def configure(ctx):
 
 
 @cli.command()
+@click.option('--wait', is_flag=True)
 @click.pass_context
-def start(ctx):
+def start(ctx, wait):
     """
     Start Teamplify
     """
-    _start(ctx.obj['env'])
+    _start(ctx.obj['env'], wait_for_start=wait)
 
 
 @cli.command()

@@ -90,6 +90,9 @@ jobs:
       - name: Set host to localhost
         run: sed -i -e '/host =/ s/= .*/= localhost/' ~/.teamplify.ini
 
+      - name: Disable crash reports
+        run: sed -i -e '/send_crash_reports =/ s/= .*/= no/' ~/.teamplify.ini
+
       - name: Install Selenium and latest chromedriver 
         run: npm install -g selenium-side-runner chromedriver@112
 

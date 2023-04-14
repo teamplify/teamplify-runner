@@ -59,6 +59,8 @@ jobs:
   setup-test:
     name: Set up an on-premise instance
     runs-on: self-hosted
+    env:
+      NPM_CONFIG_PREFIX: "~/.npm-global"
     steps:
       - uses: actions/checkout@v3
         

@@ -58,17 +58,13 @@ jobs:
   setup-test:
     name: Set up an on-premise instance
     runs-on: self-hosted
-    strategy:
-      fail-fast: false
-      matrix:
-        python_version: ['3.7', '3.8', '3.9', '3.10', '3.11']
     steps:
       - uses: actions/checkout@v3
         
       - name: Setup python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python_version }}
+          python-version: 3.11
 
       - name: Setup Docker
         uses: docker-practice/actions-setup-docker@master

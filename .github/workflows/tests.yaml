@@ -94,12 +94,6 @@ jobs:
       - name: Set host to localhost
         run: sed -i -e '/host =/ s/= .*/= localhost/' ~/.teamplify.ini
 
-      - name: Start Teamplify
-        run: teamplify start
-
-      - name: Create the first admin user
-        run: teamplify createadmin --email test-user@example.com
-
       - name: Install Selenium and latest chromedriver 
         run: npm install -g selenium-side-runner chromedriver@112
 

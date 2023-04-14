@@ -93,6 +93,10 @@ jobs:
       - name: Install Selenium and latest chromedriver 
         run: npm install -g selenium-side-runner chromedriver@112
 
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y libgconf-2-4 libatk1.0-0 libatk-bridge2.0-0 libgdk-pixbuf2.0-0 libgtk-3-0 libgbm-dev libnss3-dev libxss-dev libasound2
+
       - name: Install stable Chrome
         id: install-chrome
         uses: browser-actions/setup-chrome@v1

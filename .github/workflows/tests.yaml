@@ -55,9 +55,73 @@ jobs:
       - run: pip install -e .
       - run: flake8 --isort-show-traceback && pytest
 
+  setup-test:
+    name: Set up an on-premise instance
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python_version: ['3.7', '3.8', '3.9', '3.10', '3.11']
+    steps:
+      - uses: actions/checkout@v3
+        
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python_version }}
+
+      - name: Setup Docker
+        uses: docker-practice/actions-setup-docker@master
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+
+      - name: Install Teamplify
+        run: pip3 install --editable .
+
+      - name: Configure
+        run: teamplify configure
+
+      - name: Create backup directory
+        run: mkdir ${{ runner.temp }}/backup
+
+      - name: Set backup_mount
+        run: sed -i -e '/backup_mount =/ s~= .*~= ${{ runner.temp }}/backup~' ~/.teamplify.ini
+
+      - name: Set product key
+        run: sed -i -e '/product_key =/ s/= .*/= ${{ secrets.ONPREMISE_PRODUCT_KEY }}/' ~/.teamplify.ini
+
+      - name: Set host to localhost
+        run: sed -i -e '/host =/ s/= .*/= localhost/' ~/.teamplify.ini
+
+      - name: Create the first admin user
+        run: teamplify createadmin --email test-user@example.com
+
+      - name: Start
+        run: teamplify start --wait
+
+      - name: Install Selenium and latest chromedriver 
+        run: npm install -g selenium-side-runner chromedriver@112
+
+      - name: Install stable Chrome
+        id: install-chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: Run selenium test
+        run: >
+          selenium-side-runner 
+          -c "
+            browserName=chrome
+            goog:chromeOptions.args=[--headless, --nogpu, --disable-dev-shm-usage]
+            goog:chromeOptions.binary=${{ steps.install-chrome.outputs.chrome-path }}
+          "
+          ./tests/on-premises-start-selenium.side
+
   notify-build-failure:
     if: ${{ failure() && github.event_name == 'push' }}
-    needs: [lint-and-tests, notify-build-start]
+    needs: [lint-and-tests, setup-test, notify-build-start]
     runs-on: ubuntu-latest
     steps:
       # Send notification on build failure
@@ -72,7 +136,7 @@ jobs:
 
   notify-build-success:
     if: ${{ github.event_name == 'push' }}
-    needs: [lint-and-tests, notify-build-start]
+    needs: [lint-and-tests, setup-test, notify-build-start]
     runs-on: ubuntu-latest
     steps:
       # Send notification on build success

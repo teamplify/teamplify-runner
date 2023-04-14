@@ -119,7 +119,7 @@ def _start(env, wait_for_start=False):
 
 def _create_admin(env, email, full_name):
     click.echo('Creating admin...')
-    cmd = 'docker exec -it teamplify_app ' \
+    cmd = 'docker exec teamplify_app ' \
           '/code/manage.py createadmin --email %s' % email
     if full_name:
         cmd += ' --full-name "%s"' % full_name

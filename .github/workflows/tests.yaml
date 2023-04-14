@@ -67,9 +67,6 @@ jobs:
         with:
           python-version: 3.11
 
-      - name: Setup Docker
-        uses: docker-practice/actions-setup-docker@master
-
       - name: Setup node
         uses: actions/setup-node@v3
 

@@ -70,7 +70,7 @@ def _wait_for_teamplify_start(url, max_minutes=10, check_interval=5):
         )
 
 
-def _start(env, wait_for_start=False):
+def _start(env):
     click.echo('Starting services...')
     run('mkdir -p %s' % env['DB_BACKUP_MOUNT'])
     with cd(BASE_DIR):
@@ -99,22 +99,11 @@ def _start(env, wait_for_start=False):
         )
 
     root_url = _root_url(env)
-    if wait_for_start:
-        try:
-            _wait_for_teamplify_start(root_url)
-        except RuntimeError as e:
-            click.echo(click.style(str(e), fg='red'))
-            exit(1)
-    else:
-        click.echo(
-            '\nDone. It may take a few moments for the app to come online at:\n'
-            ' -> %s\n\n'
-            "If it isn't available immediately, please check again after "
-            'a minute or two. If you experience any problems with the '
-            'installation, please check the Troubleshooting guide:\n'
-            ' -> https://github.com/teamplify/teamplify-runner/#troubleshooting'
-            '' % root_url,
-        )
+    try:
+        _wait_for_teamplify_start(root_url)
+    except RuntimeError as e:
+        click.echo(click.style(str(e), fg='red'))
+        exit(1)
 
 
 def _create_admin(env, email, full_name):
@@ -308,13 +297,12 @@ def configure(ctx):
 
 
 @cli.command()
-@click.option('--wait', is_flag=True)
 @click.pass_context
-def start(ctx, wait):
+def start(ctx):
     """
     Start Teamplify
     """
-    _start(ctx.obj['env'], wait_for_start=wait)
+    _start(ctx.obj['env'])
 
 
 @cli.command()

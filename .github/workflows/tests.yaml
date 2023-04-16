@@ -102,7 +102,7 @@ jobs:
           chrome-version: stable
 
       - name: Wait for Teamplify to start
-        run: teamplify start --wait
+        run: teamplify start
 
       - name: Run selenium test
         run: >

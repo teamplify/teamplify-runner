@@ -58,7 +58,7 @@ jobs:
 
   setup-test:
     name: Set up an on-premise instance
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     env:
       NPM_CONFIG_PREFIX: "~/.npm-global"
     steps:
@@ -98,12 +98,6 @@ jobs:
         uses: browser-actions/setup-chrome@v1
         with:
           chrome-version: stable
-
-      - name: Add docker permissions
-        run: |
-          sudo addgroup --system docker
-          sudo adduser $USER docker
-          newgrp docker
 
       - name: Wait for Teamplify to start
         run: teamplify start --wait

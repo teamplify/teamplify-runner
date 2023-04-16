@@ -30,10 +30,10 @@ def _root_url(env):
     return root_url
 
 
-def _wait_for_teamplify_start(url, max_minutes=10, check_interval=5):
+def _wait_for_teamplify_start(url, max_minutes=5, check_interval_seconds=5):
     click.echo(
         '\nWaiting for Teamplify to start at %s,'
-        ' checking every %s seconds...' % (url, check_interval),
+        ' checking every %s seconds...' % (url, check_interval_seconds),
         nl=False,
     )
 
@@ -51,7 +51,7 @@ def _wait_for_teamplify_start(url, max_minutes=10, check_interval=5):
                 'Teamplify is starting...',
             )
         ):
-            time.sleep(check_interval)
+            time.sleep(check_interval_seconds)
             click.echo('.', nl=False)
             continue
         else:

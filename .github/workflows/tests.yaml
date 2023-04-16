@@ -82,16 +82,13 @@ jobs:
         run: mkdir ${{ runner.temp }}/backup
 
       - name: Set backup_mount
-        run: sed -i -e '/backup_mount =/ s~= .*~= ${{ runner.temp }}/backup~' ~/.teamplify.ini
+        run: sed -i -e '/backup_mount =/ s|= .*|= ${{ runner.temp }}/backup|' ~/.teamplify.ini
 
       - name: Set product key
-        run: sed -i -e '/product_key =/ s/= .*/= ${{ secrets.ONPREMISE_PRODUCT_KEY }}/' ~/.teamplify.ini
-
-      - name: Set host to localhost
-        run: sed -i -e '/host =/ s/= .*/= localhost/' ~/.teamplify.ini
+        run: sed -i -e '/product_key =/ s|= .*|= ${{ secrets.ONPREMISE_PRODUCT_KEY }}|' ~/.teamplify.ini
 
       - name: Disable crash reports
-        run: sed -i -e '/send_crash_reports =/ s/= .*/= no/' ~/.teamplify.ini
+        run: sed -i -e '/send_crash_reports =/ s|= .*|= no|' ~/.teamplify.ini
 
       - name: Install Selenium and latest chromedriver 
         run: npm install -g selenium-side-runner chromedriver@112

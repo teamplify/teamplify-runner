@@ -75,6 +75,11 @@ jobs:
       - name: Install Teamplify
         run: pip3 install --editable .
 
+      - name: Erase the previous installation if it existed
+        run: | 
+          teamplify erase --quiet
+          rm -f ~/.teamplify.ini
+
       - name: Configure
         run: teamplify configure
 

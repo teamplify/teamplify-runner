@@ -1,7 +1,5 @@
 # Teamplify runner
 
-[![image](https://travis-ci.org/teamplify/teamplify-runner.svg?branch=master)](https://travis-ci.org/teamplify/teamplify-runner)
-
 [Teamplify](https://teamplify.com) is a personal assistant for your development
 team. It helps you track work progress and notify your team about situations
 that may require their attention. It is available

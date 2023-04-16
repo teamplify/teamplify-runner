@@ -16,7 +16,7 @@ jobs:
     # Unfortunately, there's no way to explicitly check that a secret is
     # available, so we check for event_name instead:
     # https://github.com/actions/runner/issues/520
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
       - uses: ivelum/github-action-slack-notify-build@v1.7.2
@@ -103,7 +103,7 @@ jobs:
           ./tests/on-premises-start-selenium.side
 
   notify-build-failure:
-    if: ${{ failure() && github.event_name == 'push' }}
+    if: ${{ failure() && github.event_name != 'pull_request' }}
     needs: [lint-and-tests, setup-test, notify-build-start]
     runs-on: ubuntu-latest
     steps:
@@ -116,7 +116,7 @@ jobs:
           color: '#d7263d'
 
   notify-build-success:
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name != 'pull_request' }}
     needs: [lint-and-tests, setup-test, notify-build-start]
     runs-on: ubuntu-latest
     steps:

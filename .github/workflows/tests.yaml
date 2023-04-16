@@ -77,8 +77,8 @@ jobs:
 
       - name: Erase the previous installation if it existed
         run: | 
-          teamplify erase --quiet
           rm -f ~/.teamplify.ini
+          teamplify erase --quiet
 
       - name: Configure
         run: teamplify configure

@@ -5,9 +5,18 @@ on:
   pull_request:
     branches: [master]
   workflow_dispatch:
-    
+    inputs:
+      update_channel:
+        type: choice
+        description: 'Update channel'
+        options:
+          - latest
+          - stable
+        default: stable
+
 env:
   SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+  UPDATE_CHANNEL: ${{ github.event.inputs.update_channel || "stable" }}
     
 jobs:
   notify-build-start:
@@ -76,6 +85,9 @@ jobs:
 
       - name: Set product key
         run: sed -i -e '/product_key =/ s|= .*|= ${{ secrets.ONPREMISE_PRODUCT_KEY }}|' ~/.teamplify.ini
+
+      - name: Set update channel
+        run: sed -i -e '/update_channel =/ s|= .*|= ${{ UPDATE_CHANNEL }}|' ~/.teamplify.ini
 
       - name: Disable crash reports
         run: sed -i -e '/send_crash_reports =/ s|= .*|= no|' ~/.teamplify.ini

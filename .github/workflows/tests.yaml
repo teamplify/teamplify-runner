@@ -87,7 +87,7 @@ jobs:
         run: sed -i -e '/product_key =/ s|= .*|= ${{ secrets.ONPREMISE_PRODUCT_KEY }}|' ~/.teamplify.ini
 
       - name: Set update channel
-        run: sed -i -e '/update_channel =/ s|= .*|= ${{ UPDATE_CHANNEL }}|' ~/.teamplify.ini
+        run: sed -i -e '/update_channel =/ s|= .*|= ${{ env.UPDATE_CHANNEL }}|' ~/.teamplify.ini
 
       - name: Disable crash reports
         run: sed -i -e '/send_crash_reports =/ s|= .*|= no|' ~/.teamplify.ini

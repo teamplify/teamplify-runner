@@ -16,7 +16,7 @@ on:
 
 env:
   SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-  UPDATE_CHANNEL: ${{ github.event.inputs.update_channel || stable }}
+  UPDATE_CHANNEL: ${{ github.event.inputs.update_channel || 'stable' }}
     
 jobs:
   notify-build-start:

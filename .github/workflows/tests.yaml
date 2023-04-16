@@ -75,11 +75,6 @@ jobs:
       - name: Install Teamplify
         run: pip3 install --editable .
 
-      - name: Erase the previous installation if it existed
-        run: | 
-          rm -f ~/.teamplify.ini
-          teamplify erase --quiet
-
       - name: Configure
         run: teamplify configure
 
@@ -116,6 +111,12 @@ jobs:
             goog:chromeOptions.binary=${{ steps.install-chrome.outputs.chrome-path }}
           "
           ./tests/on-premises-start-selenium.side
+
+      - name: Cleanup
+        if: always()
+        run: | 
+          teamplify erase --quiet
+          rm -f ~/.teamplify.ini
 
   notify-build-failure:
     if: ${{ failure() && github.event_name == 'push' }}

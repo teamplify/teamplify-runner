@@ -53,9 +53,9 @@ jobs:
 
       - run: pip install -r requirements-tests.txt
 
-      - run: pip install -e .
+      - run: pip install --editable .
 
-      - run: flake8 --isort-show-traceback && pytest
+      - run: flake8 --isort-show-traceback && pytest -m "not selenium"
 
   setup-test:
     name: Set up an on-premise instance
@@ -67,9 +67,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: 3.11
-
-      - name: Setup node
-        uses: actions/setup-node@v3
+          cache: 'pip'
 
       - name: Install Teamplify
         run: pip3 install --editable .
@@ -92,27 +90,22 @@ jobs:
       - name: Disable crash reports
         run: sed -i -e '/send_crash_reports =/ s|= .*|= no|' ~/.teamplify.ini
 
-      - name: Install Selenium and latest chromedriver 
-        run: npm install -g selenium-side-runner chromedriver@112
-
       - name: Install stable Chrome
         id: install-chrome
         uses: browser-actions/setup-chrome@v1
         with:
           chrome-version: stable
 
+      - name: Setup ChromeDriver
+        uses: nanasess/setup-chromedriver@v2
+
       - name: Wait for Teamplify to start
         run: teamplify start
 
-      - name: Run selenium test
-        run: >
-          selenium-side-runner 
-          -c "
-            browserName=chrome
-            goog:chromeOptions.args=[--headless, --nogpu, --disable-dev-shm-usage]
-            goog:chromeOptions.binary=${{ steps.install-chrome.outputs.chrome-path }}
-          "
-          ./tests/on-premises-start-selenium.side
+      - run: pip install -r requirements-tests.txt
+
+      - name: Check that the login page is available
+        run: pytest -m "selenium"
 
   notify-build-failure:
     if: ${{ failure() && github.event_name != 'pull_request' }}

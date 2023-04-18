@@ -20,7 +20,7 @@ class ConfigurationError(Exception):
         if isinstance(message, (list, tuple)):
             self.messages = message
             if len(self.messages) > 1:
-                message = '%s errors found' % len(self.messages)
+                message = '{0} errors found'.format(len(self.messages))
             else:
                 message = self.messages[0]
         else:
@@ -29,8 +29,8 @@ class ConfigurationError(Exception):
 
     def __str__(self):
         if len(self.messages) > 1:
-            return '%s errors found:\n' % len(self.messages) + '\n'.join([
-                ' -> %s' % m for m in self.messages
+            return '{0} errors found:\n'.format(len(self.messages)) + '\n'.join([
+                ' -> {0}'.format(m) for m in self.messages
             ])
         return self.messages[0]
 
@@ -39,21 +39,21 @@ def validate_hostname(hostname):
     try:
         socket.gethostbyname(hostname)
     except socket.gaierror:
-        raise ConfigurationError("Can't resolve hostname: %s" % hostname)
+        raise ConfigurationError("Can't resolve hostname: {0}".format(hostname))
 
 
 def validate_integer(value, min=None, max=None):    # noqa C901
     try:
         value = int(value)
     except ValueError:
-        raise ConfigurationError('Must be an integer. You provided: %s' % value)
+        raise ConfigurationError('Must be an integer. You provided: {0}'.format(value))
     if min is not None and value < min:
         raise ConfigurationError(
-            'Must be greater or equal to %s. You provided: %s' % (min, value),
+            'Must be greater or equal to {0}. You provided: {1}'.format(min, value),
         )
     if max is not None and value > max:
         raise ConfigurationError(
-            'Must be less or equal to %s. You provided: %s' % (max, value),
+            'Must be less or equal to {0}. You provided: {1}'.format(max, value),
         )
 
 
@@ -61,11 +61,11 @@ def validate_certs(path, hostname):
     if not os.path.isdir(path):
         raise ConfigurationError(
             'The path to certificates directory must be valid. '
-            'You provided: %s' % path,
+            'You provided: {0}'.format(path),
         )
 
-    cert_filename = '%s.crt' % hostname
-    key_filename = '%s.key' % hostname
+    cert_filename = '{0}.crt'.format(hostname)
+    key_filename = '{0}.key'.format(hostname)
     cert_found = os.path.isfile(os.path.join(path, cert_filename))
     key_found = os.path.isfile(os.path.join(path, key_filename))
     cert_files_found = cert_found and key_found
@@ -80,8 +80,8 @@ def validate_certs(path, hostname):
         raise ConfigurationError(
             'The path to certificates directory must contain both '
             'certificate and key files for the specified host '
-            "('%s', '%s') or '%s' directory with .pem files. "
-            'You provided: %s' % (cert_filename, key_filename, hostname, path),
+            "('{0}', '{1}') or '{2}' directory with .pem files. "
+            'You provided: {3}'.format(cert_filename, key_filename, hostname, path),
         )
 
 
@@ -92,7 +92,7 @@ def validate_boolean(value):
     if value.lower() not in ('yes', 'no', 'y', 'n', 'true', 'false', '0', '1'):
         raise ConfigurationError(
             'Must be yes or no, or true / false, or 1 / 0. '
-            'You provided: %s' % value,
+            'You provided: {0}'.format(value),
         )
 
 
@@ -103,7 +103,7 @@ def str_to_bool(s):
 def validate_choice(value, choices):
     if value not in choices:
         raise ConfigurationError(
-            'Must be one of the following: %s. You provided: %s' % (
+            'Must be one of the following: {0}. You provided: {1}'.format(
                 ', '.join(choices),
                 value,
             ),
@@ -116,14 +116,14 @@ def validate_email(value):
     just make sure that it contains exactly one @ surrounded by letters.
     """
     if not re.match(r'^[^@]*\w+@\w+[^@]*$', value):
-        raise ConfigurationError('Invalid email: %s' % value)
+        raise ConfigurationError('Invalid email: {0}'.format(value))
 
 
 def validate_product_key(value):
     if not value:
         raise ConfigurationError('Product key is missing')
     if not re.match('^svr_[A-Za-z0-9]{16}-[A-Za-z0-9]{20}$', value):
-        raise ConfigurationError('Invalid product key: %s' % value)
+        raise ConfigurationError('Invalid product key: {0}'.format(value))
 
 
 class Configurator:
@@ -188,7 +188,7 @@ class Configurator:
             self.config_path = config_path
         if self.config_path:
             if not os.path.exists(self.config_path):
-                raise RuntimeError('File not found: %s' % self.config_path)
+                raise RuntimeError('File not found: {0}'.format(self.config_path))
             self.parser.read(self.config_path)
         return self
 
@@ -260,7 +260,7 @@ class Configurator:
             if section not in self.defaults:
                 # Check unknown sections here, because we don't want lots of
                 # errors for each option in unknown section
-                errors.append('Unknown section: [%s]' % section)
+                errors.append('Unknown section: [{0}]'.format(section))
                 continue
             for option in self.parser.options(section):
                 try:
@@ -270,7 +270,7 @@ class Configurator:
                         value=self.parser.get(section, option),
                     )
                 except ConfigurationError as e:
-                    errors.append('[%s] %s: %s' % (section, option, str(e)))
+                    errors.append('[{0}] {1}: {2}'.format(section, option, str(e)))
         if errors:
             raise ConfigurationError(errors)
         return self
@@ -280,7 +280,7 @@ class Configurator:
 
     def validate_option(self, section, option, value):
         if section not in self.defaults:
-            raise ConfigurationError('Unknown section: [%s]' % section)
+            raise ConfigurationError('Unknown section: [{}]'.format(section))
 
         if option not in self.defaults[section]:
             raise ConfigurationError('Unknown option')
@@ -311,7 +311,7 @@ class Configurator:
                         'For the built-in support of the SSL-enabled '
                         'configuration if there is no SSL certificates '
                         'provided, the web port must be set to 80. '
-                        'You provided: %s' % value,
+                        'You provided: {0}'.format(value),
                     )
             elif option == 'ssl_port':
                 validate_port(value)
@@ -327,7 +327,7 @@ class Configurator:
                         'For the built-in support of the SSL-enabled '
                         'configuration if there is no SSL certificates '
                         'provided, the ssl port must be set to 443. '
-                        'You provided: %s' % value,
+                        'You provided: {0}'.format(value),
                     )
             elif option == 'use_ssl':
                 validate_choice(value, ['no', 'builtin', 'external'])
@@ -342,10 +342,10 @@ class Configurator:
                 validate_port(value)
             elif option == 'backup_mount':
                 if not os.path.isdir(value):
-                    raise ConfigurationError('Must be a directory: %s' % value)
+                    raise ConfigurationError('Must be a directory: {0}'.format(value))
                 if not os.access(value, os.W_OK):
                     raise ConfigurationError(
-                        'Write permission denied: %s' % value,
+                        'Write permission denied: {0}'.format(value),
                     )
         elif section == 'email':
             if option == 'smtp_host' and value.lower() != 'builtin_smtp':

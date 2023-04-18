@@ -27,7 +27,7 @@ def test_valid_configurations():
     try:
         c = Configurator().load(os.path.join(BASE_DIR, valid_config)).validate()
     except ConfigurationError:
-        fail('Configuration %s is expected to be valid' % valid_config)
+        fail('Configuration {0} is expected to be valid'.format(valid_config))
     else:
         # it must have the default options, not mentioned in the source config
         env = c.env()
@@ -56,4 +56,4 @@ def test_deeply_invalid_configuration():
     except ConfigurationError as e:
         assert e.messages == expected_errors
     else:
-        fail('Configuration %s must be invalid' % invalid_config)
+        fail('Configuration {0} must be invalid'.format(invalid_config))

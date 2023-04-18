@@ -69,7 +69,7 @@ def _wait_for_teamplify_start(url, max_minutes=10, check_interval_seconds=1):
 
 def _start(env):
     click.echo('Starting services...')
-    run('mkdir -p %s' % env['DB_BACKUP_MOUNT'])
+    run('mkdir -p {0}'.format(env['DB_BACKUP_MOUNT']))
     with cd(BASE_DIR):
         run(
             'docker-compose up '
@@ -151,7 +151,7 @@ def _assert_builtin_db(env):
 
 def _backup(env, filename=None):
     now = datetime.utcnow().replace(microsecond=0)
-    default_filename = '%s_%s.sql.gz' % (
+    default_filename = '{0}_{1}.sql.gz'.format(
         env['DB_NAME'],
         now.isoformat('_').replace(':', '-'),
     )

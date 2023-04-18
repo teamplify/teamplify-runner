@@ -39,7 +39,7 @@ def run(cmd, raise_on_error=True, capture_output=True, suppress_output=False,
             echo_output(result.stdout.read(), result.stderr.read())
         # print two last traceback records: current line and run caller
         traceback.print_stack(limit=2)
-        msg = 'Command failed, exit code %s' % code
+        msg = 'Command failed, exit code {0}'.format(code)
         if exit_on_error:
             click.echo(msg)
             exit(1)

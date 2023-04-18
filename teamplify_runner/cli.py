@@ -38,7 +38,10 @@ def _wait_for_teamplify_start(url, max_minutes=10, check_interval_seconds=1):
         seconds_since_launch = int(time.time() - start_time)
         minutes, seconds = divmod(seconds_since_launch, 60)
         # Add two spaces so we always overwrite the previous string
-        click.echo('Startup in progress, {0} min {1} sec ...  \r'.format(minutes, seconds), nl=False)
+        click.echo(
+            'Startup in progress, {0} min {1} sec ...  \r'.format(minutes, seconds),
+            nl=False,
+        )
 
         response = requests.get(url).text
         if 'window.BUILD_NUMBER' in response:

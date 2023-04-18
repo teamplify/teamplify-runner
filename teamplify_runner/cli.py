@@ -30,19 +30,19 @@ def _root_url(env):
     return root_url
 
 
-def _wait_for_teamplify_start(url, max_minutes=5, check_interval_seconds=5):
-    click.echo(
-        '\nWaiting for Teamplify to start at %s,'
-        ' checking every %s seconds...' % (url, check_interval_seconds),
-        nl=False,
-    )
+def _wait_for_teamplify_start(url, max_minutes=5, check_interval_seconds=1):
+    click.echo('\nTeamplify will be available at {0}\n'.format(url))
 
     start_time = time.time()
     while time.time() < start_time + max_minutes * 60:
-        response = requests.get(url).text
+        seconds_since_launch = int(time.time() - start_time)
+        minutes, seconds = divmod(seconds_since_launch, 60)
+        # Add two spaces so we always overwrite the previous string
+        click.echo('Startup in progress, {0} min {1} sec ...  \r'.format(minutes, seconds), nl=False)
 
+        response = requests.get(url).text
         if 'window.BUILD_NUMBER' in response:
-            click.echo('\nTeamplify successfully started!')
+            click.echo('\n\nTeamplify successfully started!')
             return
         elif any(
             marker in response
@@ -52,7 +52,6 @@ def _wait_for_teamplify_start(url, max_minutes=5, check_interval_seconds=5):
             )
         ):
             time.sleep(check_interval_seconds)
-            click.echo('.', nl=False)
             continue
         else:
             raise RuntimeError(
@@ -60,12 +59,12 @@ def _wait_for_teamplify_start(url, max_minutes=5, check_interval_seconds=5):
                 'Please check the Troubleshooting guide:\n -> '
                 'https://github.com/teamplify/teamplify-runner/#troubleshooting'.format(response)
             )
-    else:
-        raise RuntimeError(
-            "\n\nTeamplify didn't start in {0} minutes. "
-            'Please check the Troubleshooting guide:\n'
-            ' -> https://github.com/teamplify/teamplify-runner/#troubleshooting'.format(max_minutes)
-        )
+
+    raise RuntimeError(
+        "\n\nTeamplify didn't start in {0} minutes. "
+        'Please check the Troubleshooting guide:\n'
+        ' -> https://github.com/teamplify/teamplify-runner/#troubleshooting'.format(max_minutes)
+    )
 
 
 def _start(env):

@@ -30,7 +30,7 @@ def _root_url(env):
     return root_url
 
 
-def _wait_for_teamplify_start(url, max_minutes=5, check_interval_seconds=1):
+def _wait_for_teamplify_start(url, max_minutes=10, check_interval_seconds=1):
     click.echo('\nTeamplify will be available at {0}\n'.format(url))
 
     start_time = time.time()

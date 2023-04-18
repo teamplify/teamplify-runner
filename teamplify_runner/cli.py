@@ -7,8 +7,7 @@ import click
 import requests
 
 from teamplify_runner import __version__
-from teamplify_runner.configurator import BASE_DIR, ConfigurationError, \
-    Configurator
+from teamplify_runner.configurator import BASE_DIR, ConfigurationError, Configurator
 from teamplify_runner.utils import cd, run
 
 

@@ -56,17 +56,15 @@ def _wait_for_teamplify_start(url, max_minutes=5, check_interval_seconds=5):
             continue
         else:
             raise RuntimeError(
-                '\n\nUnexpected response from Teamplify: %s\n\n'
+                '\n\nUnexpected response from Teamplify: {0}\n\n'
                 'Please check the Troubleshooting guide:\n -> '
-                'https://github.com/teamplify/teamplify-runner/#troubleshooting'
-                % response,
+                'https://github.com/teamplify/teamplify-runner/#troubleshooting'.format(response)
             )
     else:
         raise RuntimeError(
-            "\n\nTeamplify didn't start in %s minutes. "
+            "\n\nTeamplify didn't start in {0} minutes. "
             'Please check the Troubleshooting guide:\n'
-            ' -> https://github.com/teamplify/teamplify-runner/#troubleshooting'
-            % max_minutes,
+            ' -> https://github.com/teamplify/teamplify-runner/#troubleshooting'.format(max_minutes)
         )
 
 
@@ -109,9 +107,9 @@ def _start(env):
 def _create_admin(env, email, full_name):
     click.echo('Creating admin...')
     cmd = 'docker exec teamplify_app ' \
-          '/code/manage.py createadmin --email %s' % email
+          '/code/manage.py createadmin --email {0}'.format(email)
     if full_name:
-        cmd += ' --full-name "%s"' % full_name
+        cmd += ' --full-name "{0}"'.format(full_name)
     run(cmd, capture_output=False, env=env)
 
 
@@ -143,10 +141,10 @@ def _assert_builtin_db(env):
             '"teamplify restore" commands are designed to work with '
             '"builtin_db" only. The current configuration specifies an '
             'external DB at:\n'
-            ' -> %s\n'
+            ' -> {0}\n'
             'To perform backup or restore operations, please use tools that '
             'connect to this DB server directly.\n\n'
-            'Command aborted.' % db_host,
+            'Command aborted.'.format(db_host),
             err=True,
         )
         exit(1)
@@ -167,9 +165,9 @@ def _backup(env, filename=None):
     temp_filename = os.path.join('/backup', default_filename)
     cleanup_on_error = not os.path.exists(target_file)
     # check for write access on the host
-    run('touch %s' % target_file)
+    run('touch {0}'.format(target_file))
     # check for write access inside docker
-    run('docker exec teamplify_db bash -c "touch %s"' % temp_filename)
+    run('docker exec teamplify_db bash -c "touch {0}"'.format(target_file))
     command = (
         'MYSQL_PWD={password} mysqldump --single-transaction -u{user} '
         '-h {host} {db} | gzip > {filename}'.format(
@@ -180,7 +178,7 @@ def _backup(env, filename=None):
             filename=os.path.join('/backup', default_filename),
         )
     )
-    click.echo('Making backup of Teamplify DB to:\n -> %s' % target_file)
+    click.echo('Making backup of Teamplify DB to:\n -> {0}'.format(target_file))
     click.echo('Please wait...')
     try:
         run(
@@ -191,7 +189,7 @@ def _backup(env, filename=None):
         )
     except RuntimeError:
         if cleanup_on_error:
-            run('rm %s' % target_file)
+            run('rm {0}'.format(target_file))
         exit(1)
     run('mv {source} {target}'.format(
         source=os.path.join(env['DB_BACKUP_MOUNT'], default_filename),
@@ -204,7 +202,7 @@ def _restore(env, filename):
     click.echo('Copying the backup...')
     restore_filename = 'restore.sql.gz'
     restore_mount = os.path.join(env['DB_BACKUP_MOUNT'], restore_filename)
-    run('cp %s %s' % (filename, restore_mount))
+    run('cp {0} {1}'.format(filename, restore_mount))
     try:
         sql = (
             'docker exec -e MYSQL_PWD="{password}" teamplify_db mysql -u{user} '
@@ -214,8 +212,8 @@ def _restore(env, filename):
             )
         )
         click.echo('Dropping and re-creating the DB...')
-        run(sql % ('drop database %s' % env['DB_NAME']))
-        run(sql % ('create database %s' % env['DB_NAME']))
+        run(sql % ('drop database {0}'.format(env['DB_NAME'])))
+        run(sql % ('create database {0}'.format(env['DB_NAME'])))
         click.echo('Restoring DB backup...')
         run(
             'docker exec -e MYSQL_PWD="{password}" teamplify_db bash -c "'
@@ -227,21 +225,21 @@ def _restore(env, filename):
             ),
         )
     finally:
-        run('rm %s' % restore_mount)
+        run('rm {0}'.format(restore_mount))
     click.echo('Done.')
 
 
 def _remove_unused_images():
     unused_images = run(
-        'docker images -f reference=%s -f dangling=true -q' % (IMAGES['app']),
+        'docker images -f reference={0} -f dangling=true -q'.format(IMAGES['app']),
         suppress_output=True,
     ).stdout_lines
-    click.echo('Cleanup: %s stale image(s) found' % len(unused_images))
+    click.echo('Cleanup: {0} stale image(s) found'.format(len(unused_images)))
     if unused_images:
         # Suppress errors because it might be possible
         # that some images are still used
         run(
-            'docker rmi %s' % ' '.join(unused_images),
+            'docker rmi {0}'.format(' '.join(unused_images)),
             suppress_output=True,
             raise_on_error=False,
         )
@@ -250,25 +248,25 @@ def _remove_unused_images():
 def cli(ctx, config):
     config = Configurator(config).load()
     if config.config_path:
-        click.echo('Using the configuration file at %s' % config.config_path)
+        click.echo('Using the configuration file at {0}'.format(config.config_path))
     if ctx.invoked_subcommand != 'configure':
         try:
             config.validate()
         except ConfigurationError as e:
             title = 'Configuration problem'
             title += ' - ' if len(e.messages) > 1 else ':\n -> '
-            click.echo('%s%s' % (title, str(e)), err=True)
+            click.echo(title + str(e), err=True)
             click.echo('Command aborted.', err=True)
             exit(1)
     ctx.obj['config'] = config
     env = config.env()
     for image_id, reference in IMAGES.items():
-        env['IMAGE_%s' % image_id.upper()] = reference
+        env['IMAGE_{0}'.format(image_id.upper())] = reference
     env['IMAGE_APP'] += ':' + env['MAIN_UPDATE_CHANNEL']
     ctx.obj['env'] = env
 
 
-cli.__doc__ = 'Teamplify runner v%s' % __version__
+cli.__doc__ = 'Teamplify runner v{0}'.format(__version__)
 
 
 cli = click.group()(
@@ -286,7 +284,7 @@ def configure(ctx):
     """
     config = ctx.obj['config']
     config.remove_unknown().dump()
-    click.echo('Current configuration saved to:\n -> %s' % config.config_path)
+    click.echo('Current configuration saved to:\n -> {0}'.format(config.config_path))
     click.echo(
         '\nThe file above contains the full list of configurable options. '
         'Please use your favorite text editor to adjust them as necessary. '
@@ -370,8 +368,8 @@ def restore(ctx, filename, quiet):
     if not quiet:
         confirm = input(
             'Current Teamplify DB will be overwritten from:\n'
-            ' -> %s\n'
-            'Continue (y/N)? ' % filename,
+            ' -> {0}\n'
+            'Continue (y/N)? '.format(filename),
         )
         if confirm.lower() != 'y':
             click.echo('DB restore cancelled, exiting')
@@ -382,7 +380,7 @@ def restore(ctx, filename, quiet):
 def _image_id(name):
     try:
         return run(
-            'docker image ls -q --no-trunc %s' % name,
+            'docker image ls -q --no-trunc {0}'.format(name),
             suppress_output=True,
         ).stdout_lines[0]
     except IndexError:
@@ -398,14 +396,14 @@ def update(ctx):
     env = ctx.obj['env']
     if _running(env):
         current_image = _image_id(env['IMAGE_APP'])
-        run('docker pull %s' % env['IMAGE_APP'], capture_output=False)
+        run('docker pull {0}'.format(env['IMAGE_APP']), capture_output=False)
         new_image = _image_id(env['IMAGE_APP'])
         if current_image != new_image:
             _stop(env)
             _start(env)
             click.echo('')
     else:
-        run('docker pull %s' % env['IMAGE_APP'])
+        run('docker pull {0}'.format(env['IMAGE_APP']))
     _remove_unused_images()
     click.echo('Done.')
 
@@ -435,24 +433,24 @@ def erase(ctx, quiet):
         suppress_output=True,
     ).stdout_lines
     if networks:
-        click.echo('Removing %s Docker network(s):' % len(networks))
-        run('docker network rm %s' % ' '.join(networks), raise_on_error=False)
+        click.echo('Removing {0} Docker network(s):'.format(len(networks)))
+        run('docker network rm {0}'.format(' '.join(networks)), raise_on_error=False)
     volumes = run(
         'docker volume ls -f name=teamplify_runner* -q',
         suppress_output=True,
     ).stdout_lines
     if volumes:
-        click.echo('Removing %s Docker volume(s):' % len(volumes))
-        run('docker volume rm %s' % ' '.join(volumes), raise_on_error=False)
+        click.echo('Removing {0} Docker volume(s):'.format(len(volumes)))
+        run('docker volume rm {0}'.format(' '.join(volumes)), raise_on_error=False)
     click.echo('Removing Docker images:')
     images = []
     for image_id, reference in IMAGES.items():
         if image_id == 'app':
             for channel in ('stable', 'latest'):
-                images.append('%s:%s' % (reference, channel))
+                images.append('{0}:{0}'.format(reference, channel))
         else:
             images.append(reference)
-    run('docker rmi %s' % ' '.join(images), raise_on_error=False)
+    run('docker rmi {0}'.format(' '.join(images)), raise_on_error=False)
     click.echo('Done.')
 
 

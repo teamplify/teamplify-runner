@@ -167,7 +167,7 @@ def _backup(env, filename=None):
     temp_filename = os.path.join('/backup', default_filename)
     cleanup_on_error = not os.path.exists(target_file)
     # check for write access on the host
-    run('touch {0}'.format(target_file))
+    run('touch {0}'.format(temp_filename))
     # check for write access inside docker
     run('docker exec teamplify_db bash -c "touch {0}"'.format(target_file))
     command = (
@@ -449,7 +449,7 @@ def erase(ctx, quiet):
     for image_id, reference in IMAGES.items():
         if image_id == 'app':
             for channel in ('stable', 'latest'):
-                images.append('{0}:{0}'.format(reference, channel))
+                images.append('{0}:{1}'.format(reference, channel))
         else:
             images.append(reference)
     run('docker rmi {0}'.format(' '.join(images)), raise_on_error=False)

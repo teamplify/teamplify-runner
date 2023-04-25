@@ -8,7 +8,7 @@ import requests
 
 from teamplify_runner import __version__
 from teamplify_runner.configurator import BASE_DIR, ConfigurationError, Configurator
-from teamplify_runner.utils import cd, run
+from teamplify_runner.utils import cd, compose, run
 
 
 IMAGES = {
@@ -78,8 +78,8 @@ def _start(env):
     click.echo('Starting services...')
     run('mkdir -p {0}'.format(env['DB_BACKUP_MOUNT']))
     with cd(BASE_DIR):
-        run(
-            'docker-compose up '
+        compose(
+            'up '
             '--detach '
             '--remove-orphans '
             '--scale worker_slim={worker_slim_count} '
@@ -122,8 +122,8 @@ def _create_admin(env, email, full_name):
 def _stop(env):
     click.echo('Stopping services...')
     with cd(BASE_DIR):
-        run(
-            'docker-compose rm -v --stop --force',
+        compose(
+            'rm -v --stop --force',
             capture_output=False,
             env=env,
         )
@@ -131,8 +131,8 @@ def _stop(env):
 
 def _running(env):
     with cd(BASE_DIR):
-        output = run(
-            'docker-compose ps -q app',
+        output = compose(
+            'ps -q app',
             suppress_output=True,
             env=env,
         ).stdout_lines

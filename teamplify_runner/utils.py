@@ -55,6 +55,14 @@ def run(cmd, raise_on_error=True, capture_output=True, suppress_output=False,
     return result
 
 
+def compose(cmd, **kwargs):
+    result = run('docker compose {0}'.format(cmd), **kwargs, raise_on_error=False)
+    if result.returncode == 125:
+        result = run('docker-compose {0}'.format(cmd), **kwargs)
+        click.echo('WARNING: docker-compose is deprecated, please use Docker Compose V2')
+    return result
+
+
 def random_string(length):
     # Use /dev/urandom, see https://stackoverflow.com/a/23728630
     choice = random.SystemRandom().choice

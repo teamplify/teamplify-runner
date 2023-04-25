@@ -85,8 +85,11 @@ services:
   builtin_smtp:
     image: ${IMAGE_SMTP}
     container_name: teamplify_smtp
-    volumes:
-      - ./postfix.cf:/etc/postfix/main.cf.d/10-custom.cf:ro
+    environment:
+      - ENABLE_CLAMAV
+      - POSTMASTER_EMAIL
+      - POSTFIX_MYNETWORKS
+      - POSTFIX_MYHOSTNAME
     restart: always
 
   app:

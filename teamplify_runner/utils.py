@@ -1,4 +1,5 @@
 import contextlib
+import ipaddress
 import os
 import random
 import string
@@ -69,3 +70,11 @@ def random_string(length):
     return ''.join(
         choice(string.ascii_letters + string.digits) for _ in range(length)
     )
+
+
+def is_ip_address(value):
+    try:
+        ipaddress.ip_address(value)
+        return True
+    except ValueError:
+        return False

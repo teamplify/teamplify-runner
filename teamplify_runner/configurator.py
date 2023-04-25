@@ -6,7 +6,7 @@ from collections import OrderedDict
 from configparser import ConfigParser
 from functools import partial
 
-from teamplify_runner.utils import random_string
+from teamplify_runner.utils import is_ip_address, random_string
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -236,6 +236,16 @@ class Configurator:
         env['COMPOSE_PROFILES'] = 'nossl'
         env['HTTPS_METHOD'] = 'nohttps'
         env['HTTPS_PORT'] = env['WEB_SSL_PORT']
+
+        # Postfix
+        env['ENABLE_CLAMAV'] = 'false'
+        env['POSTFIX_MYNETWORKS'] = '127.0.0.1/32 192.168.0.0/16 172.16.0.0/12 10.0.0.0/8'
+        env['POSTFIX_MYHOSTNAME'] = env['WEB_HOST']
+        if is_ip_address(env['WEB_HOST']):
+            env['POSTMASTER_EMAIL'] = f'postmaster@{env["WEB_HOST"]}'
+        else:
+            domain = env['WEB_HOST'].split('.', 1)[-1]
+            env['POSTMASTER_EMAIL'] = f'postmaster@{domain}'
 
         # The 'external' SSL mode is handled by Django
         # and does not need special configuration

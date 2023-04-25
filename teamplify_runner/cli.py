@@ -16,7 +16,7 @@ IMAGES = {
     'redis': 'redis:6.2.6',
     'nginx': 'jwilder/nginx-proxy:latest',
     'letsencrypt': 'jrcs/letsencrypt-nginx-proxy-companion:latest',
-    'smtp': 'instrumentisto/postfix:3.1.3',
+    'smtp': 'mikenye/postfix:3.5.9',
     'app': 'public.ecr.aws/q5a3z0t4/teamplify/server',
 }
 

@@ -42,7 +42,12 @@ def _wait_for_teamplify_start(url, max_minutes=10, check_interval_seconds=1):
             nl=False,
         )
 
-        response = requests.get(url).text
+        try:
+            response = requests.get(url).text
+        except (requests.ConnectionError, requests.Timeout):
+            time.sleep(check_interval_seconds)
+            continue
+
         if 'window.BUILD_NUMBER' in response:
             click.echo('\n\nTeamplify successfully started!')
             return

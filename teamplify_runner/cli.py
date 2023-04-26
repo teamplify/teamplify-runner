@@ -172,7 +172,7 @@ def _backup(env, filename=None):
     # check for write access on the host
     run('touch {0}'.format(target_file))
     # check for write access inside docker
-    run('docker exec teamplify_db bash -c "touch {0}"'.format(target_file))
+    run('docker exec teamplify_db bash -c "touch {0}"'.format(temp_filename))
     command = (
         'MYSQL_PWD={password} mysqldump --single-transaction -u{user} '
         '-h {host} {db} | gzip > {filename}'.format(

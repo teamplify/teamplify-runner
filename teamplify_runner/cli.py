@@ -170,7 +170,7 @@ def _backup(env, filename=None):
     temp_filename = os.path.join('/backup', default_filename)
     cleanup_on_error = not os.path.exists(target_file)
     # check for write access on the host
-    run('touch {0}'.format(temp_filename))
+    run('touch {0}'.format(target_file))
     # check for write access inside docker
     run('docker exec teamplify_db bash -c "touch {0}"'.format(target_file))
     command = (

@@ -32,33 +32,32 @@ def _root_url(env):
 def _wait_for_teamplify_start(url, max_minutes=10, check_interval_seconds=1):
     click.echo('\nTeamplify will be available at {0}\n'.format(url))
 
+    status = 'Connecting'
     start_time = time.time()
     while time.time() < start_time + max_minutes * 60:
         seconds_since_launch = int(time.time() - start_time)
         minutes, seconds = divmod(seconds_since_launch, 60)
         # Add two spaces so we always overwrite the previous string
         click.echo(
-            'Startup in progress, {0} min {1} sec ...  \r'.format(minutes, seconds),
+            '{0}, {1} min {2} sec ...  \r'.format(status, minutes, seconds),
             nl=False,
         )
+        time.sleep(check_interval_seconds)
 
         try:
             response = requests.get(url).text
         except (requests.ConnectionError, requests.Timeout):
-            time.sleep(check_interval_seconds)
+            status = 'Connecting'
             continue
 
         if 'window.BUILD_NUMBER' in response:
             click.echo('\n\nTeamplify successfully started!')
             return
-        elif any(
-            marker in response
-            for marker in (
-                'Welcome to nginx!',
-                'Teamplify is starting...',
-            )
-        ):
-            time.sleep(check_interval_seconds)
+        elif 'Welcome to nginx!' in response:
+            status = 'Started nginx'
+            continue
+        elif 'Teamplify is starting...' in response:
+            status = 'Teamplify is starting'
             continue
         else:
             raise RuntimeError(

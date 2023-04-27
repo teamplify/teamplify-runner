@@ -113,7 +113,7 @@ jobs:
         run: pytest -m "selenium"
 
       - name: Test Teamplify backup command
-        run: teamplify backup ${{ runner.temp }}/backup
+        run: teamplify backup ${{ runner.temp }}/backup/test-backup.sql.gz
 
   notify-build-failure:
     if: ${{ failure() && github.event_name != 'pull_request' }}

@@ -99,6 +99,9 @@ jobs:
       - name: Setup ChromeDriver
         uses: nanasess/setup-chromedriver@v2
 
+      - name: Login to public ECR
+        run: docker login -u AWS -p $(aws --region us-east-1 ecr-public get-login-password) public.ecr.aws
+
       - name: Wait for Teamplify to start
         run: teamplify start
 

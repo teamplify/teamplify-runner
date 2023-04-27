@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import re
 import time
 from datetime import datetime
 
@@ -50,7 +51,7 @@ def _wait_for_teamplify_start(url, max_minutes=10, check_interval_seconds=1):
             status = 'Connecting'
             continue
 
-        if 'window.BUILD_NUMBER' in response:
+        if re.match(r"window.BUILD_NUMBER = '\d+'", response):
             click.echo('\n\nTeamplify successfully started!')
             return
         elif 'Welcome to nginx!' in response:

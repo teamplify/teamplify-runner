@@ -20,7 +20,7 @@ def cd(path):
 
 
 def run(cmd, raise_on_error=True, capture_output=True, suppress_output=False,
-        exit_on_error=True, **kwargs):
+        exit_on_error=True, skip_error_codes=None, **kwargs):
     """
     Wrapper around sarge.run that can raise errors and capture stdout.
     """
@@ -35,7 +35,8 @@ def run(cmd, raise_on_error=True, capture_output=True, suppress_output=False,
         kwargs['stderr'] = sarge.Capture()
     result = sarge.run(cmd, **kwargs)
     code = result.returncode
-    if code and raise_on_error:
+    skip_error_codes = skip_error_codes or []
+    if code and code not in skip_error_codes and raise_on_error:
         if capture_output:
             echo_output(result.stdout.read(), result.stderr.read())
         # print two last traceback records: current line and run caller
@@ -57,8 +58,13 @@ def run(cmd, raise_on_error=True, capture_output=True, suppress_output=False,
 
 
 def compose(cmd, **kwargs):
-    result = run('docker compose {0}'.format(cmd), **kwargs, raise_on_error=False)
-    if result.returncode == 125:
+    missing_docker_compose_v2_code = 125
+    result = run(
+        'docker compose {0}'.format(cmd),
+        **kwargs,
+        skip_error_codes=[missing_docker_compose_v2_code],
+    )
+    if result.returncode == missing_docker_compose_v2_code:
         result = run('docker-compose {0}'.format(cmd), **kwargs)
         click.echo('WARNING: docker-compose is deprecated, please use Docker Compose V2')
     return result

@@ -17,7 +17,7 @@ on:
 env:
   SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
   UPDATE_CHANNEL: ${{ inputs.update_channel || 'stable' }}
-    
+
 jobs:
   notify-build-start:
     # Secrets are not available for forks for security reasons, so pull
@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        
+
       - name: Setup python
         uses: actions/setup-python@v4
         with:
@@ -106,6 +106,9 @@ jobs:
 
       - name: Check that the login page is available
         run: pytest -m "selenium"
+
+      - name: Test Teamplify backup command
+        run: teamplify backup ${{ runner.temp }}/backup
 
   notify-build-failure:
     if: ${{ failure() && github.event_name != 'pull_request' }}

@@ -366,7 +366,7 @@ class Configurator:
                 validate_port(value)
             elif option == 'address_from':
                 validate_email(value)
-        elif section == 'workers':
+        elif section == 'worker':
             if option in {'slim_count', 'fat_count'}:
                 validate_integer(value, 1)
 

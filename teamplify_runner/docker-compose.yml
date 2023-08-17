@@ -162,16 +162,16 @@ services:
       - EMAIL_SMTP_USER
       - EMAIL_SMTP_PASSWORD
       - CRYPTO_SIGNING_KEY
-    command: /code/server/worker.sh default
+    command: /code/server/worker-slim.sh
     restart: always
 
   worker_fat:
     <<: *worker
-    command: /code/server/worker.sh default,fat
+    command: /code/server/worker-fat.sh --without-penalized
 
   worker_fat_penalized:
     <<: *worker
-    command: /code/server/worker.sh default,fat,fatPenalized
+    command: /code/server/worker-fat.sh
 
   beat:
     <<: *worker

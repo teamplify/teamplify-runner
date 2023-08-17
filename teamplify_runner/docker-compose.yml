@@ -132,7 +132,7 @@ services:
     command: /code/server/app.sh
     restart: always
 
-  worker_slim:
+  worker_slim: &worker
     image: ${IMAGE_APP}
     depends_on:
       - app
@@ -162,72 +162,23 @@ services:
       - EMAIL_SMTP_USER
       - EMAIL_SMTP_PASSWORD
       - CRYPTO_SIGNING_KEY
-    command: /code/server/worker-slim.sh
+    command: /code/server/worker.sh default
     restart: always
 
   worker_fat:
-    image: ${IMAGE_APP}
-    depends_on:
-      - app
-      - builtin_smtp
-    links:
-      - builtin_db
-      - redis
-      - builtin_smtp
-    volumes:
-      - media:/media/
-    environment:
-      - C_FORCE_ROOT=1
-      - MAIN_PRODUCT_KEY
-      - MAIN_UPDATE_CHANNEL
-      - MAIN_SEND_CRASH_REPORTS
-      - WEB_HOST
-      - WEB_PORT
-      - WEB_SSL_PORT
-      - DB_HOST
-      - DB_PORT
-      - DB_USER
-      - DB_PASSWORD
-      - EMAIL_ADDRESS_FROM
-      - EMAIL_SMTP_HOST
-      - EMAIL_SMTP_PROTOCOL
-      - EMAIL_SMTP_PORT
-      - EMAIL_SMTP_USER
-      - EMAIL_SMTP_PASSWORD
-      - CRYPTO_SIGNING_KEY
-    command: /code/server/worker-fat.sh
-    restart: always
+    <<: *worker
+    command: /code/server/worker.sh default,fat
+
+  worker_fat_penalized:
+    <<: *worker
+    command: /code/server/worker.sh default,fat,fatPenalized
 
   beat:
-    image: ${IMAGE_APP}
+    <<: *worker
     container_name: teamplify_beat
-    depends_on:
-      - app
-    links:
-      - builtin_db
-      - redis
-    volumes:
-      - media:/media/
     environment:
-      - MAIN_PRODUCT_KEY
-      - MAIN_UPDATE_CHANNEL
-      - MAIN_SEND_CRASH_REPORTS
-      - WEB_HOST
-      - WEB_PORT
-      - WEB_SSL_PORT
-      - DB_HOST
-      - DB_PORT
-      - DB_USER
-      - DB_PASSWORD
-      - EMAIL_ADDRESS_FROM
-      - EMAIL_SMTP_HOST
-      - EMAIL_SMTP_PROTOCOL
-      - EMAIL_SMTP_PORT
-      - EMAIL_SMTP_USER
-      - EMAIL_SMTP_PASSWORD
-      - CRYPTO_SIGNING_KEY
+      - C_FORCE_ROOT=0
     command: /code/server/beat.sh
-    restart: always
 
 volumes:
   nginx_certs:

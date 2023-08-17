@@ -78,14 +78,19 @@ def _start(env):
     click.echo('Starting services...')
     run('mkdir -p {0}'.format(env['DB_BACKUP_MOUNT']))
     with cd(BASE_DIR):
+        fat_count = int(env['WORKER_FAT_COUNT'])
+        worker_fat_penalized_count = 1 if fat_count > 0 else 0
+        worker_fat_count = (fat_count - worker_fat_penalized_count) if fat_count > 0 else 0
         compose(
             'up '
             '--detach '
             '--remove-orphans '
             '--scale worker_slim={worker_slim_count} '
+            '--scale worker_fat_penalized={worker_fat_penalized_count} '
             '--scale worker_fat={worker_fat_count}'.format(
                 worker_slim_count=env['WORKER_SLIM_COUNT'],
-                worker_fat_count=env['WORKER_FAT_COUNT'],
+                worker_fat_penalized_count=worker_fat_penalized_count,
+                worker_fat_count=worker_fat_count,
             ),
             capture_output=False,
             env=env,

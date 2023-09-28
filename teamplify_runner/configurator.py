@@ -1,5 +1,6 @@
 import io
 import os
+import pickle
 import re
 import socket
 from collections import OrderedDict
@@ -170,6 +171,7 @@ class Configurator:
         '/etc/teamplify/teamplify.ini',
     ]
     default_save_location = os.path.expanduser('~/.teamplify.ini')
+    defaults_to_hide = (('main', 'update_channel',),)
 
     def __init__(self, config_path=None):
         if config_path:
@@ -196,17 +198,20 @@ class Configurator:
         self.parser.read_string(configuration)
         return self
 
-    def dump(self, config_path=None):
+    def dump(self, config_path=None, hide_defaults=True):
         self.config_path = config_path \
                            or self.config_path \
                            or self.default_save_location
+        parser = self.parser
+        if hide_defaults:
+            parser = self.remove_default_options(parser)
         with open(self.config_path, 'w') as f:
-            self.parser.set(
+            parser.set(
                 'email',
                 '; please note: Teamplify does not require email address '
                 'confirmation when only the admin user is registered.',
             )
-            self.parser.write(f)
+            parser.write(f)
         return self
 
     def dumps(self):
@@ -385,3 +390,17 @@ class Configurator:
         for section in unknown_sections:
             self.parser.remove_section(section)
         return self
+
+    def remove_default_options(self, parser):
+        if not self.defaults_to_hide:
+            return parser
+        parser_copy = ConfigParser()
+        data = pickle.dumps(parser)
+        parser_copy = pickle.loads(data)
+
+        for section, option in self.defaults_to_hide:
+            default_value = self.defaults.get(section, {}).get(option)
+            if parser_copy.get(section, option) == default_value:
+                parser_copy.remove_option(section, option)
+
+        return parser_copy

@@ -58,14 +58,11 @@ def run(cmd, raise_on_error=True, capture_output=True, suppress_output=False,
 
 
 def compose(cmd, **kwargs):
-    missing_docker_compose_v2_code = 125
-    result = run(
-        'docker compose {0}'.format(cmd),
-        **kwargs,
-        skip_error_codes=[missing_docker_compose_v2_code],
-    )
-    if result.returncode == missing_docker_compose_v2_code:
-        result = run('docker-compose {0}'.format(cmd), **kwargs)
+    result = run('docker compose version', skip_error_codes=[1], capture_output=False)
+    compose_v2_available = result.returncode == 0
+    compose_cmd = 'docker compose' if compose_v2_available else 'docker-compose'
+    result = run('{0} {1}'.format(compose_cmd, cmd), **kwargs)
+    if not compose_v2_available:
         click.echo('WARNING: docker-compose is deprecated, please use Docker Compose V2')
     return result
 

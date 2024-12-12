@@ -210,6 +210,7 @@ command line. Example:
   Teamplify runner will use [Let's Encrypt](https://letsencrypt.org) 
   to generate and renew SSL certificates for the domain that you specified
   in the `host` parameter above.
+- `count` (optional) - the number of web instances to run. The default is `1`.
 
 `[runner]`
 

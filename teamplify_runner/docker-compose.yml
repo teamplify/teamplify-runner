@@ -92,7 +92,7 @@ services:
       - POSTFIX_MYHOSTNAME
     restart: always
 
-  app:
+  app: &app
     image: ${IMAGE_APP}
     container_name: teamplify_app
     depends_on:
@@ -131,6 +131,11 @@ services:
       - CRYPTO_SIGNING_KEY
     command: /code/server/app.sh
     restart: always
+
+  app_replica:
+    <<: *app
+    container_name: ""
+    command: /code/server/app_replica.sh
 
   worker_slim: &worker
     image: ${IMAGE_APP}

@@ -140,6 +140,7 @@ class Configurator:
             ('ssl_port', 443),
             ('ssl_certs', ''),
             ('use_ssl', 'no'),
+            ('count', 1),
         ))),
         ('db', OrderedDict((
             ('host', 'builtin_db'),
@@ -350,6 +351,8 @@ class Configurator:
                 hostname = self.parser.get('web', 'host', fallback='').lower()
                 if value and hostname and self.ssl_mode() == 'builtin':
                     validate_certs(value, hostname)
+            elif option == 'count':
+                validate_integer(value, 1)
         elif section == 'db':
             if option == 'host' and value.lower() != 'builtin_db':
                 validate_hostname(value)

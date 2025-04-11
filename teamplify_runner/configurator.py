@@ -140,7 +140,7 @@ class Configurator:
             ('ssl_port', 443),
             ('ssl_certs', ''),
             ('use_ssl', 'no'),
-            ('count', 1),
+            ('count', 2),
         ))),
         ('db', OrderedDict((
             ('host', 'builtin_db'),
@@ -163,7 +163,7 @@ class Configurator:
         ))),
         ('worker', OrderedDict((
             ('slim_count', 1),
-            ('fat_count', 2),
+            ('fat_count', 3),
         ))),
     ))
     default_config_locations = [

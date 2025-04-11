@@ -71,7 +71,7 @@ can find the command line tools installed with `pip3` in your `$PATH`.
 
 ### Hardware
 
-As a default server configuration, we recommend 4GB of RAM, 2 CPU cores, and
+As a default server configuration, we recommend 8GB of RAM, 4 CPU cores, and
 30 GB of disk space (SSD is strongly recommended). For most small-to-medium
 organizations (up to a few dozen people), this should be enough. Larger
 workloads, however, may need more resources. The recommended strategy is to
@@ -210,7 +210,7 @@ command line. Example:
   Teamplify runner will use [Let's Encrypt](https://letsencrypt.org) 
   to generate and renew SSL certificates for the domain that you specified
   in the `host` parameter above.
-- `count` (optional) - the number of web instances to run. The default is `1`.
+- `count` (optional) - the number of web instances to run. The default is `2`.
 
 `[runner]`
 
@@ -271,7 +271,7 @@ command line. Example:
   repositories, chats, issues, etc. If you have a lot of resources or it takes
   a long time to sync them, you can increase this parameter. Essentially, it
   controls how many resources are synchronized in parallel. The default setting
-  is `2`.
+  is `3`.
 
 ## Starting and stopping the service
 

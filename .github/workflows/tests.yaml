@@ -132,11 +132,11 @@ jobs:
           files: |
             tests_output/pytest-playwright-*.xml
 
-      - name: Upload failure traces
+      - name: Upload Playwright traces
         uses: actions/upload-artifact@v4
-        if: failure()
+        if: always()
         with:
-          name: playwright-failures
+          name: playwright-traces
           path: tests_output
           retention-days: 3
 

@@ -9,3 +9,4 @@ dist
 MANIFEST
 .dccache
 __pycache__
+tests/test-results

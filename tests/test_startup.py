@@ -1,4 +1,5 @@
 import pytest
+from playwright.sync_api import Page
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
@@ -21,3 +22,10 @@ def test_login_page_is_visible(driver):
     email_field.send_keys('test@example.com')
     button_element = driver.find_element(By.XPATH, "//button[contains(.,'Continue')]")
     button_element.click()
+
+
+@pytest.mark.playwright
+def test_login_page_is_visible_playwright(page: Page):
+    page.goto('http://localhost')
+    page.get_by_role('textbox', name='Your email').fill('test@example.com')
+    page.get_by_role("button", name="Continue").click()

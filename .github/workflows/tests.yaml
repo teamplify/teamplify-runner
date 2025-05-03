@@ -122,9 +122,79 @@ jobs:
       - name: Test Teamplify backup command
         run: teamplify backup ${{ runner.temp }}/backup/test-backup.sql.gz
 
+  setup-test-playwright:
+    name: Set up an on-premise instance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+          cache: 'pip'
+
+      - name: Install Teamplify
+        run: pip3 install --editable .
+
+      - name: Configure
+        run: teamplify configure
+
+      - name: Create backup directory
+        run: mkdir ${{ runner.temp }}/backup
+
+      - name: Set backup_mount
+        run: sed -i -e '/backup_mount =/ s|= .*|= ${{ runner.temp }}/backup|' ~/.teamplify.ini
+
+      - name: Set product key
+        run: sed -i -e '/product_key =/ s|= .*|= ${{ secrets.ONPREMISE_PRODUCT_KEY }}|' ~/.teamplify.ini
+
+      - name: Set update channel
+        run: sed -i -e '/update_channel =/ s|= .*|= ${{ env.UPDATE_CHANNEL }}|' ~/.teamplify.ini
+
+      - name: Disable crash reports
+        run: sed -i -e '/send_crash_reports =/ s|= .*|= no|' ~/.teamplify.ini
+
+      - name: Login to public ECR
+        run: docker login -u AWS -p $(aws --region us-east-1 ecr-public get-login-password) public.ecr.aws
+
+      - name: Wait for Teamplify to start
+        run: teamplify start
+
+      - run: pip install -r requirements-tests.txt
+
+      - run: playwright install
+
+      - name: Check that the login page is available
+        run: > 
+          pytest -m "playwright"
+          --tracing retain-on-failure
+          --output tests_output
+          --junit-xml tests_output/pytest-playwright-${{ github.run_number }}.xml
+
+      - name: Publish test results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          check_name: "Playwright report"
+          fail_on: "nothing"
+          files: |
+            tests_output/pytest-playwright-*.xml
+
+      - name: Upload failure traces
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-failures
+          path: tests_output
+          retention-days: 3
+
+      - name: Test Teamplify backup command
+        run: teamplify backup ${{ runner.temp }}/backup/test-backup.sql.gz
+
   notify-build-failure:
     if: ${{ failure() && github.event_name != 'pull_request' }}
-    needs: [lint-and-tests, setup-test, notify-build-start]
+    needs: [lint-and-tests, setup-test, setup-test-playwright, notify-build-start]
     runs-on: ubuntu-latest
     steps:
       - name: Notify slack fail
@@ -136,7 +206,7 @@ jobs:
 
   notify-build-success:
     if: ${{ github.event_name != 'pull_request' && inputs.update_channel != 'latest' }}
-    needs: [lint-and-tests, setup-test, notify-build-start]
+    needs: [lint-and-tests, setup-test, setup-test-playwright, notify-build-start]
     runs-on: ubuntu-latest
     steps:
       - name: Notify slack success

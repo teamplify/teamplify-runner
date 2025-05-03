@@ -107,6 +107,10 @@ jobs:
 
       - run: pip install -r requirements-tests.txt
 
+      # Install playwright separately because it can't be installed on python <3.9,
+      # and we still want to run our configuration tests using older versions
+      - run: pip install pytest-playwright==0.7.0
+
       - run: playwright install
 
       - name: Check that the login page is available

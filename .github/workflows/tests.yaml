@@ -64,7 +64,10 @@ jobs:
 
       - run: pip install --editable .
 
-      - run: flake8 --isort-show-traceback && pytest -m "not playwright"
+      - run: flake8 --isort-show-traceback
+
+      - run: >
+          pytest --ignore */test_startup.py
 
   setup-test:
     name: Set up an on-premises instance

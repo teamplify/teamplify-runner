@@ -119,7 +119,7 @@ jobs:
       - name: Check that the login page is available
         run: > 
           pytest -m "playwright"
-          --tracing retain-on-failure
+          --tracing on
           --output tests_output
           --junit-xml tests_output/pytest-playwright-${{ github.run_number }}.xml
 

@@ -134,7 +134,7 @@ def _stop(env):
         compose(
             'rm -v --stop --force',
             capture_output=False,
-            env=env,
+            env={**env, 'COMPOSE_PROFILES': '*'},
         )
 
 

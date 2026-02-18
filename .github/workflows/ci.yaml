@@ -164,25 +164,8 @@ jobs:
       - name: Build
         run: uv build
 
-      - name: Notify slack publish started
-        id: slack
-        uses: ivelum/github-action-slack-notify-build@v1.7.2
-        with:
-          channel_id: ${{ vars.SLACK_CHANNEL_ID }}
-          status: PUBLISHING TO PYPI...
-          color: '#ee9b00'
-
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-
-      - name: Notify slack publish result
-        if: always()
-        uses: ivelum/github-action-slack-notify-build@v1.7.2
-        with:
-          message_id: ${{ steps.slack.outputs.message_id }}
-          channel_id: ${{ vars.SLACK_CHANNEL_ID }}
-          status: ${{ job.status == 'success' && 'PUBLISHED TO PYPI' || 'PYPI PUBLISH FAILED' }}
-          color: ${{ job.status == 'success' && '#16db65' || '#d7263d' }}
 
   notify-build-failure:
     if: ${{ failure() && github.event_name != 'pull_request' }}

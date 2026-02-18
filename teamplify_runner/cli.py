@@ -23,6 +23,9 @@ IMAGES = {
 
 
 def _root_url(env):
+    use_ssl = env.get('WEB_USE_SSL', '').lower()
+    if use_ssl in ('builtin', 'external', 'yes', 'true', '1'):
+        return 'https://' + env['WEB_HOST']
     port = env['WEB_PORT']
     root_url = 'http://' + env['WEB_HOST']
     if port != '80':

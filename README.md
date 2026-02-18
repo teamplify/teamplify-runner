@@ -192,13 +192,14 @@ command line. Example:
   is `80`. If `use_ssl` is set to `builtin` and no SSL certificates path is specified
   then `80` is the only allowed option;
 - `use_ssl` - SSL mode. Possible values are `no`, `builtin`, and `external`, defaults to
-  `no`. When set to `builtin`, Teamplify will serve HTTPS requests on the port specified 
+  `no`. When set to `builtin`, Teamplify will serve HTTPS requests on the port specified
   in the `ssl_port` option below. All HTTP traffic will be redirected to this port.
-  If you're hosting Teamplify behind a proxy or load balancer that is already 
-  configured for SSL support, please set this parameter to `external`, 
+  If you're hosting Teamplify behind a proxy or load balancer that is already
+  configured for SSL support, please set this parameter to `external`,
   and also make sure that your proxy correctly sets `X-Forwarded-Proto` HTTP header.
-  In this case, Teamplify will handle HTTP requests on the port number specified 
-  in the `port` option and redirect insecure requests to `https://<host>:<ssl_port>`.
+  In this case, the `port` setting specifies the local port that Teamplify binds to
+  (for the load balancer to forward traffic to), and the startup check will verify
+  that your service is accessible at `https://<host>` (standard port 443).
 - `ssl_port` - the port on which Teamplify web interface will be running when SSL
   is enabled, the default is `443`. If `use_ssl` is set to `builtin` and 
   no SSL certificates path is specified, then `443` is the only allowed option;

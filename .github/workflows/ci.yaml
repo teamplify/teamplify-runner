@@ -1,4 +1,4 @@
-name: Tests
+name: CI
 on:
   push:
     branches: [master]
@@ -135,9 +135,40 @@ jobs:
       - name: Test Teamplify backup command
         run: uv run teamplify backup ${{ runner.temp }}/backup/test-backup.sql.gz
 
+  check-version:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    outputs:
+      should-publish: ${{ steps.version.outputs.local_version_is_higher }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check if version needs publishing
+        id: version
+        uses: maybe-hello-world/pyproject-check-version@v3
+        with:
+          pyproject-path: pyproject.toml
+
+  publish:
+    needs: [lint-and-tests, setup-test, check-version]
+    if: needs.check-version.outputs.should-publish == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Build
+        run: uv build
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
   notify-build-failure:
     if: ${{ failure() && github.event_name != 'pull_request' }}
-    needs: [lint-and-tests, setup-test, notify-build-start]
+    needs: [lint-and-tests, setup-test, notify-build-start, check-version, publish]
     runs-on: ubuntu-latest
     steps:
       - name: Notify slack fail
@@ -149,7 +180,7 @@ jobs:
 
   notify-build-success:
     if: ${{ github.event_name != 'pull_request' && inputs.update_channel != 'latest' }}
-    needs: [lint-and-tests, setup-test, notify-build-start]
+    needs: [lint-and-tests, setup-test, notify-build-start, check-version, publish]
     runs-on: ubuntu-latest
     steps:
       - name: Notify slack success

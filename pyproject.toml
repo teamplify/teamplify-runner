@@ -1,5 +1,6 @@
 [project]
 name = "teamplify"
+# Changing the version automatically publishes to PyPI (see DEVELOPMENT.md)
 version = "0.13.0"
 description = "Teamplify on-premise runner"
 readme = "README.md"

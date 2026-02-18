@@ -153,6 +153,7 @@ jobs:
     needs: [lint-and-tests, setup-test, check-version]
     if: needs.check-version.outputs.should-publish == 'true'
     runs-on: ubuntu-latest
+    environment: pypi
     permissions:
       id-token: write
     steps:

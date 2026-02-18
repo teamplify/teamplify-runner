@@ -80,11 +80,10 @@ jobs:
 
       - uses: astral-sh/setup-uv@v5
 
-      - name: Install Teamplify
-        run: uv tool install --editable .
+      - run: uv sync
 
       - name: Configure
-        run: teamplify configure
+        run: uv run teamplify configure
 
       - name: Create backup directory
         run: mkdir ${{ runner.temp }}/backup
@@ -105,9 +104,9 @@ jobs:
         run: docker login -u AWS -p $(aws --region us-east-1 ecr-public get-login-password) public.ecr.aws
 
       - name: Wait for Teamplify to start
-        run: teamplify start
+        run: uv run teamplify start
 
-      - run: uv pip install pytest-playwright
+      - run: uv add --dev pytest-playwright
 
       - run: uv run playwright install
 
@@ -136,7 +135,7 @@ jobs:
           retention-days: 3
 
       - name: Test Teamplify backup command
-        run: teamplify backup ${{ runner.temp }}/backup/test-backup.sql.gz
+        run: uv run teamplify backup ${{ runner.temp }}/backup/test-backup.sql.gz
 
   notify-build-failure:
     if: ${{ failure() && github.event_name != 'pull_request' }}

@@ -70,10 +70,22 @@ jobs:
           pytest --ignore */test_startup.py
 
   setup-test:
-    name: Set up an on-premises instance
+    name: Set up on-premises (Compose ${{ matrix.compose-version }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        compose-version: ['v2.29.0', 'v2.38.0', 'v2.39.0', 'v2.40.3', 'latest']
     steps:
       - uses: actions/checkout@v3
+
+      - name: Set up Docker Compose
+        uses: docker/setup-compose-action@v1
+        with:
+          version: ${{ matrix.compose-version }}
+
+      - name: Verify Compose version
+        run: docker compose version
 
       - name: Setup python
         uses: actions/setup-python@v4
@@ -136,7 +148,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: playwright-traces
+          name: playwright-traces-${{ matrix.compose-version }}
           path: tests_output
           retention-days: 3
 

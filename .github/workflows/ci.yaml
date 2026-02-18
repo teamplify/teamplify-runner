@@ -145,7 +145,7 @@ jobs:
 
       - name: Check if version needs publishing
         id: version
-        uses: maybe-hello-world/pyproject-check-version@v3
+        uses: maybe-hello-world/pyproject-check-version@cbb988d0ddc5eb18f243b2fd088be84e0c42d053
         with:
           pyproject-path: pyproject.toml
 

@@ -54,7 +54,7 @@ jobs:
 
       - run: uv sync --group dev
 
-      - run: uv run flake8 --isort-show-traceback
+      - run: uv run ruff check
 
       - run: uv run pytest --ignore tests/test_startup.py
 

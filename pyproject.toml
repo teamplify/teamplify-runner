@@ -50,21 +50,19 @@ packages = ["teamplify_runner"]
 
 [dependency-groups]
 dev = [
-    "flake8>=3.2.1",
-    "flake8-isort>=2.6.0",
     "pytest>=2.9.0",
+    "ruff>=0.9.0",
 ]
 
 [tool.pytest.ini_options]
 addopts = "--tb=short"
 markers = ["playwright: Playwright-based tests"]
 
-[tool.flake8]
-max-line-length = 100
-exclude = [".git", ".venv", "build", "dist", "teamplify.egg-info"]
+[tool.ruff]
+line-length = 100
 
-[tool.isort]
-line_length = 100
-lines_after_imports = 2
-multi_line_output = 2
-sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+
+[tool.ruff.lint.isort]
+lines-after-imports = 2

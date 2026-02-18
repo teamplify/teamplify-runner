@@ -107,13 +107,13 @@ jobs:
       - name: Wait for Teamplify to start
         run: teamplify start
 
-      - run: uv tool install pytest-playwright
+      - run: uv pip install pytest-playwright
 
-      - run: playwright install
+      - run: uv run playwright install
 
       - name: Check that the login page is available
         run: >
-          pytest -m "playwright"
+          uv run pytest -m "playwright"
           --tracing on
           --output tests_output
           --junit-xml tests_output/pytest-playwright-${{ github.run_number }}.xml

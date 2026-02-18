@@ -2,6 +2,44 @@
 # See https://github.com/docker/compose/issues/4379
 version: '2'
 
+x-app-base: &app-base
+  image: ${IMAGE_APP}
+  depends_on:
+    - builtin_db
+    - redis
+  links:
+    - builtin_db
+    - redis
+  volumes:
+    - media:/media/
+  environment:
+    # nginx-proxy & Let's Encrypt configuration:
+    - VIRTUAL_HOST=${WEB_HOST}
+    - VIRTUAL_PORT=8211
+    - VIRTUAL_PROTO=uwsgi
+    - LETSENCRYPT_HOST=${LETSENCRYPT_HOST}
+    - HSTS=off
+
+    - MAIN_PRODUCT_KEY
+    - MAIN_UPDATE_CHANNEL
+    - MAIN_SEND_CRASH_REPORTS
+    - MAIN_BYPASS_EMAIL_CONFIRMATION
+    - WEB_HOST
+    - WEB_PORT
+    - WEB_SSL_PORT
+    - DB_HOST
+    - DB_PORT
+    - DB_USER
+    - DB_PASSWORD
+    - EMAIL_ADDRESS_FROM
+    - EMAIL_SMTP_HOST
+    - EMAIL_SMTP_PROTOCOL
+    - EMAIL_SMTP_PORT
+    - EMAIL_SMTP_USER
+    - EMAIL_SMTP_PASSWORD
+    - CRYPTO_SIGNING_KEY
+  restart: always
+
 services:
 
   builtin_db:
@@ -92,49 +130,13 @@ services:
       - POSTFIX_MYHOSTNAME
     restart: always
 
-  app: &app
-    image: ${IMAGE_APP}
+  app:
+    <<: *app-base
     container_name: teamplify_app
-    depends_on:
-      - builtin_db
-      - redis
-    links:
-      - builtin_db
-      - redis
-    volumes:
-      - media:/media/
-    environment:
-      # nginx-proxy & Let's Encrypt configuration:
-      - VIRTUAL_HOST=${WEB_HOST}
-      - VIRTUAL_PORT=8211
-      - VIRTUAL_PROTO=uwsgi
-      - LETSENCRYPT_HOST=${LETSENCRYPT_HOST}
-      - HSTS=off
-
-      - MAIN_PRODUCT_KEY
-      - MAIN_UPDATE_CHANNEL
-      - MAIN_SEND_CRASH_REPORTS
-      - MAIN_BYPASS_EMAIL_CONFIRMATION
-      - WEB_HOST
-      - WEB_PORT
-      - WEB_SSL_PORT
-      - DB_HOST
-      - DB_PORT
-      - DB_USER
-      - DB_PASSWORD
-      - EMAIL_ADDRESS_FROM
-      - EMAIL_SMTP_HOST
-      - EMAIL_SMTP_PROTOCOL
-      - EMAIL_SMTP_PORT
-      - EMAIL_SMTP_USER
-      - EMAIL_SMTP_PASSWORD
-      - CRYPTO_SIGNING_KEY
     command: /code/server/app.sh
-    restart: always
 
   app_replica:
-    <<: *app
-    container_name: ""
+    <<: *app-base
     command: /code/server/app_replica.sh
 
   worker_slim: &worker

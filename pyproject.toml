@@ -5,7 +5,7 @@ description = "Teamplify on-premise runner"
 readme = "README.md"
 license = "MIT"
 authors = [{ name = "Teamplify", email = "support@teamplify.com" }]
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 dependencies = [
     "certifi>=2022.12.7",
     "click>=5.0",
@@ -20,8 +20,6 @@ classifiers = [
     "Operating System :: MacOS",
     "Operating System :: POSIX :: Linux",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",

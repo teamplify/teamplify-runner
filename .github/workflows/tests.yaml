@@ -43,15 +43,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - { python: '3.7', ubuntu: '22.04' }
-          - { python: '3.8', ubuntu: '24.04' }
-          - { python: '3.9', ubuntu: '24.04' }
-          - { python: '3.10', ubuntu: '24.04' }
-          - { python: '3.11', ubuntu: '24.04' }
-          - { python: '3.12', ubuntu: '24.04' }
-          - { python: '3.13', ubuntu: '24.04' }
-    runs-on: ubuntu-${{ matrix.ubuntu }}
+        python: ['3.9', '3.10', '3.11', '3.12', '3.13']
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
@@ -122,8 +115,6 @@ jobs:
 
       - run: pip install -r requirements-tests.txt
 
-      # Install playwright separately because it can't be installed on python <3.9,
-      # and we still want to run our configuration tests using older versions
       - run: pip install pytest-playwright==0.7.0
 
       - run: playwright install

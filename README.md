@@ -40,7 +40,7 @@ Before you install, make sure that your system has the following components:
 
 * [Docker version 1.13 and above](https://docs.docker.com/install/);
 * [Docker Compose V2](https://docs.docker.com/compose/install/);
-* [Python 3.6 and above](https://www.python.org/downloads/);
+* [Python 3.9 and above](https://www.python.org/downloads/);
 * [pip for Python 3](https://packaging.python.org/tutorials/installing-packages/#ensure-you-can-run-pip-from-the-command-line)
 
 To check that the required versions are installed, run these commands (shown
@@ -48,11 +48,11 @@ with example output):
 
 ``` shell
 $ docker -v
-Docker version 18.06.1-ce, build e68fc7a215d7133c34aa18e3b72b4a21fd0c6136
+Docker version 27.5.1, build 9f9e405
 $ python3 --version
-Python 3.7.2
+Python 3.12.3
 $ pip3 --version
-pip 9.0.3 from /usr/lib/python3.7/site-packages (python 3.7)
+pip 24.0 from /usr/lib/python3/dist-packages/pip (python 3.12)
 ```
 
 ### On Ubuntu, be sure to install `pip3`

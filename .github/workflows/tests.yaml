@@ -46,21 +46,17 @@ jobs:
         python: ['3.9', '3.10', '3.11', '3.12', '3.13']
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v4
+      - uses: astral-sh/setup-uv@v5
         with:
           python-version: ${{ matrix.python }}
-          cache: 'pip'
 
-      - run: pip install -r requirements-tests.txt
+      - run: uv sync --group dev
 
-      - run: pip install --editable .
+      - run: uv run flake8 --isort-show-traceback
 
-      - run: flake8 --isort-show-traceback
-
-      - run: >
-          pytest --ignore */test_startup.py
+      - run: uv run pytest --ignore tests/test_startup.py
 
   setup-test:
     name: Set up on-premises (Compose ${{ matrix.compose-version }})
@@ -70,7 +66,7 @@ jobs:
       matrix:
         compose-version: ['v2.29.0', 'v2.38.0', 'v2.39.0', 'v2.40.3', 'latest']
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Docker Compose
         uses: docker/setup-compose-action@v1
@@ -80,14 +76,10 @@ jobs:
       - name: Verify Compose version
         run: docker compose version
 
-      - name: Setup python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.11
-          cache: 'pip'
+      - uses: astral-sh/setup-uv@v5
 
       - name: Install Teamplify
-        run: pip3 install --editable .
+        run: uv tool install --editable .
 
       - name: Configure
         run: teamplify configure
@@ -113,14 +105,12 @@ jobs:
       - name: Wait for Teamplify to start
         run: teamplify start
 
-      - run: pip install -r requirements-tests.txt
-
-      - run: pip install pytest-playwright==0.7.0
+      - run: uv tool install pytest-playwright
 
       - run: playwright install
 
       - name: Check that the login page is available
-        run: > 
+        run: >
           pytest -m "playwright"
           --tracing on
           --output tests_output

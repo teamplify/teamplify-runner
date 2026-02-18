@@ -19,11 +19,19 @@ def cd(path):
         os.chdir(cwd)
 
 
-def run(cmd, raise_on_error=True, capture_output=True, suppress_output=False,
-        exit_on_error=True, skip_error_codes=None, **kwargs):
+def run(
+    cmd,
+    raise_on_error=True,
+    capture_output=True,
+    suppress_output=False,
+    exit_on_error=True,
+    skip_error_codes=None,
+    **kwargs,
+):
     """
     Wrapper around sarge.run that can raise errors and capture stdout.
     """
+
     def echo_output(stdout, stderr):
         if stdout:
             click.echo(stdout)
@@ -58,21 +66,13 @@ def run(cmd, raise_on_error=True, capture_output=True, suppress_output=False,
 
 
 def compose(cmd, **kwargs):
-    result = run('docker compose version', skip_error_codes=[1], capture_output=False)
-    compose_v2_available = result.returncode == 0
-    compose_cmd = 'docker compose' if compose_v2_available else 'docker-compose'
-    result = run('{0} {1}'.format(compose_cmd, cmd), **kwargs)
-    if not compose_v2_available:
-        click.echo('WARNING: docker-compose is deprecated, please use Docker Compose V2')
-    return result
+    return run('docker compose {0}'.format(cmd), **kwargs)
 
 
 def random_string(length):
     # Use /dev/urandom, see https://stackoverflow.com/a/23728630
     choice = random.SystemRandom().choice
-    return ''.join(
-        choice(string.ascii_letters + string.digits) for _ in range(length)
-    )
+    return ''.join(choice(string.ascii_letters + string.digits) for _ in range(length))
 
 
 def is_ip_address(value):

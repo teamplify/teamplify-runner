@@ -80,7 +80,7 @@ jobs:
 
       - uses: astral-sh/setup-uv@v5
 
-      - run: uv sync
+      - run: uv sync --group dev
 
       - name: Configure
         run: uv run teamplify configure
@@ -105,8 +105,6 @@ jobs:
 
       - name: Wait for Teamplify to start
         run: uv run teamplify start
-
-      - run: uv add --dev pytest-playwright
 
       - run: uv run playwright install
 

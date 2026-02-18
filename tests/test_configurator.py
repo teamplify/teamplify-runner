@@ -47,8 +47,7 @@ def test_deeply_invalid_configuration():
         '[db] backup_mount: Must be a directory: not a valid path',
         '[db] unknown_key: Unknown option',
         '[email] address_from: Invalid email: not even a email',
-        '[email] smtp_protocol: Must be one of the following: plain, ssl, tls. '
-        'You provided: tcp',
+        '[email] smtp_protocol: Must be one of the following: plain, ssl, tls. You provided: tcp',
         'Unknown section: [unknown_section]',
     ]
     try:

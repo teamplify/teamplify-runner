@@ -64,5 +64,10 @@ line-length = 100
 [tool.ruff.lint]
 select = ["E", "F", "I", "W"]
 
+[tool.ruff.format]
+quote-style = "single"
+
 [tool.ruff.lint.isort]
 lines-after-imports = 2
+force-wrap-aliases = true
+combine-as-imports = true

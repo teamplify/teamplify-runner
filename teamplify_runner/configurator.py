@@ -17,6 +17,7 @@ class ConfigurationError(Exception):
     """
     Supports a single error or a list of errors
     """
+
     def __init__(self, message, *args, **kwargs):
         if isinstance(message, (list, tuple)):
             self.messages = message
@@ -30,9 +31,9 @@ class ConfigurationError(Exception):
 
     def __str__(self):
         if len(self.messages) > 1:
-            return '{0} errors found:\n'.format(len(self.messages)) + '\n'.join([
-                ' -> {0}'.format(m) for m in self.messages
-            ])
+            return '{0} errors found:\n'.format(len(self.messages)) + '\n'.join(
+                [' -> {0}'.format(m) for m in self.messages]
+            )
         return self.messages[0]
 
 
@@ -43,7 +44,7 @@ def validate_hostname(hostname):
         raise ConfigurationError("Can't resolve hostname: {0}".format(hostname))
 
 
-def validate_integer(value, min=None, max=None):    # noqa C901
+def validate_integer(value, min=None, max=None):  # noqa C901
     try:
         value = int(value)
     except ValueError:
@@ -61,8 +62,7 @@ def validate_integer(value, min=None, max=None):    # noqa C901
 def validate_certs(path, hostname):
     if not os.path.isdir(path):
         raise ConfigurationError(
-            'The path to certificates directory must be valid. '
-            'You provided: {0}'.format(path),
+            'The path to certificates directory must be valid. You provided: {0}'.format(path),
         )
 
     cert_filename = '{0}.crt'.format(hostname)
@@ -92,8 +92,7 @@ validate_port = partial(validate_integer, min=0, max=65535)
 def validate_boolean(value):
     if value.lower() not in ('yes', 'no', 'y', 'n', 'true', 'false', '0', '1'):
         raise ConfigurationError(
-            'Must be yes or no, or true / false, or 1 / 0. '
-            'You provided: {0}'.format(value),
+            'Must be yes or no, or true / false, or 1 / 0. You provided: {0}'.format(value),
         )
 
 
@@ -128,51 +127,81 @@ def validate_product_key(value):
 
 
 class Configurator:
-    defaults = OrderedDict((
-        ('main', OrderedDict((
-            ('product_key', ''),
-            ('update_channel', 'stable'),
-            ('send_crash_reports', 'yes'),
-        ))),
-        ('web', OrderedDict((
-            ('host', 'localhost'),
-            ('port', 80),
-            ('ssl_port', 443),
-            ('ssl_certs', ''),
-            ('use_ssl', 'no'),
-            ('count', 2),
-        ))),
-        ('db', OrderedDict((
-            ('host', 'builtin_db'),
-            ('name', 'teamplify'),
-            ('port', 3306),
-            ('user', 'root'),
-            ('password', 'teamplify'),
-            ('backup_mount', os.path.join(BASE_DIR, 'backup')),
-        ))),
-        ('email', OrderedDict((
-            ('address_from', 'Teamplify <support@teamplify.com>'),
-            ('smtp_host', 'builtin_smtp'),
-            ('smtp_protocol', 'plain'),
-            ('smtp_port', 25),
-            ('smtp_user', ''),
-            ('smtp_password', ''),
-        ))),
-        ('crypto', OrderedDict((
-            ('signing_key', random_string(50)),
-        ))),
-        ('worker', OrderedDict((
-            ('slim_count', 1),
-            ('fat_count', 3),
-        ))),
-    ))
+    defaults = OrderedDict(
+        (
+            (
+                'main',
+                OrderedDict(
+                    (
+                        ('product_key', ''),
+                        ('update_channel', 'stable'),
+                        ('send_crash_reports', 'yes'),
+                    )
+                ),
+            ),
+            (
+                'web',
+                OrderedDict(
+                    (
+                        ('host', 'localhost'),
+                        ('port', 80),
+                        ('ssl_port', 443),
+                        ('ssl_certs', ''),
+                        ('use_ssl', 'no'),
+                        ('count', 2),
+                    )
+                ),
+            ),
+            (
+                'db',
+                OrderedDict(
+                    (
+                        ('host', 'builtin_db'),
+                        ('name', 'teamplify'),
+                        ('port', 3306),
+                        ('user', 'root'),
+                        ('password', 'teamplify'),
+                        ('backup_mount', os.path.join(BASE_DIR, 'backup')),
+                    )
+                ),
+            ),
+            (
+                'email',
+                OrderedDict(
+                    (
+                        ('address_from', 'Teamplify <support@teamplify.com>'),
+                        ('smtp_host', 'builtin_smtp'),
+                        ('smtp_protocol', 'plain'),
+                        ('smtp_port', 25),
+                        ('smtp_user', ''),
+                        ('smtp_password', ''),
+                    )
+                ),
+            ),
+            ('crypto', OrderedDict((('signing_key', random_string(50)),))),
+            (
+                'worker',
+                OrderedDict(
+                    (
+                        ('slim_count', 1),
+                        ('fat_count', 3),
+                    )
+                ),
+            ),
+        )
+    )
     default_config_locations = [
         os.environ.get('TEAMPLIFY_CONF', ''),
         os.path.expanduser('~/.teamplify.ini'),
         '/etc/teamplify/teamplify.ini',
     ]
     default_save_location = os.path.expanduser('~/.teamplify.ini')
-    defaults_to_hide = (('main', 'update_channel',),)
+    defaults_to_hide = (
+        (
+            'main',
+            'update_channel',
+        ),
+    )
 
     def __init__(self, config_path=None):
         if config_path:
@@ -200,9 +229,7 @@ class Configurator:
         return self
 
     def dump(self, config_path=None, hide_defaults=True):
-        self.config_path = config_path \
-                           or self.config_path \
-                           or self.default_save_location
+        self.config_path = config_path or self.config_path or self.default_save_location
         parser = self.parser
         if hide_defaults:
             parser = self.remove_default_options(parser)
@@ -320,9 +347,7 @@ class Configurator:
                         "Can't use port 443 because it's reserved for the "
                         'SSL-enabled configuration. Please choose another port',
                     )
-                if value != '80'\
-                        and self.ssl_mode() == 'builtin' \
-                        and self.is_letsencrypt():
+                if value != '80' and self.ssl_mode() == 'builtin' and self.is_letsencrypt():
                     raise ConfigurationError(
                         'For the built-in support of the SSL-enabled '
                         'configuration if there is no SSL certificates '
@@ -336,9 +361,7 @@ class Configurator:
                         "Can't use port 80 because it's reserved for the "
                         'SSL-enabled configuration. Please choose another port',
                     )
-                if value != '443' \
-                        and self.ssl_mode() == 'builtin' \
-                        and self.is_letsencrypt():
+                if value != '443' and self.ssl_mode() == 'builtin' and self.is_letsencrypt():
                     raise ConfigurationError(
                         'For the built-in support of the SSL-enabled '
                         'configuration if there is no SSL certificates '

@@ -102,8 +102,8 @@ def _start(env):
 
     if env['WEB_HOST'].lower() == 'localhost':
         click.echo(
-            click.style('\nWARNING:', fg='yellow') +
-            " you're running Teamplify on localhost. This is "
+            click.style('\nWARNING:', fg='yellow')
+            + " you're running Teamplify on localhost. This is "
             'probably OK if you only need to run a demo on your local machine. '
             'However, in this mode it will not be available to anyone from the '
             "network. If you'd like to make it available on the network, you "
@@ -121,8 +121,7 @@ def _start(env):
 
 def _create_admin(env, email, full_name):
     click.echo('Creating admin...')
-    cmd = 'docker exec teamplify_app ' \
-          '/code/manage.py createadmin --email {0}'.format(email)
+    cmd = 'docker exec teamplify_app /code/manage.py createadmin --email {0}'.format(email)
     if full_name:
         cmd += ' --full-name "{0}"'.format(full_name)
     run(cmd, capture_output=False, env=env)
@@ -206,10 +205,12 @@ def _backup(env, filename=None):
         if cleanup_on_error:
             run('rm {0}'.format(target_file))
         exit(1)
-    run('mv {source} {target}'.format(
-        source=os.path.join(env['DB_BACKUP_MOUNT'], default_filename),
-        target=target_file,
-    ))
+    run(
+        'mv {source} {target}'.format(
+            source=os.path.join(env['DB_BACKUP_MOUNT'], default_filename),
+            target=target_file,
+        )
+    )
     click.echo('Done.')
 
 
@@ -219,12 +220,9 @@ def _restore(env, filename):
     restore_mount = os.path.join(env['DB_BACKUP_MOUNT'], restore_filename)
     run('cp {0} {1}'.format(filename, restore_mount))
     try:
-        sql = (
-            'docker exec -e MYSQL_PWD="{password}" teamplify_db mysql -u{user} '
-            '-e "%s"'.format(
-                user=env['DB_USER'],
-                password=env['DB_PASSWORD'],
-            )
+        sql = 'docker exec -e MYSQL_PWD="{password}" teamplify_db mysql -u{user} -e "%s"'.format(
+            user=env['DB_USER'],
+            password=env['DB_PASSWORD'],
         )
         click.echo('Dropping and re-creating the DB...')
         run(sql % ('drop database {0}'.format(env['DB_NAME'])))
@@ -285,10 +283,15 @@ cli.__doc__ = 'Teamplify runner v{0}'.format(__version__)
 
 
 cli = click.group()(
-    click.option('--config', type=click.Path(exists=True, dir_okay=False),
-                 default=None, help='Optional, config file to use')(
+    click.option(
+        '--config',
+        type=click.Path(exists=True, dir_okay=False),
+        default=None,
+        help='Optional, config file to use',
+    )(
         click.pass_context(cli),
-    ))
+    )
+)
 
 
 @cli.command()
@@ -382,9 +385,9 @@ def restore(ctx, filename, quiet):
     _assert_builtin_db(env)
     if not quiet:
         confirm = input(
-            'Current Teamplify DB will be overwritten from:\n'
-            ' -> {0}\n'
-            'Continue (y/N)? '.format(filename),
+            'Current Teamplify DB will be overwritten from:\n -> {0}\nContinue (y/N)? '.format(
+                filename
+            ),
         )
         if confirm.lower() != 'y':
             click.echo('DB restore cancelled, exiting')

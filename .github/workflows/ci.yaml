@@ -164,12 +164,29 @@ jobs:
       - name: Build
         run: uv build
 
+      - name: Notify slack publish started
+        id: slack
+        uses: ivelum/github-action-slack-notify-build@v1.7.2
+        with:
+          channel_id: C0PT3267R
+          status: PUBLISHING TO PYPI...
+          color: '#ee9b00'
+
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
 
+      - name: Notify slack publish result
+        if: always()
+        uses: ivelum/github-action-slack-notify-build@v1.7.2
+        with:
+          message_id: ${{ steps.slack.outputs.message_id }}
+          channel_id: C0PT3267R
+          status: ${{ job.status == 'success' && 'PUBLISHED TO PYPI' || 'PYPI PUBLISH FAILED' }}
+          color: ${{ job.status == 'success' && '#16db65' || '#d7263d' }}
+
   notify-build-failure:
     if: ${{ failure() && github.event_name != 'pull_request' }}
-    needs: [lint-and-tests, setup-test, notify-build-start, check-version, publish]
+    needs: [lint-and-tests, setup-test, notify-build-start]
     runs-on: ubuntu-latest
     steps:
       - name: Notify slack fail
@@ -181,7 +198,7 @@ jobs:
 
   notify-build-success:
     if: ${{ github.event_name != 'pull_request' && inputs.update_channel != 'latest' }}
-    needs: [lint-and-tests, setup-test, notify-build-start, check-version, publish]
+    needs: [lint-and-tests, setup-test, notify-build-start]
     runs-on: ubuntu-latest
     steps:
       - name: Notify slack success

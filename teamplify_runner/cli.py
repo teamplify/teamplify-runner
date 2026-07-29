@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import re
+import sys
 import time
 from datetime import datetime
 
@@ -10,6 +11,7 @@ import requests
 from teamplify_runner import __version__
 from teamplify_runner.configurator import BASE_DIR, ConfigurationError, Configurator
 from teamplify_runner.utils import cd, compose, run
+from teamplify_runner.version_checker import get_latest_version, is_update_available
 
 
 IMAGES = {
@@ -261,7 +263,37 @@ def _remove_unused_images():
         )
 
 
+def _check_for_updates():
+    latest_version = get_latest_version()
+    if not latest_version or not is_update_available(__version__, latest_version):
+        return
+
+    click.echo(
+        click.style('A new version of Teamplify runner is available: ', fg='yellow')
+        + 'v{0} (you have v{1}).'.format(latest_version, __version__),
+    )
+    update_hint = 'To update Teamplify runner, run:\n -> pip3 install -U teamplify\n'
+    if not sys.stdin.isatty():
+        click.echo(update_hint)
+        return
+    if click.confirm(
+        'Would you like to stop the current command and update now?',
+        default=True,
+    ):
+        click.echo(update_hint)
+        exit(0)
+
+
 def cli(ctx, config):
+    try:
+        _check_for_updates()
+    except click.exceptions.Abort:
+        # In case the user stopped the process reraise the error
+        raise
+    except Exception:
+        # But the rest of the updates check errors should never break the CLI
+        pass
+
     config = Configurator(config).load()
     if config.config_path:
         click.echo('Using the configuration file at {0}'.format(config.config_path))

@@ -152,21 +152,25 @@ def _running(env):
     return bool(output)
 
 
-def _assert_builtin_db(env):
+def _assert_builtin_db(env, exit_on_error=True):
     db_host = env['DB_HOST']
     if db_host != Configurator.defaults['db']['host']:
-        click.echo(
-            '\nWe are sorry, but the "teamplify backup" and '
-            '"teamplify restore" commands are designed to work with '
-            '"builtin_db" only. The current configuration specifies an '
-            'external DB at:\n'
-            ' -> {0}\n'
-            'To perform backup or restore operations, please use tools that '
-            'connect to this DB server directly.\n\n'
-            'Command aborted.'.format(db_host),
-            err=True,
-        )
-        exit(1)
+        if exit_on_error:
+            click.echo(
+                '\nWe are sorry, but the "teamplify backup" and '
+                '"teamplify restore" commands are designed to work with '
+                '"builtin_db" only. The current configuration specifies an '
+                'external DB at:\n'
+                ' -> {0}\n'
+                'To perform backup or restore operations, please use tools that '
+                'connect to this DB server directly.\n\n'
+                'Command aborted.'.format(db_host),
+                err=True,
+            )
+            exit(1)
+        return False
+
+    return True
 
 
 def _backup(env, filename=None):
@@ -440,6 +444,19 @@ def _image_id(name):
         return None
 
 
+def _offer_backup(env):
+    # Don't offer to do a backup if an external DB is used
+    if not _assert_builtin_db(env, exit_on_error=False):
+        return
+
+    if not sys.stdin.isatty() or click.confirm(
+        'Would you like to backup the Teamplify DB before updating?',
+        default=True,
+    ):
+        _backup(env)
+        click.echo('')
+
+
 @cli.command()
 @click.pass_context
 def update(ctx):
@@ -448,6 +465,7 @@ def update(ctx):
     """
     env = ctx.obj['env']
     if _running(env):
+        _offer_backup(env)
         current_image = _image_id(env['IMAGE_APP'])
         run('docker pull {0}'.format(env['IMAGE_APP']), capture_output=False)
         new_image = _image_id(env['IMAGE_APP'])

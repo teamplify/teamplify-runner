@@ -10,7 +10,7 @@ x-app-base: &app-base
     - media:/media/
   environment:
     # nginx-proxy & Let's Encrypt configuration:
-    - VIRTUAL_HOST=${WEB_HOST}
+    - VIRTUAL_HOST
     - VIRTUAL_PORT=8211
     - VIRTUAL_PROTO=uwsgi
     - LETSENCRYPT_HOST=${LETSENCRYPT_HOST}
@@ -23,6 +23,7 @@ x-app-base: &app-base
     - WEB_HOST
     - WEB_PORT
     - WEB_SSL_PORT
+    - WEB_MULTI_WORKSPACE
     - DB_HOST
     - DB_PORT
     - DB_USER
@@ -71,6 +72,8 @@ services:
       - /usr/share/nginx/html
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ./vhost.conf:/etc/nginx/vhost.d/${WEB_HOST}:ro
+      # entry verbatim, so the wildcard vhost needs its own copy.
+      - ./vhost.conf:/etc/nginx/vhost.d/*.${WEB_HOST}:ro
       - ./uwsgi_params.conf:/etc/nginx/uwsgi_params:ro
     volumes_from:
       - app:ro
@@ -107,6 +110,8 @@ services:
     environment:
       - VIRTUAL_HOST=${WEB_HOST}
       - LETSENCRYPT_HOST
+      - ACME_CHALLENGE
+      - ACMESH_DNS_API_CONFIG
     volumes:
       - nginx_certs:/etc/nginx/certs
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -153,6 +158,7 @@ services:
       - WEB_HOST
       - WEB_PORT
       - WEB_SSL_PORT
+      - WEB_MULTI_WORKSPACE
       - DB_HOST
       - DB_PORT
       - DB_USER

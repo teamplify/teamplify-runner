@@ -198,7 +198,7 @@ def _backup(env, filename=None):
             password=env['DB_PASSWORD'],
             host='localhost',
             db=env['DB_NAME'],
-            filename=os.path.join('/backup', default_filename),
+            filename=temp_filename,
         )
     )
     click.echo('Making backup of Teamplify DB to:\n -> {0}'.format(target_file))
@@ -288,6 +288,14 @@ def _check_for_updates():
         exit(0)
 
 
+def _abort_on_configuration_error(error):
+    title = 'Configuration problem'
+    title += ' - ' if len(error.messages) > 1 else ':\n -> '
+    click.echo(title + str(error), err=True)
+    click.echo('Command aborted.', err=True)
+    exit(1)
+
+
 def cli(ctx, config):
     try:
         _check_for_updates()
@@ -305,11 +313,7 @@ def cli(ctx, config):
         try:
             config.validate()
         except ConfigurationError as e:
-            title = 'Configuration problem'
-            title += ' - ' if len(e.messages) > 1 else ':\n -> '
-            click.echo(title + str(e), err=True)
-            click.echo('Command aborted.', err=True)
-            exit(1)
+            _abort_on_configuration_error(e)
     ctx.obj['config'] = config
     env = config.env()
     for image_id, reference in IMAGES.items():
@@ -340,7 +344,10 @@ def configure(ctx):
     Interactive configuration wizard
     """
     config = ctx.obj['config']
-    config.remove_unknown().dump()
+    try:
+        config.remove_unknown().dump()
+    except ConfigurationError as e:
+        _abort_on_configuration_error(e)
     click.echo('Current configuration saved to:\n -> {0}'.format(config.config_path))
     click.echo(
         '\nThe file above contains the full list of configurable options. '

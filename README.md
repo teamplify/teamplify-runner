@@ -27,6 +27,8 @@ This package is the installer and runner for the on-premise version.
    * [Teamplify won't start](#teamplify-wont-start)
    * [Email delivery issues](#email-delivery-issues)
    * [The connection is refused or not trusted in SSL-enabled mode](#the-connection-is-refused-or-not-trusted-in-ssl-enabled-mode)
+   * [A workspace subdomain returns a 503 error](#a-workspace-subdomain-returns-a-503-error)
+   * [The certificate is not trusted on a workspace subdomain](#the-certificate-is-not-trusted-on-a-workspace-subdomain)
    * [Other](#other)
 * [License](#license)
 
@@ -134,7 +136,7 @@ your file with the `--config` option._
   * `host` and `port` in the `[web]` section
   
   Other parameters are optional and can keep their default values.
-  You can review them at [the reference of all configuration options](#A-reference-of-all-configuration-options)
+  You can review them at [the reference of all configuration options](#a-reference-of-all-configuration-options)
 
 ### Where are configuration files located?
 
@@ -178,19 +180,33 @@ command line. Example:
 `[web]`
 
  > ⚠️ Please note that the built-in SSL option with certificates from
- > Let's Encrypt requires standard ports for HTTP and HTTPS: `port = 80` and
- > `ssl_port = 443`. This requirement comes from the
- > [Let's Encrypt HTTP-01 challenge](https://letsencrypt.org/docs/challenge-types/#http-01-challenge),
- > which does not support custom ports. However, you can still use custom HTTP and
- > HTTPS ports if you provide your own SSL certificates or use an external proxy
- > with `use_ssl = external`.
+ > Let's Encrypt requires standard ports for HTTP and HTTPS, `port = 80` and
+ > `ssl_port = 443`, when it validates your domain with the
+ > [HTTP-01 challenge](https://letsencrypt.org/docs/challenge-types/#http-01-challenge),
+ > which does not support custom ports. You can still use custom HTTP and HTTPS
+ > ports if you switch to the DNS-01 challenge with the `acme_challenge` option
+ > below, provide your own SSL certificates, or use an external proxy with
+ > `use_ssl = external`.
 
 - `host` - domain name on which the Teamplify web interface will be running. It
   must be created in advance, and pointed to the server where you have
-  installed Teamplify;
+  installed Teamplify. With `multi_workspace` enabled, it also needs a wildcard
+  DNS record `*.host` pointing to the same server, since every additional
+  workspace is served on its own subdomain of `host`. IP addresses and
+  single-label host names, such as `localhost`, work for a single workspace
+  only;
+
+  > ⚠️ Please use a dedicated domain or subdomain for Teamplify, such as
+  > `teamplify.your-company-domain.com`, rather than the apex domain of your
+  > company. Teamplify scopes its session and CSRF cookies to `.{host}`, so on
+  > an apex domain they would also be sent to every other host in that domain.
+  > This does not apply to IP addresses and single-label host names, which keep
+  > host-only cookies.
+
 - `port` - the port on which Teamplify web interface will be running, the default
-  is `80`. If `use_ssl` is set to `builtin` and no SSL certificates path is specified
-  then `80` is the only allowed option;
+  is `80`. Must be `80` when Teamplify issues its own certificates over the
+  HTTP-01 challenge (`use_ssl = builtin`, `ssl_certs` is empty and
+  `acme_challenge = http-01`);
 - `use_ssl` - SSL mode. Possible values are `no`, `builtin`, and `external`, defaults to
   `no`. When set to `builtin`, Teamplify will serve HTTPS requests on the port specified
   in the `ssl_port` option below. All HTTP traffic will be redirected to this port.
@@ -200,9 +216,13 @@ command line. Example:
   In this case, the `port` setting specifies the local port that Teamplify binds to
   (for the load balancer to forward traffic to), and the startup check will verify
   that your service is accessible at `https://<host>` (standard port 443).
+  With `multi_workspace` enabled, both SSL modes need a certificate that covers
+  `*.host`: see the `acme_challenge` and `ssl_certs` options below for
+  `builtin`, and make sure that your own proxy terminates wildcard TLS and
+  forwards every `*.host` name to Teamplify for `external`;
 - `ssl_port` - the port on which Teamplify web interface will be running when SSL
-  is enabled, the default is `443`. If `use_ssl` is set to `builtin` and 
-  no SSL certificates path is specified, then `443` is the only allowed option;
+  is enabled, the default is `443`. Must be `443` under the same condition as
+  `port` above;
 - `ssl_certs` (optional) - a path to a directory which contains SSL
   certificates. The directory must contain certificate (.crt) and key (.key) files 
   for the domain specified in the `host` option above. The filenames must be equal 
@@ -211,6 +231,56 @@ command line. Example:
   Teamplify runner will use [Let's Encrypt](https://letsencrypt.org) 
   to generate and renew SSL certificates for the domain that you specified
   in the `host` parameter above.
+
+  With `multi_workspace` enabled, the certificate must also cover `*.host`,
+  either as a wildcard certificate or through a Subject
+  Alternative Name. The file names, however, still follow the `host` value and
+  not the wildcard: for `host = example.com` the files must be named
+  `example.com.crt` and `example.com.key`, even though the certificate inside is
+  issued for both `example.com` and `*.example.com`. If you would rather have
+  Teamplify obtain and renew the wildcard certificate for you, leave `ssl_certs`
+  empty and use the `acme_challenge` option below instead.
+
+- `acme_challenge` (optional) - the challenge type that
+  [Let's Encrypt](https://letsencrypt.org) uses to verify that you own the
+  domain. Possible values are `http-01` and `dns-01`, defaults to `http-01`.
+  This option only has an effect when `use_ssl = builtin` and `ssl_certs` is
+  empty, that is, when Teamplify issues the certificates itself.
+
+  The default, `http-01`, verifies the domain over plain HTTP on the standard
+  ports. It cannot issue wildcard certificates, so it cannot be combined with
+  `multi_workspace`.
+
+  With `dns-01`, the verification happens through a temporary TXT record that
+  Teamplify creates in your DNS zone, so the certificate covers both `host` and
+  `*.host`, and it is renewed automatically just like the regular one. Nothing
+  has to reach the server over HTTP for the validation, so `port` and `ssl_port`
+  are free to be non-standard. This requires API access to your DNS provider,
+  configured through the `acme_dns_api_config` option below;
+- `acme_dns_api_config` (optional) - a path to a file with the credentials of
+  your DNS provider. Required when `acme_challenge` is set to `dns-01`, ignored
+  otherwise. The file is in YAML format and is passed to
+  [acme.sh](https://github.com/acmesh-official/acme.sh) as is. The `DNS_API`
+  key names the acme.sh DNS API to use, and the rest of the keys are the
+  credentials that this particular API expects. For example, for Cloudflare:
+
+  ``` yaml
+  DNS_API: dns_cf
+  CF_Token: your-api-token
+  CF_Account_ID: your-account-id
+  ```
+
+  The list of the supported DNS providers and the credentials that each of them
+  needs is available in the
+  [acme.sh documentation](https://github.com/acmesh-official/acme.sh/wiki/dnsapi);
+- `multi_workspace` (optional) - possible values are `yes` and `no`, defaults to
+  `no`. Set it to `yes` to host several independent workspaces on this
+  installation. Each of them is then served on its own subdomain of `host`: a
+  workspace named `design` on `host = example.com` is served at
+  `design.example.com`. Teamplify serves every `*.host` subdomain and includes
+  `*.host` in the certificate it obtains. If the rest of the configuration
+  cannot support this, `teamplify start` reports a configuration error and tells
+  you what to change;
 - `count` (optional) - the number of web instances to run. The default is `2`.
 
 `[runner]`
@@ -300,7 +370,7 @@ $ teamplify stop
 ```
 
 After running Teamplify for the first time,
-[follow the instructions to create an admin account](#create-an-admin-account)
+[follow the instructions to create an admin account](#creating-an-admin-account)
 
 There's also a convenient command to stop the service and start it again. This
 is useful when applying changes made to the configuration:
@@ -556,10 +626,41 @@ It also might be helpful to check the logs:
 $ docker logs teamplify_letsencrypt
 ```
 
+### A workspace subdomain returns a 503 error
+
+A 503 error means that the request never reached Teamplify: the proxy in front
+of it received a host name that it doesn't serve. The main workspace keeps
+working in this case, only the workspace subdomains are affected. Please check
+the following:
+
+1. That `multi_workspace = yes` is set in the `[web]` section of the
+   configuration, and that Teamplify has been restarted since. Without it the
+   built-in proxy only serves the bare `host`;
+2. That the wildcard DNS record `*.host` exists and points to the same server
+   as the record for `host` itself. Without it, the browser either can't
+   resolve the subdomain at all or resolves it to some other server;
+3. That your proxy is configured for the subdomains, if you run Teamplify with
+   `use_ssl = external`. The proxy has to forward every `*.host` name to
+   Teamplify, and to pass the original host name through in the `Host` header.
+
+### The certificate is not trusted on a workspace subdomain
+
+If the main workspace opens fine but a workspace subdomain reports an untrusted
+certificate, then the certificate that Teamplify serves covers `host` but not
+`*.host`. See the `acme_challenge` and `ssl_certs` options in the
+[Configuration](#a-reference-of-all-configuration-options) for how to obtain a
+certificate that covers both. If you have just switched `acme_challenge` to
+`dns-01`, give the companion a few minutes to issue the new certificate, and
+check its progress with:
+
+``` shell
+$ docker logs teamplify_letsencrypt
+```
+
 ### Other
 
 For any issue with Teamplify, we recommend that you try to
-[check for updates](#updates) first. We release updates frequently. It's quite
+[check for updates](#updating-teamplify) first. We release updates frequently. It's quite
 possible that the problem that you encountered is already addressed in a newer
 version.
 

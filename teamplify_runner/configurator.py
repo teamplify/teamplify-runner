@@ -3,10 +3,12 @@ import os
 import pickle
 import re
 import socket
+import stat
 from collections import OrderedDict
 from configparser import ConfigParser
 from functools import partial
 
+from teamplify_runner import acme_dns
 from teamplify_runner.utils import is_ip_address, random_string
 
 
@@ -119,6 +121,25 @@ def validate_distinct_ports(port, ssl_port):
         )
 
 
+def warn_about_exposed_credentials(path):
+    """
+    Return a warning when the file with the DNS provider credentials is
+    readable by other users of this machine, or None when it is not. This is a
+    warning rather than an error: an installation may keep the file readable
+    for a group on purpose.
+    """
+    try:
+        mode = os.stat(path).st_mode
+    except OSError:
+        return None
+    if not mode & (stat.S_IRWXG | stat.S_IRWXO):
+        return None
+    return (
+        'The credentials of your DNS provider are readable by other users of '
+        'this machine: {0}. Consider "chmod 600 {0}"'.format(path)
+    )
+
+
 def validate_http_01_port(option, value, standard_port):
     if value != standard_port:
         raise ConfigurationError(
@@ -126,6 +147,19 @@ def validate_http_01_port(option, value, standard_port):
             'standard ports, so {0} must be {1}. Switch acme_challenge to '
             'dns-01 or provide your own ssl_certs to use another port. '
             'You provided: {2}'.format(option, standard_port, value),
+        )
+
+
+def has_subdomains(host):
+    return not is_ip_address(host) and '.' in host.strip('.')
+
+
+def validate_acme_dns_host(host):
+    if not has_subdomains(host):
+        raise ConfigurationError(
+            'acme-dns answers the challenges in a zone delegated from the host, '
+            'which is not possible for IP addresses and single-label host names. '
+            'You provided: {0}'.format(host),
         )
 
 
@@ -138,7 +172,7 @@ def validate_multi_workspace(host, uses_http_01_challenge):
     Whether a certificate supplied through `ssl_certs` really covers the
     wildcard is not, since the runner does not read the certificate itself.
     """
-    if is_ip_address(host) or '.' not in host.strip('.'):
+    if not has_subdomains(host):
         raise ConfigurationError(
             'Additional workspaces are served on subdomains of the host, '
             'which is not possible for IP addresses and single-label host '
@@ -333,14 +367,18 @@ class Configurator:
 
     def acme_challenge(self):
         """
-        Return the ACME challenge type used to obtain Let's Encrypt
-        certificates, normalized to the way the companion container spells it.
+        Return the way Let's Encrypt certificates are obtained: `http-01`,
+        `dns-01` with a DNS provider API, or `acme-dns` with the self-hosted
+        acme-dns server, which also answers DNS-01 challenges.
         """
         challenge = self.parser.get('web', 'acme_challenge', fallback='').lower()
-        return 'DNS-01' if challenge == 'dns-01' else 'HTTP-01'
+        return challenge if challenge in ('dns-01', 'acme-dns') else 'http-01'
 
     def uses_letsencrypt(self):
         return self.ssl_mode() == 'builtin' and self.is_letsencrypt()
+
+    def uses_acme_dns(self):
+        return self.uses_letsencrypt() and self.acme_challenge() == 'acme-dns'
 
     def multi_workspace(self):
         return str_to_bool(self.parser.get('web', 'multi_workspace', fallback='no'))
@@ -351,7 +389,7 @@ class Configurator:
         challenge, which needs the standard HTTP and HTTPS ports and cannot
         issue wildcard certificates.
         """
-        return self.uses_letsencrypt() and self.acme_challenge() == 'HTTP-01'
+        return self.uses_letsencrypt() and self.acme_challenge() == 'http-01'
 
     def acme_dns_api_config(self):
         """
@@ -388,6 +426,7 @@ class Configurator:
 
         env['ACME_CHALLENGE'] = 'HTTP-01'
         env['ACMESH_DNS_API_CONFIG'] = ''
+        env['ACME_DNS_CONFIG'] = ''
         env['COMPOSE_PROFILES'] = 'nossl'
         env['HTTPS_METHOD'] = 'nohttps'
         env['HTTPS_PORT'] = env['WEB_SSL_PORT']
@@ -415,14 +454,22 @@ class Configurator:
             else:
                 env['COMPOSE_PROFILES'] = 'ssl,letsencrypt'
 
-                if self.acme_challenge() == 'DNS-01':
+                challenge = self.acme_challenge()
+                if challenge in ('dns-01', 'acme-dns'):
                     env['ACME_CHALLENGE'] = 'DNS-01'
-                    env['ACMESH_DNS_API_CONFIG'] = self.acme_dns_api_config()
 
                     # The DNS-01 challenge is the only one that can issue the
                     # wildcard certificate that additional workspaces need
                     if self.multi_workspace():
                         env['LETSENCRYPT_HOST'] = '{0},*.{0}'.format(env['WEB_HOST'])
+
+                if challenge == 'dns-01':
+                    env['ACMESH_DNS_API_CONFIG'] = self.acme_dns_api_config()
+                elif challenge == 'acme-dns':
+                    # The acme-dns credentials only exist once the server is
+                    # up, so the runner adds ACMESH_DNS_API_CONFIG at startup
+                    env['COMPOSE_PROFILES'] = 'ssl,letsencrypt,acme-dns'
+                    env['ACME_DNS_CONFIG'] = acme_dns.server_config(env['WEB_HOST'])
         elif not _ssl_mode:
             del env['WEB_SSL_PORT']
 
@@ -449,6 +496,20 @@ class Configurator:
             raise ConfigurationError(errors)
         return self
 
+    def warnings(self):
+        """
+        Problems that are worth telling the administrator about, but that are
+        not a reason to refuse to start.
+        """
+        messages = []
+        if self.uses_letsencrypt() and self.acme_challenge() == 'dns-01':
+            exposed = warn_about_exposed_credentials(
+                self.parser.get('web', 'acme_dns_api_config', fallback=''),
+            )
+            if exposed:
+                messages.append(exposed)
+        return messages
+
     def is_letsencrypt(self):
         return self.parser.get('web', 'ssl_certs', fallback='') == ''
 
@@ -473,12 +534,16 @@ class Configurator:
                 pass
             elif option == 'port':
                 validate_port(value)
-                validate_distinct_ports(value, self.parser.get('web', 'ssl_port'))
+                # Only the built-in SSL makes nginx listen on both ports at
+                # once; otherwise the ssl port is not served by this machine
+                if self.ssl_mode() == 'builtin':
+                    validate_distinct_ports(value, self.parser.get('web', 'ssl_port'))
                 if self.uses_http_01_challenge():
                     validate_http_01_port(option, value, '80')
             elif option == 'ssl_port':
                 validate_port(value)
-                validate_distinct_ports(self.parser.get('web', 'port'), value)
+                if self.ssl_mode() == 'builtin':
+                    validate_distinct_ports(self.parser.get('web', 'port'), value)
                 if self.uses_http_01_challenge():
                     validate_http_01_port(option, value, '443')
             elif option == 'use_ssl':
@@ -488,9 +553,11 @@ class Configurator:
                 if value and hostname and self.ssl_mode() == 'builtin':
                     validate_certs(value, hostname)
             elif option == 'acme_challenge':
-                validate_choice(value.lower(), ['http-01', 'dns-01'])
+                validate_choice(value.lower(), ['http-01', 'dns-01', 'acme-dns'])
+                if self.uses_acme_dns():
+                    validate_acme_dns_host(self.parser.get('web', 'host', fallback='').lower())
             elif option == 'acme_dns_api_config':
-                if self.uses_letsencrypt() and self.acme_challenge() == 'DNS-01':
+                if self.uses_letsencrypt() and self.acme_challenge() == 'dns-01':
                     validate_acme_dns_api_config(value)
             elif option == 'multi_workspace':
                 validate_boolean(value)

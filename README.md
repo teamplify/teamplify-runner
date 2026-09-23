@@ -29,6 +29,7 @@ This package is the installer and runner for the on-premise version.
    * [The connection is refused or not trusted in SSL-enabled mode](#the-connection-is-refused-or-not-trusted-in-ssl-enabled-mode)
    * [A workspace subdomain returns a 503 error](#a-workspace-subdomain-returns-a-503-error)
    * [The certificate is not trusted on a workspace subdomain](#the-certificate-is-not-trusted-on-a-workspace-subdomain)
+   * [The acme-dns records are not found](#the-acme-dns-records-are-not-found)
    * [Other](#other)
 * [License](#license)
 
@@ -243,23 +244,46 @@ command line. Example:
 
 - `acme_challenge` (optional) - the challenge type that
   [Let's Encrypt](https://letsencrypt.org) uses to verify that you own the
-  domain. Possible values are `http-01` and `dns-01`, defaults to `http-01`.
-  This option only has an effect when `use_ssl = builtin` and `ssl_certs` is
-  empty, that is, when Teamplify issues the certificates itself.
+  domain. Possible values are `http-01`, `dns-01` and `acme-dns`, defaults to
+  `http-01`. This option only has an effect when `use_ssl = builtin` and
+  `ssl_certs` is empty, that is, when Teamplify issues the certificates itself.
 
   The default, `http-01`, verifies the domain over plain HTTP on the standard
   ports. It cannot issue wildcard certificates, so it cannot be combined with
   `multi_workspace`.
 
   With `dns-01`, the verification happens through a temporary TXT record that
-  Teamplify creates in your DNS zone, so the certificate covers both `host` and
+  Teamplify creates in your DNS zone, so the certificate can also cover
   `*.host`, and it is renewed automatically just like the regular one. Nothing
   has to reach the server over HTTP for the validation, so `port` and `ssl_port`
   are free to be non-standard. This requires API access to your DNS provider,
-  configured through the `acme_dns_api_config` option below;
+  configured through the `acme_dns_api_config` option below.
+
+  `acme-dns` works the same way for a DNS that has no API. Teamplify runs its
+  own small DNS server, [acme-dns](https://github.com/joohoi/acme-dns), which
+  answers the verification requests in a zone that you delegate to it once. On
+  the first `teamplify start`, the runner prints two records to add to the zone
+  of `host`, for example:
+
+  ```
+  _acme.example.com.            NS     example.com.
+  _acme-challenge.example.com.  CNAME  d420c923-bbd7-4056-ab64-c3ca54c9b3cf._acme.example.com.
+  ```
+
+  It then checks through a public resolver that they work and only starts
+  Teamplify after that; run the first start in a terminal, so that you can
+  confirm when the records are in place. From then on certificates are issued
+  and renewed without touching your DNS again. This mode requires `host` to be
+  a domain name whose A record points to this server, and port 53 of this
+  server to be open to the Internet over both UDP and TCP. Docker publishes that
+  port with firewall rules of its own, which on a host managed with `ufw` makes
+  it reachable no matter what `ufw` allows; acme-dns answers for the delegated
+  zone only. The records are tied to the credentials kept in the `acme_dns`
+  Docker volume: if the volume is lost, for example after `teamplify erase`, the
+  CNAME record has to be changed to the new value that the runner prints;
 - `acme_dns_api_config` (optional) - a path to a file with the credentials of
   your DNS provider. Required when `acme_challenge` is set to `dns-01`, ignored
-  otherwise. The file is in YAML format and is passed to
+  otherwise, including for `acme-dns`. The file is in YAML format and is passed to
   [acme.sh](https://github.com/acmesh-official/acme.sh) as is. The `DNS_API`
   key names the acme.sh DNS API to use, and the rest of the keys are the
   credentials that this particular API expects. For example, for Cloudflare:
@@ -272,7 +296,11 @@ command line. Example:
 
   The list of the supported DNS providers and the credentials that each of them
   needs is available in the
-  [acme.sh documentation](https://github.com/acmesh-official/acme.sh/wiki/dnsapi);
+  [acme.sh documentation](https://github.com/acmesh-official/acme.sh/wiki/dnsapi).
+  The contents of this file are passed to the container that renews the
+  certificates, where anyone who can use Docker on this server can read them, so
+  we recommend an API token limited to the zone of `host` and `chmod 600` on the
+  file itself;
 - `multi_workspace` (optional) - possible values are `yes` and `no`, defaults to
   `no`. Set it to `yes` to host several independent workspaces on this
   installation. Each of them is then served on its own subdomain of `host`: a
@@ -280,7 +308,9 @@ command line. Example:
   `design.example.com`. Teamplify serves every `*.host` subdomain and includes
   `*.host` in the certificate it obtains. If the rest of the configuration
   cannot support this, `teamplify start` reports a configuration error and tells
-  you what to change;
+  you what to change. The DNS record and the certificate that the subdomains
+  need are not checked at startup: see the `host`, `use_ssl` and `ssl_certs`
+  options above;
 - `count` (optional) - the number of web instances to run. The default is `2`.
 
 `[runner]`
@@ -656,6 +686,21 @@ check its progress with:
 ``` shell
 $ docker logs teamplify_letsencrypt
 ```
+
+### The acme-dns records are not found
+
+With `acme_challenge = acme-dns`, `teamplify start` doesn't start Teamplify
+until it sees the records it asked for through a public resolver, and it lists
+the problems it found. Please check the following:
+
+1. That both records are added exactly as printed, including the long name in
+   the CNAME record. Changes to a DNS zone may take a while to become visible,
+   so give them a few minutes and let the runner check again;
+2. That port 53 of this server is open to the Internet over both UDP and TCP,
+   in the firewall of the server and of your cloud provider, if any. Otherwise
+   neither the runner nor the certificate authority can reach acme-dns, even
+   when the records are right;
+3. That nothing else on the server listens on port 53.
 
 ### Other
 

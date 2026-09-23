@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+import json
 import os
 import re
+import shlex
 import sys
 import time
 from datetime import datetime
@@ -8,7 +10,7 @@ from datetime import datetime
 import click
 import requests
 
-from teamplify_runner import __version__
+from teamplify_runner import __version__, acme_dns
 from teamplify_runner.configurator import BASE_DIR, ConfigurationError, Configurator
 from teamplify_runner.utils import cd, compose, run
 from teamplify_runner.version_checker import get_latest_version, is_update_available
@@ -19,9 +21,16 @@ IMAGES = {
     'redis': 'redis:6.2.6',
     'nginx': 'jwilder/nginx-proxy:latest',
     'letsencrypt': 'jrcs/letsencrypt-nginx-proxy-companion:latest',
+    'acme_dns': 'joohoi/acme-dns:v2.0.2',
     'smtp': 'mikenye/postfix:3.5.9',
     'app': 'public.ecr.aws/q5a3z0t4/teamplify/server',
 }
+
+ACME_DNS_CONTAINER = 'teamplify_acme_dns'
+# Kept in the acme-dns volume next to its database, so that both are lost or
+# kept together
+ACME_DNS_CREDENTIALS = '/var/lib/acme-dns/teamplify-credentials.json'
+ACME_DNS_VERIFIED = '/var/lib/acme-dns/teamplify-verified'
 
 
 def _root_url(env):
@@ -79,9 +88,191 @@ def _wait_for_teamplify_start(url, max_minutes=10, check_interval_seconds=1):
     )
 
 
+def _acme_dns_exec(command, input=None):
+    # Only attach stdin when there is something to send: an attached terminal
+    # would otherwise swallow what the administrator types at the next prompt
+    interactive = '-i ' if input is not None else ''
+    return run(
+        f'docker exec {interactive}{ACME_DNS_CONTAINER} {command}',
+        input=input,
+        suppress_output=True,
+        raise_on_error=False,
+    )
+
+
+def _start_acme_dns(env):
+    with cd(BASE_DIR):
+        started = compose(
+            'up --detach acme_dns',
+            capture_output=False,
+            env=env,
+            raise_on_error=False,
+        )
+    if started.returncode != 0:
+        click.echo(
+            "\nCan't start the acme-dns server. It answers the DNS queries of the "
+            'certificate authority, so it needs port 53 of this machine, over both UDP '
+            'and TCP. A local DNS resolver is the usual reason for the port to be busy. '
+            'On a host running systemd-resolved, free it with all three of:\n'
+            ' -> set DNSStubListener=no in /etc/systemd/resolved.conf\n'
+            ' -> ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf\n'
+            ' -> systemctl restart systemd-resolved',
+            err=True,
+        )
+        exit(1)
+
+
+def _acme_dns_credentials(env):
+    _start_acme_dns(env)
+
+    stored = _acme_dns_exec(f'cat {ACME_DNS_CREDENTIALS}')
+    if stored.returncode == 0:
+        try:
+            return acme_dns.parse_credentials('\n'.join(stored.stdout_lines))
+        except ValueError as e:
+            click.echo(
+                f'The stored acme-dns credentials are damaged: {e}\n'
+                f'Remove {ACME_DNS_CREDENTIALS} from the {ACME_DNS_CONTAINER} container '
+                'to register again. The _acme-challenge CNAME record will have to be '
+                'changed after that.',
+                err=True,
+            )
+            exit(1)
+
+    # The API may take a moment to come up after the container starts
+    for _ in range(30):
+        response = _acme_dns_exec('wget -qO- --post-data= http://127.0.0.1/register')
+        if response.returncode == 0:
+            break
+        time.sleep(1)
+    else:
+        click.echo("Can't register in acme-dns. Its own log follows:\n", err=True)
+        run(
+            f'docker logs --tail 50 {ACME_DNS_CONTAINER}',
+            capture_output=False,
+            raise_on_error=False,
+        )
+        exit(1)
+
+    credentials = acme_dns.parse_credentials('\n'.join(response.stdout_lines))
+    saved = _acme_dns_exec(
+        f"sh -c 'cat > {ACME_DNS_CREDENTIALS}'",
+        input=acme_dns.dump_credentials(credentials),
+    )
+    if saved.returncode != 0:
+        click.echo("Can't store the acme-dns credentials", err=True)
+        exit(1)
+    return credentials
+
+
+def _acme_dns_lookup(env, record_type, name):
+    result = run(
+        f'docker run --rm --entrypoint dig {env["IMAGE_LETSENCRYPT"]} '
+        f'+short +time=5 +tries=2 {record_type} {name} @{acme_dns.PUBLIC_RESOLVER}',
+        suppress_output=True,
+        raise_on_error=False,
+    )
+    if result.returncode != 0:
+        # A query that never reached the resolver tells us nothing about the
+        # records, so it must not be reported as a missing one
+        details = ' '.join(line for line in result.stdout_lines if line.strip())
+        raise acme_dns.LookupFailed(
+            f"Can't look up the {record_type} record of {name} through the public resolver "
+            f'{acme_dns.PUBLIC_RESOLVER}: {details or "the query failed"}. This machine has '
+            'to be able to send DNS queries to the Internet over port 53 to check the '
+            'records, and Docker has to be able to run the '
+            f'{env["IMAGE_LETSENCRYPT"]} image',
+        )
+    return result.stdout_lines
+
+
+def _acme_dns_publish(credentials, value):
+    data = json.dumps({'subdomain': credentials.subdomain, 'txt': value})
+    result = _acme_dns_exec(
+        'wget -qO- '
+        f'--header {shlex.quote(f"X-Api-User: {credentials.username}")} '
+        f'--header {shlex.quote(f"X-Api-Key: {credentials.password}")} '
+        "--header 'Content-Type: application/json' "
+        f'--post-data {shlex.quote(data)} '
+        'http://127.0.0.1/update',
+    )
+    if result.returncode != 0:
+        click.echo("Can't publish a test record in acme-dns", err=True)
+        exit(1)
+
+
+def _acme_dns_verified(credentials):
+    """
+    Whether the DNS records were already confirmed to work for exactly these
+    credentials. The marker holds the name the CNAME record has to point at, so
+    that credentials issued by a later registration are checked again instead
+    of inheriting the confirmation given to the previous ones.
+    """
+    marker = _acme_dns_exec(f'cat {ACME_DNS_VERIFIED}')
+    if marker.returncode != 0:
+        return False
+    return '\n'.join(marker.stdout_lines).strip() == credentials.fulldomain
+
+
+def _mark_acme_dns_verified(credentials):
+    saved = _acme_dns_exec(
+        f"sh -c 'cat > {ACME_DNS_VERIFIED}'",
+        input=credentials.fulldomain,
+    )
+    if saved.returncode != 0:
+        click.echo(
+            "Can't save the result of the DNS check, it will run again on the next start.",
+            err=True,
+        )
+
+
+def _setup_acme_dns(env):
+    """
+    Get the acme-dns server ready and hand its credentials over to the Let's
+    Encrypt companion. Until the DNS records are confirmed to work, walk the
+    administrator through adding them.
+    """
+    credentials = _acme_dns_credentials(env)
+    env['ACMESH_DNS_API_CONFIG'] = acme_dns.acmesh_dns_api_config(credentials)
+    if _acme_dns_verified(credentials):
+        return
+
+    host = env['WEB_HOST']
+    records = '\n'.join(f' -> {record}' for record in acme_dns.required_records(host, credentials))
+    while True:
+        click.echo('Checking the DNS records for acme-dns...')
+        problems = acme_dns.find_problems(
+            host,
+            credentials,
+            lookup=lambda record_type, name: _acme_dns_lookup(env, record_type, name),
+            publish_txt=lambda value: _acme_dns_publish(credentials, value),
+        )
+        if not problems:
+            _mark_acme_dns_verified(credentials)
+            click.echo('The DNS records for acme-dns are in place.\n')
+            return
+
+        click.echo(
+            '\nTo obtain certificates through acme-dns, add these records to the '
+            f'DNS zone of {host}. This is only needed once:\n\n'
+            f'{records}\n\n'
+            f'The A record of {host} must point to this server, and port 53 of '
+            'this server must be open to the Internet over both UDP and TCP. '
+            'DNS changes may take a while to become visible.\n\n'
+            'Problems found:\n' + '\n'.join(f' -> {problem}' for problem in problems) + '\n',
+        )
+        if not sys.stdin.isatty():
+            click.echo('Add the records and run the command again.', err=True)
+            exit(1)
+        if not click.confirm('Check the records again?', default=True):
+            exit(1)
+
+
 def _start(env):
     click.echo('Starting services...')
     run('mkdir -p {0}'.format(env['DB_BACKUP_MOUNT']))
+    if 'acme-dns' in env['COMPOSE_PROFILES'].split(','):
+        _setup_acme_dns(env)
     with cd(BASE_DIR):
         web_count = int(env['WEB_COUNT'])
         app_replica_count = web_count - 1
@@ -314,6 +505,8 @@ def cli(ctx, config):
             config.validate()
         except ConfigurationError as e:
             _abort_on_configuration_error(e)
+        for warning in config.warnings():
+            click.echo(click.style('WARNING: ', fg='yellow') + warning)
     ctx.obj['config'] = config
     env = config.env()
     for image_id, reference in IMAGES.items():

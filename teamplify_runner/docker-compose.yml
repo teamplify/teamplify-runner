@@ -23,7 +23,6 @@ x-app-base: &app-base
     - WEB_HOST
     - WEB_PORT
     - WEB_SSL_PORT
-    - WEB_MULTI_WORKSPACE
     - DB_HOST
     - DB_PORT
     - DB_USER
@@ -120,6 +119,30 @@ services:
     profiles:
       - letsencrypt
 
+  acme_dns:
+    image: ${IMAGE_ACME_DNS}
+    container_name: teamplify_acme_dns
+    # The runner generates the configuration and passes it in the environment,
+    # so that nothing has to be written on the host
+    entrypoint: sh -c 'printf "%s\n" "$$ACME_DNS_CONFIG" > /etc/acme-dns/config.cfg && exec acme-dns'
+    environment:
+      - ACME_DNS_CONFIG
+    volumes:
+      # the database and the credentials of the runner: losing them means that
+      # the _acme-challenge CNAME record has to be changed
+      - acme_dns:/var/lib/acme-dns
+    ports:
+      - 53:53/udp
+      - 53:53/tcp
+    networks:
+      default:
+        aliases:
+          # a hostname without underscores for the API URL
+          - acme-dns
+    restart: always
+    profiles:
+      - acme-dns
+
   builtin_smtp:
     image: ${IMAGE_SMTP}
     container_name: teamplify_smtp
@@ -158,7 +181,6 @@ services:
       - WEB_HOST
       - WEB_PORT
       - WEB_SSL_PORT
-      - WEB_MULTI_WORKSPACE
       - DB_HOST
       - DB_PORT
       - DB_USER
@@ -193,3 +215,4 @@ volumes:
   nginx_dhparam:
   media:
   mysql_data:
+  acme_dns:

@@ -35,13 +35,18 @@ ACME_DNS_VERIFIED = '/var/lib/acme-dns/teamplify-verified'
 
 def _root_url(env):
     use_ssl = env.get('WEB_USE_SSL', '').lower()
-    if use_ssl in ('builtin', 'external', 'yes', 'true', '1'):
-        return 'https://' + env['WEB_HOST']
-    port = env['WEB_PORT']
-    root_url = 'http://' + env['WEB_HOST']
-    if port != '80':
-        root_url += ':' + port
-    return root_url
+    if use_ssl == 'external':
+        # The external proxy terminates SSL on the standard port
+        return _url('https', env['WEB_HOST'])
+    if use_ssl in ('builtin', 'yes', 'true', '1'):
+        return _url('https', env['WEB_HOST'], env['WEB_SSL_PORT'], '443')
+    return _url('http', env['WEB_HOST'], env['WEB_PORT'], '80')
+
+
+def _url(scheme, host, port=None, default_port=None):
+    if port == default_port:
+        return f'{scheme}://{host}'
+    return f'{scheme}://{host}:{port}'
 
 
 def _wait_for_teamplify_start(url, max_minutes=10, check_interval_seconds=1):

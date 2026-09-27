@@ -237,19 +237,18 @@ def test_ssl_certs_accepts_a_directory_with_a_certificate_pair(certs_dir):
     assert check('web', 'ssl_certs', certs_dir, use_ssl='builtin', host='localhost') is None
 
 
-def test_ssl_certs_accepts_a_directory_of_pem_files(tmp_path):
-    pem_dir = tmp_path / 'localhost'
-    pem_dir.mkdir()
-    (pem_dir / 'fullchain.pem').write_text('cert')
-    assert check('web', 'ssl_certs', tmp_path, use_ssl='builtin', host='localhost') is None
-
-
 def test_ssl_certs_rejects_a_missing_directory():
     message = error('web', 'ssl_certs', '/no/such/dir', use_ssl='builtin', host='localhost')
     assert 'path to certificates directory must be valid' in message
 
 
 def test_ssl_certs_rejects_a_directory_without_the_certificate(tmp_path):
+    message = error('web', 'ssl_certs', tmp_path, use_ssl='builtin', host='localhost')
+    assert "('localhost.crt', 'localhost.key')" in message
+
+
+def test_ssl_certs_rejects_a_certificate_without_a_key(tmp_path):
+    (tmp_path / 'localhost.crt').write_text('cert')
     message = error('web', 'ssl_certs', tmp_path, use_ssl='builtin', host='localhost')
     assert "('localhost.crt', 'localhost.key')" in message
 

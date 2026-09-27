@@ -71,20 +71,12 @@ def validate_certs(path, hostname):
     key_filename = '{0}.key'.format(hostname)
     cert_found = os.path.isfile(os.path.join(path, cert_filename))
     key_found = os.path.isfile(os.path.join(path, key_filename))
-    cert_files_found = cert_found and key_found
 
-    cert_dirname = os.path.join(path, hostname)
-    cert_dir_exists = os.path.isdir(cert_dirname)
-    cert_dir_found = cert_dir_exists and any(
-        [fname.endswith('.pem') for fname in os.listdir(cert_dirname)],
-    )
-
-    if not (cert_files_found or cert_dir_found):
+    if not (cert_found and key_found):
         raise ConfigurationError(
             'The path to certificates directory must contain both '
             'certificate and key files for the specified host '
-            "('{0}', '{1}') or '{2}' directory with .pem files. "
-            'You provided: {3}'.format(cert_filename, key_filename, hostname, path),
+            "('{0}', '{1}'). You provided: {2}".format(cert_filename, key_filename, path),
         )
 
 

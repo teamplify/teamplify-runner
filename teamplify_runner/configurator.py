@@ -328,11 +328,6 @@ class Configurator:
             parser = self.remove_default_options(parser)
         try:
             with open(self.config_path, 'w') as f:
-                parser.set(
-                    'email',
-                    '; please note - Teamplify does not require email address '
-                    'confirmation when only the admin user is registered.',
-                )
                 parser.write(f)
         except OSError as e:
             raise ConfigurationError(

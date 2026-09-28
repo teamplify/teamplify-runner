@@ -631,7 +631,7 @@ def test_dump_and_dumps_write_the_same_configuration(tmp_path):
     # the options left at their defaults
     path = tmp_path / 'teamplify.ini'
     Configurator().dump(str(path), hide_defaults=False)
-    written = re.sub(r'^; please note.*\n', '', path.read_text(), flags=re.M)
+    written = path.read_text()
     assert written == Configurator().dumps()
 
 
@@ -659,18 +659,6 @@ def test_dump_hides_the_update_channel_left_at_its_default(tmp_path, main, hide_
     config(main=main).dump(str(path), hide_defaults=hide_defaults)
     lines = [written for written in path.read_text().splitlines() if 'update_channel' in written]
     assert lines == ([line] if line else [])
-
-
-def test_dump_writes_the_email_note_as_a_comment(tmp_path):
-    path = str(tmp_path / 'with-note.ini')
-    Configurator().dump(path)
-    notes = [line.strip() for line in open(path) if 'please note' in line]
-    assert len(notes) == 1
-    assert notes[0].startswith(';')
-
-    loaded = Configurator().load(path)
-    assert loaded.parser.options('email') == list(Configurator.defaults['email'])
-    assert loaded.validate_option('email', 'smtp_host', 'builtin_smtp') is None
 
 
 def test_load_only_overrides_the_options_that_the_file_sets(tmp_path):

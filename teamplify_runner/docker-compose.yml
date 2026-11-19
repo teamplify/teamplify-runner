@@ -81,6 +81,10 @@ services:
       - HTTPS_PORT
       - HTTP_PORT=${WEB_PORT}
       - TRUST_DOWNSTREAM_PROXY=true
+      # Mitigates the nginx2root HTTP/2 vulnerabilities until nginx-proxy ships nginx >= 1.31.9.
+      # DEFAULT_HOST replaces the fallback server, which enables HTTP/2 regardless of ENABLE_HTTP2.
+      - ENABLE_HTTP2=false
+      - DEFAULT_HOST=${WEB_HOST}
     ports:
       - ${WEB_PORT}:${WEB_PORT}
     restart: always
@@ -95,6 +99,10 @@ services:
       - HTTPS_PORT
       - HTTP_PORT=${WEB_PORT}
       - TRUST_DOWNSTREAM_PROXY=true
+      # Mitigates the nginx2root HTTP/2 vulnerabilities until nginx-proxy ships nginx >= 1.31.9.
+      # DEFAULT_HOST replaces the fallback server, which enables HTTP/2 regardless of ENABLE_HTTP2.
+      - ENABLE_HTTP2=false
+      - DEFAULT_HOST=${WEB_HOST}
     ports:
       - ${WEB_PORT}:${WEB_PORT}
       - ${HTTPS_PORT}:${HTTPS_PORT}

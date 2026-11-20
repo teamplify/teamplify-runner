@@ -1,8 +1,17 @@
+# Stops the backend while the DB or Redis is recreated, so that it doesn't fail
+# against them, and starts it again afterwards
+x-stateful-dependencies: &stateful-dependencies
+  builtin_db:
+    condition: service_started
+    restart: true
+  redis:
+    condition: service_started
+    restart: true
+
 x-app-base: &app-base
   image: ${IMAGE_APP}
   depends_on:
-    - builtin_db
-    - redis
+    <<: *stateful-dependencies
   links:
     - builtin_db
     - redis
@@ -48,6 +57,8 @@ services:
       - mysql_data:/var/lib/mysql/
       - ${DB_BACKUP_MOUNT}:/backup/
       - ./mysql.cnf:/etc/mysql/conf.d/teamplify.cnf:ro
+    labels:
+      - teamplify.config-hash=${MYSQL_CONFIG_HASH}
     restart: always
 
   redis:
@@ -55,6 +66,8 @@ services:
     container_name: teamplify_redis
     volumes:
       - ./redis.conf:/etc/redis/redis.conf:ro
+    labels:
+      - teamplify.config-hash=${REDIS_CONFIG_HASH}
     restart: always
     command: redis-server /etc/redis/redis.conf
 
@@ -74,6 +87,8 @@ services:
       # entry verbatim, so the wildcard vhost needs its own copy.
       - ./vhost.conf:/etc/nginx/vhost.d/*.${WEB_HOST}:ro
       - ./uwsgi_params.conf:/etc/nginx/uwsgi_params:ro
+    labels:
+      - teamplify.config-hash=${NGINX_CONFIG_HASH}
     volumes_from:
       - app:ro
     environment:
@@ -173,8 +188,11 @@ services:
   worker_slim: &worker
     image: ${IMAGE_APP}
     depends_on:
-      - app
-      - builtin_smtp
+      <<: *stateful-dependencies
+      app:
+        condition: service_started
+      builtin_smtp:
+        condition: service_started
     links:
       - builtin_db
       - redis

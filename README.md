@@ -42,7 +42,7 @@ also deploy on Mac OS X. Windows is not supported.
 Before you install, make sure that your system has the following components:
 
 * [Docker version 1.13 and above](https://docs.docker.com/install/);
-* [Docker Compose V2](https://docs.docker.com/compose/install/);
+* [Docker Compose 2.29.4 and above](https://docs.docker.com/compose/install/);
 * [Python 3.9 and above](https://www.python.org/downloads/);
 * [pip for Python 3](https://packaging.python.org/tutorials/installing-packages/#ensure-you-can-run-pip-from-the-command-line)
 

@@ -447,17 +447,26 @@ def _restore(env, filename):
     click.echo('Done.')
 
 
-def _remove_unused_images():
-    unused_images = run(
-        'docker images -f reference={0} -f dangling=true -q'.format(IMAGES['app']),
-        suppress_output=True,
-    ).stdout_lines
-    click.echo('Cleanup: {0} stale image(s) found'.format(len(unused_images)))
-    if unused_images:
-        # Suppress errors because it might be possible
-        # that some images are still used
+def _image_ids(env):
+    references = (env[f'IMAGE_{name.upper()}'] for name in IMAGES)
+    return {reference: _image_id(reference) for reference in references}
+
+
+def _remove_replaced_images(previous_image_ids):
+    # The containerd image store drops the repository name of a replaced image,
+    # so it can be found only by the ID it had before the pull
+    dangling = set(
         run(
-            'docker rmi {0}'.format(' '.join(unused_images)),
+            'docker images -f dangling=true -q --no-trunc',
+            suppress_output=True,
+        ).stdout_lines,
+    )
+    replaced = sorted(set(previous_image_ids.values()) & dangling)
+    click.echo(f'Cleanup: {len(replaced)} stale image(s) found')
+    if replaced:
+        # Docker refuses to remove images that containers of other applications still use
+        run(
+            f'docker rmi {" ".join(replaced)}',
             suppress_output=True,
             raise_on_error=False,
         )
@@ -669,19 +678,24 @@ def update(ctx):
     Update to the latest version
     """
     env = ctx.obj['env']
-    if _running(env):
+    running = _running(env)
+    if running:
         _offer_backup(env)
-        current_image = _image_id(env['IMAGE_APP'])
-        run('docker pull {0}'.format(env['IMAGE_APP']), capture_output=False)
-        new_image = _image_id(env['IMAGE_APP'])
-        if current_image != new_image:
+    previous_image_ids = _image_ids(env)
+    _pull_images(env)
+    if running:
+        if _image_id(env['IMAGE_APP']) != previous_image_ids[env['IMAGE_APP']]:
             _stop(env)
-            _start(env)
-            click.echo('')
-    else:
-        run('docker pull {0}'.format(env['IMAGE_APP']))
-    _remove_unused_images()
+        # Compose recreates only the containers whose image or configuration has changed
+        _start(env)
+        click.echo('')
+    _remove_replaced_images(previous_image_ids)
     click.echo('Done.')
+
+
+def _pull_images(env):
+    with cd(BASE_DIR):
+        compose('pull', capture_output=False, env=env)
 
 
 @cli.command()

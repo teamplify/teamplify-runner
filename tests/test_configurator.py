@@ -1,10 +1,18 @@
 import os
 import re
+import shutil
 
 import pytest
+import yaml
 
-from teamplify_runner import acme_dns
-from teamplify_runner.configurator import ConfigurationError, Configurator
+from teamplify_runner import acme_dns, configurator
+from teamplify_runner.configurator import (
+    BASE_DIR,
+    MOUNTED_CONFIGS,
+    ConfigurationError,
+    Configurator,
+    files_hash,
+)
 
 
 PRODUCT_KEY = 'svr_Q5Luvv4yZbhbdale-kzbToeKyVsthN5yx35Hh'
@@ -940,6 +948,87 @@ def test_env_hosts(ssl_setups, setup, multi_workspace, virtual_host, letsencrypt
 )
 def test_env_postmaster_address(host, postmaster):
     assert config(web={'host': host}).env()['POSTMASTER_EMAIL'] == postmaster
+
+
+def compose_services():
+    """
+    Files mounted from the runner and the env variables interpolated into the
+    config hash label, for each compose service.
+    """
+    with open(os.path.join(BASE_DIR, 'docker-compose.yml')) as f:
+        services = yaml.safe_load(f)['services']
+    result = {}
+    for name, service in services.items():
+        files = {
+            volume.split(':', 1)[0].removeprefix('./')
+            for volume in service.get('volumes', [])
+            if volume.startswith('./')
+        }
+        hash_variables = {
+            match[1]
+            for label in service.get('labels', [])
+            if (match := re.fullmatch(r'teamplify\.config-hash=\$\{(\w+)\}', label))
+        }
+        result[name] = files, hash_variables
+    return result
+
+
+SERVICES_WITH_MOUNTED_CONFIGS = [name for name, (files, _) in compose_services().items() if files]
+
+
+@pytest.mark.parametrize('service', SERVICES_WITH_MOUNTED_CONFIGS)
+def test_every_mounted_config_is_fingerprinted_in_the_service_label(service):
+    files, hash_variables = compose_services()[service]
+    assert len(hash_variables) == 1
+    assert set(MOUNTED_CONFIGS[hash_variables.pop()]) == files
+
+
+def test_every_config_hash_is_used_by_a_service():
+    used = set().union(*(hash_variables for _, hash_variables in compose_services().values()))
+    assert used == set(MOUNTED_CONFIGS)
+
+
+MOUNTED_FILE_HASH_VARIABLES = sorted(
+    {
+        (file, hash_variable)
+        for files, hash_variables in compose_services().values()
+        for file in files
+        for hash_variable in hash_variables
+    }
+)
+
+
+@pytest.mark.parametrize('file,hash_variable', MOUNTED_FILE_HASH_VARIABLES)
+def test_editing_a_mounted_config_changes_the_hash_in_its_service_label(
+    tmp_path, monkeypatch, file, hash_variable
+):
+    runner_dir = tmp_path / 'runner'
+    shutil.copytree(BASE_DIR, runner_dir)
+    monkeypatch.setattr(configurator, 'BASE_DIR', str(runner_dir))
+    before = config().env()[hash_variable]
+    with open(runner_dir / file, 'a') as f:
+        f.write('\n# edited\n')
+    assert config().env()[hash_variable] != before
+
+
+def test_files_hash_follows_the_contents_of_every_file(tmp_path):
+    first, second = tmp_path / 'first.conf', tmp_path / 'second.conf'
+    first.write_text('a')
+    second.write_text('b')
+    before = files_hash(first, second)
+    assert files_hash(first, second) == before
+    second.write_text('c')
+    assert files_hash(first, second) != before
+
+
+def test_files_hash_tells_apart_where_the_contents_split(tmp_path):
+    first, second = tmp_path / 'first.conf', tmp_path / 'second.conf'
+    first.write_text('ab')
+    second.write_text('c')
+    before = files_hash(first, second)
+    first.write_text('a')
+    second.write_text('bc')
+    assert files_hash(first, second) != before
 
 
 # the helpers that the rules above are built on

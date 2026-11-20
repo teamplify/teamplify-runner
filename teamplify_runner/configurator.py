@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+import hashlib
 import io
 import os
 import pickle
@@ -13,6 +16,24 @@ from teamplify_runner.utils import is_ip_address, random_string
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Compose does not track the contents of bind-mounted files, so their hashes go
+# into container labels to make it recreate the containers when they change
+MOUNTED_CONFIGS = {
+    'MYSQL_CONFIG_HASH': ('mysql.cnf',),
+    'REDIS_CONFIG_HASH': ('redis.conf',),
+    'NGINX_CONFIG_HASH': ('vhost.conf', 'uwsgi_params.conf'),
+}
+
+
+def files_hash(*paths: str | os.PathLike[str]) -> str:
+    digest = hashlib.sha256()
+    for path in paths:
+        with open(path, 'rb') as f:
+            content = f.read()
+        digest.update(f'{len(content)}:'.encode())
+        digest.update(content)
+    return digest.hexdigest()
 
 
 class ConfigurationError(Exception):
@@ -417,6 +438,9 @@ class Configurator:
         env['COMPOSE_PROFILES'] = 'nossl'
         env['HTTPS_METHOD'] = 'nohttps'
         env['HTTPS_PORT'] = env['WEB_SSL_PORT']
+
+        for name, files in MOUNTED_CONFIGS.items():
+            env[name] = files_hash(*(os.path.join(BASE_DIR, file) for file in files))
 
         # Postfix
         env['ENABLE_CLAMAV'] = 'false'
